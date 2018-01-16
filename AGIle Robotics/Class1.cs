@@ -1,12 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AGIle_Robotics
+﻿namespace AGIle_Robotics
 {
-    public class Class1
+    public interface Population
     {
+
+    }
+
+    public interface NeuronalNetwork
+    {
+
+    }
+
+    public interface Neuron
+    {
+
+    }
+
+    public interface NeuronLayer
+    {
+        Neuron[] Neurons { get; }
+    }
+
+    public class Trainer
+    {
+
     }
 }
