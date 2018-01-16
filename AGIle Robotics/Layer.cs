@@ -12,12 +12,12 @@ namespace AGIle_Robotics
         public INeuron[] Neurons { get => neurons; private set => neurons = value; }
         private INeuron[] neurons;
 
-        public Layer(int size, int inputSize, Func<double, double> activateWith)
+        public Layer(int size, int inputSize, Tuple<double, double> weightRange, Func<double, double> activateWith)
         {
             Neurons = new INeuron[size];
             for(int i = 0; i < Neurons.Length; i++)
             {
-                Neurons[i] = new Neuron(inputSize, activateWith);
+                Neurons[i] = new Neuron(inputSize, weightRange, activateWith);
             }
         }
 

@@ -12,12 +12,6 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-            INeuron neuron = new Neuron(3, Math.Abs);
-            double[] input = new double[] { 1, 0.5, -0.75 };
-            var output = neuron.Activate(input);
-            foreach (var o in output)
-                Console.WriteLine(o);
-
             Console.ReadLine();
         }
     }

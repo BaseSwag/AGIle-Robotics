@@ -16,13 +16,13 @@ namespace AGIle_Robotics
 
         public int OutputSize => Layers.Length > 0 ? Layers[Layers.Length - 1].Neurons.Length : 0;
 
-        public NeuralNetwork(int[] definition, Func<double, double> activateWith)
+        public NeuralNetwork(int[] definition, Tuple<double, double> weightRange, Func<double, double> activateWith)
         {
             Layers = new ILayer[definition.Length];
             for(int i = 0; i < definition.Length; i++)
             {
                 int inputSize = i > 0 ? definition[i - 1] : definition[i];
-                ILayer layer = new Layer(definition[i], inputSize, activateWith);
+                ILayer layer = new Layer(definition[i], inputSize, weightRange, activateWith);
                 Layers[i] = layer;
             }
         }

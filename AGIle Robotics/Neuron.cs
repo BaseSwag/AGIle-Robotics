@@ -13,16 +13,20 @@ namespace AGIle_Robotics
         private double[] inputWeights;
 
         public Func<double, double> ActivationFunction { get => activationFunction; private set => activationFunction = value; }
+        public Tuple<double, double> WeightRange { get => weightRange; set => weightRange = value; }
+        private Tuple<double, double> weightRange;
+
         private Func<double, double> activationFunction;
 
-        public Neuron(int inputSize, Func<double, double> activateWith)
+        public Neuron(int inputSize, Tuple<double, double> weightRange, Func<double, double> activateWith)
         {
+            WeightRange = weightRange;
             ActivationFunction = activateWith;
 
             InputWeights = new double[inputSize];
             for(int i = 0; i < InputWeights.Length; i++)
             {
-                InputWeights[i] = Environment.RandomDouble(-1, 1);
+                InputWeights[i] = Environment.RandomDouble(weightRange.Item1, weightRange.Item2);
             }
         }
 
