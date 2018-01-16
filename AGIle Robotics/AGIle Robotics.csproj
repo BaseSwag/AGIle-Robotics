@@ -42,13 +42,16 @@
   <ItemGroup>
     <Compile Include="Class1.cs" />
     <Compile Include="Environment.cs" />
-    <Compile Include="IEvolvable.cs" />
-    <Compile Include="ILayer.cs" />
-    <Compile Include="INeuralNetwork.cs" />
-    <Compile Include="INeuron.cs" />
-    <Compile Include="INeuralElement.cs" />
+    <Compile Include="Interfaces\IEvolvable.cs" />
+    <Compile Include="Interfaces\ILayer.cs" />
+    <Compile Include="Interfaces\INeuralNetwork.cs" />
+    <Compile Include="Interfaces\INeuron.cs" />
+    <Compile Include="Interfaces\INeuralElement.cs" />
+    <Compile Include="Layer.cs" />
+    <Compile Include="NeuralNetwork.cs" />
     <Compile Include="Neuron.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

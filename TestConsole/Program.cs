@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AGIle_Robotics;
+using AGIle_Robotics.Interfaces;
 
 namespace TestConsole
 {
@@ -11,7 +12,7 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-            INeuron neuron = new Neuron(3);
+            INeuron neuron = new Neuron(3, Math.Abs);
             double[] input = new double[] { 1, 0.5, -0.75 };
             var output = neuron.Activate(input);
             foreach (var o in output)

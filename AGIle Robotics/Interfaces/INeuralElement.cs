@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AGIle_Robotics
+namespace AGIle_Robotics.Interfaces
 {
-    public interface ILayer : INeuralElement
+    public interface INeuralElement
     {
-        INeuron[] Neurons { get; }
+        double[] Activate(double[] input);
     }
 }

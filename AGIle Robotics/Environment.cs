@@ -8,6 +8,8 @@ namespace AGIle_Robotics
 {
     public static class Environment
     {
+        public static readonly Func<double, double> DefaultActivationFunction;
+
         public static Random RNG = new Random();
 
         public static double RandomInt(int min, int max) => RNG.Next(min, max);

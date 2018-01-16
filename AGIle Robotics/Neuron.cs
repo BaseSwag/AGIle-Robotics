@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AGIle_Robotics.Interfaces;
 
 namespace AGIle_Robotics
 {
@@ -11,11 +12,13 @@ namespace AGIle_Robotics
         public double[] InputWeights { get => inputWeights; set => inputWeights = value; }
         private double[] inputWeights;
 
-        public Func<double, double> ActivationFunction { get => activationFunction; }
-        private Func<double, double> activationFunction => Math.Abs;
+        public Func<double, double> ActivationFunction { get => activationFunction; private set => activationFunction = value; }
+        private Func<double, double> activationFunction;
 
-        public Neuron(int inputSize)
+        public Neuron(int inputSize, Func<double, double> activateWith)
         {
+            ActivationFunction = activateWith;
+
             InputWeights = new double[inputSize];
             for(int i = 0; i < InputWeights.Length; i++)
             {

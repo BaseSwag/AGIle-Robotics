@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AGIle_Robotics
+namespace AGIle_Robotics.Interfaces
 {
     public interface IEvolvable
     {
