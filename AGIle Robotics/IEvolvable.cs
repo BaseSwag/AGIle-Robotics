@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AGIle_Robotics
 {
-    interface IEvolvable
+    public interface IEvolvable
     {
         IEvolvable Evolve();
     }

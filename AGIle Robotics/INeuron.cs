@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AGIle_Robotics
 {
-    interface INeuron : INeuralElement
+    public interface INeuron : INeuralElement
     {
         double[] InputWeights { get; set; }
         Func<double,double> ActivationFunction { get; }

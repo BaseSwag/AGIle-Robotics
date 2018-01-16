@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AGIle_Robotics
 {
-    interface INeuralElement
+    public interface INeuralElement
     {
         double[] Activate(double[] input);
     }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AGIle_Robotics
 {
-    interface ILayer : INeuralElement
+    public interface ILayer : INeuralElement
     {
         INeuron[] Neurons { get; }
     }

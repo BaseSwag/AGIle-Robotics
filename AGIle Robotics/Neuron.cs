@@ -6,13 +6,22 @@ using System.Threading.Tasks;
 
 namespace AGIle_Robotics
 {
-    class Neuron : INeuron
+    public class Neuron : INeuron
     {
         public double[] InputWeights { get => inputWeights; set => inputWeights = value; }
+        private double[] inputWeights;
+
         public Func<double, double> ActivationFunction { get => activationFunction; }
         private Func<double, double> activationFunction => Math.Abs;
 
-        private double[] inputWeights;
+        public Neuron(int inputSize)
+        {
+            InputWeights = new double[inputSize];
+            for(int i = 0; i < InputWeights.Length; i++)
+            {
+                InputWeights[i] = Environment.RandomDouble(-1, 1);
+            }
+        }
 
         public double[] Activate(double[] input)
         {
