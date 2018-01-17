@@ -45,8 +45,10 @@
   <ItemGroup>
     <Compile Include="Class1.cs" />
     <Compile Include="Environment.cs" />
+    <Compile Include="Generation.cs" />
     <Compile Include="Interfaces\IElement.cs" />
     <Compile Include="Interfaces\IEvolvable.cs" />
+    <Compile Include="Interfaces\IGeneration.cs" />
     <Compile Include="Interfaces\ILayer.cs" />
     <Compile Include="Interfaces\INeuralNetwork.cs" />
     <Compile Include="Interfaces\INeuron.cs" />

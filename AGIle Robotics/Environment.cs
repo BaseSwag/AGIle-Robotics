@@ -10,12 +10,22 @@ namespace AGIle_Robotics
     {
         public static readonly Func<double, double> DefaultActivationFunction;
 
-        public static Random RNG = new Random();
+        private static Random RNG = new Random();
 
-        public static int RandomInt(int min, int max) => RNG.Next(min, max);
+        public static int RandomInt(int min, int max)
+        {
+            lock (RNG)
+            {
+                return RNG.Next(min, max);
+            }
+        }
         public static double RandomDouble(double min = 0, double max = 1)
         {
-            double rand = RNG.NextDouble();
+            double rand;
+            lock (RNG)
+            {
+                rand = RNG.NextDouble();
+            }
             if(min != 0 || max != 1)
                 rand = Map(rand, 0, 1, min, max);
 
