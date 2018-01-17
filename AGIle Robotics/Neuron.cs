@@ -70,5 +70,19 @@ namespace AGIle_Robotics
                 throw new InvalidOperationException("Cannot perform CrossOver on Neurons with different InputWeights sizes.");
             }
         }
+
+        public void Mutate(double ratio)
+        {
+            for(int i = 0; i < InputWeights.Length; i++)
+            {
+                if (Environment.RandomBool(ratio))
+                {
+                    double rand = InputWeights[i];
+                    rand += Environment.RandomDouble(-Math.Abs(ratio), Math.Abs(ratio));
+                    rand = Environment.Cap(rand, WeightRange);
+                    InputWeights[i] = rand;
+                }
+            }
+        }
     }
 }

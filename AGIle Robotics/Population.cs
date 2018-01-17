@@ -79,6 +79,8 @@ namespace AGIle_Robotics
                 {
                     Best = net;
                 }
+
+                newPopulation.Networks[i].Mutate(mutationRatio); // Mutate
             }
             return newPopulation;
         }

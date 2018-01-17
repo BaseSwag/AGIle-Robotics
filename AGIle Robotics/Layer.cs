@@ -62,5 +62,13 @@ namespace AGIle_Robotics
                 throw new InvalidOperationException("Cannot perform CrossOver on Layers with different inputs.");
             }
         }
+
+        public void Mutate(double ratio)
+        {
+            for(int i = 0; i < Neurons.Length; i++)
+            {
+                Neurons[i].Mutate(ratio);
+            }
+        }
     }
 }

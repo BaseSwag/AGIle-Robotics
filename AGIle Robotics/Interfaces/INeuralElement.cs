@@ -12,5 +12,6 @@ namespace AGIle_Robotics.Interfaces
         Func<double, double> ActivationFunction { get; }
         double[] Activate(double[] input);
         INeuralElement CrossOver(INeuralElement e, double p1, double p2);
+        void Mutate(double ratio);
     }
 }

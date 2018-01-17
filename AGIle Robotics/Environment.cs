@@ -16,13 +16,28 @@ namespace AGIle_Robotics
         public static double RandomDouble(double min = 0, double max = 1)
         {
             double rand = RNG.NextDouble();
-            rand = Map(rand, 0, 1, min, max);
+            if(min != 0 || max != 1)
+                rand = Map(rand, 0, 1, min, max);
+
             return rand;
+        }
+        public static bool RandomBool(double probability)
+        {
+            double rand = RandomDouble();
+            return rand < probability;
         }
 
         public static dynamic Map(dynamic x, dynamic in_min, dynamic in_max, dynamic out_min, dynamic out_max)
         {
             return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+        }
+
+        public static double Cap(double x, (double, double) caps) => Cap(x, caps.Item1, caps.Item2);
+        public static double Cap(double x, double min, double max)
+        {
+            x = Math.Max(min, x);
+            x = Math.Min(max, x);
+            return x;
         }
 
         public static bool DecideByProbability(double p1, double p2)
