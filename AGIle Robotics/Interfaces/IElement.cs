@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace AGIle_Robotics.Interfaces
 {
-    public interface IPopulation : IEvolvable
+    public interface IElement
     {
-        INeuralNetwork[] Networks { get; }
+        (double, double) WeightRange { get; }
+        Func<double, double> ActivationFunction { get; }
     }
 }

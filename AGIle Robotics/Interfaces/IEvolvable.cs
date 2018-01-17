@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace AGIle_Robotics.Interfaces
 {
-    public interface IEvolvable
+    public interface IEvolvable : IElement
     {
-        (double, double) WeightRange { get; }
         INeuralNetwork Best { get; }
         IEvolvable Evolve(double transitionRatio, double randomRatio, double mutationRate);
     }
