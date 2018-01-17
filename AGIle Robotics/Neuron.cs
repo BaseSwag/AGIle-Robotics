@@ -13,20 +13,24 @@ namespace AGIle_Robotics
         private double[] inputWeights;
 
         public Func<double, double> ActivationFunction { get => activationFunction; private set => activationFunction = value; }
-        public Tuple<double, double> WeightRange { get => weightRange; set => weightRange = value; }
-        private Tuple<double, double> weightRange;
-
         private Func<double, double> activationFunction;
 
-        public Neuron(int inputSize, Tuple<double, double> weightRange, Func<double, double> activateWith)
+        public (double, double) WeightRange { get => weightRange; set => weightRange = value; }
+        private (double, double) weightRange;
+
+
+        public Neuron(int inputSize, (double, double) weightRange, Func<double, double> activateWith, bool init = true)
         {
             WeightRange = weightRange;
             ActivationFunction = activateWith;
 
             InputWeights = new double[inputSize];
-            for(int i = 0; i < InputWeights.Length; i++)
+            if (init)
             {
-                InputWeights[i] = Environment.RandomDouble(weightRange.Item1, weightRange.Item2);
+                for(int i = 0; i < InputWeights.Length; i++)
+                {
+                    InputWeights[i] = Environment.RandomDouble(weightRange.Item1, weightRange.Item2);
+                }
             }
         }
 
@@ -44,6 +48,27 @@ namespace AGIle_Robotics
 
             double output = ActivationFunction(wSum); // Use activation function
             return new double[] { output };
+        }
+
+        public INeuralElement CrossOver(INeuralElement e, double p1, double p2)
+        {
+            var neuron2 = e as Neuron;
+            int len = InputWeights.Length;
+
+            if(len == neuron2?.InputWeights.Length)
+            {
+                var newNeuron = new Neuron(len, WeightRange, ActivationFunction, false);
+                for(int i = 0; i < len; i++)
+                {
+                    var decision = Environment.DecideByProbability(p1, p2);
+                    newNeuron.InputWeights[i] = decision ? neuron2.InputWeights[i] : InputWeights[i];
+                }
+                return newNeuron;
+            }
+            else
+            {
+                throw new InvalidOperationException("Cannot perform CrossOver on Neurons with different InputWeights sizes.");
+            }
         }
     }
 }

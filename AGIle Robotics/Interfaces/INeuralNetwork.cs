@@ -11,5 +11,7 @@ namespace AGIle_Robotics.Interfaces
         ILayer[] Layers { get; }
         int InputSize { get; }
         int OutputSize { get; }
+        int[] Definition { get; }
+        double Fitness { get; set; }
     }
 }

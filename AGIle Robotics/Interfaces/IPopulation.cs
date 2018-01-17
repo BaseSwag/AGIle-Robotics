@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace AGIle_Robotics.Interfaces
 {
-    public interface INeuralElement
+    public interface IPopulation : IEvolvable
     {
-        (double, double) WeightRange { get; }
+        INeuralNetwork[] Networks { get; }
         Func<double, double> ActivationFunction { get; }
-        double[] Activate(double[] input);
-        INeuralElement CrossOver(INeuralElement e, double p1, double p2);
     }
 }
