@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class AIInput : MonoBehaviour {
+public class AIInput : MonoBehaviour
+{
 
     [System.Serializable]
     public class UnityFloatEvent : UnityEvent<float[]> { };
@@ -21,15 +22,17 @@ public class AIInput : MonoBehaviour {
     }
 
     // Use this for initialization
-    void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    void Start()
+    {
 
-        if(OnInput != null)
-            OnInput.Invoke(new float[] { inputs[0] / 180, 0.5f });
-        		
-	}
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+        if (OnInput != null)
+            OnInput.Invoke(new float[] { Mathf.Clamp(inputs[0] / 90, -1f, 1f), 1f });
+
+    }
 }

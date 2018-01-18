@@ -44,17 +44,24 @@ public class CarController : MonoBehaviour
         Vector3 difference = target.position - transform.position;
         float rotationZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
 
-        lookRotationRelative = rotationZ + this.transform.rotation.eulerAngles.z;
+        lookRotationRelative = rotationZ - this.transform.rotation.eulerAngles.z;
 
 
         while (lookRotationRelative > 180)
             lookRotationRelative -= 360;
-       
+
+        while (lookRotationRelative < -180)
+            lookRotationRelative += 360;
+
 
         lookRotationRelativeClamped = Mathf.Clamp(lookRotationRelative, -45, 45);
+
         Debug.DrawLine(transform.position, target.position);
 
-        OnSetAIInputs.Invoke(new float[] { lookRotationRelative, 0 });
+
+        //this.transform.rotation = Quaternion.Euler(0, 0, rotationZ);
+
+        OnSetAIInputs.Invoke(new float[] { -lookRotationRelative, 0 });
 
     }
 
