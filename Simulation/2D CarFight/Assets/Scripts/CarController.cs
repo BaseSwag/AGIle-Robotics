@@ -65,6 +65,18 @@ public class CarController : MonoBehaviour
 
     }
 
+    public void OnExitInnerCircle(Collider2D collider)
+    {
+        if (collider.gameObject == this.gameObject)
+            Debug.Log("Exit inner Circle");
+    }
+
+    public void OnExitOuterCircle(Collider2D collider)
+    {
+        if (collider.gameObject == this.gameObject)
+            Debug.Log("Exit outer Circle");
+    }
+
     public void OnInput(float[] inputs)
     {
         hortizontal = inputs[0];
