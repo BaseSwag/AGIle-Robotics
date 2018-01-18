@@ -12,7 +12,7 @@ namespace AGIle_Robotics
         public int MaxThreads
         {
             get => maxThreads;
-            private set
+            set
             {
                 if(value != maxThreads)
                 {

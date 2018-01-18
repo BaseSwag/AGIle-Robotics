@@ -42,7 +42,7 @@ namespace TestConsole
 
             Console.WriteLine();
 
-            workPool = new WorkPool(8);
+            workPool.MaxThreads = 8;
             Console.WriteLine("WorkPool 2");
             start = DateTime.Now;
             TestPool();
