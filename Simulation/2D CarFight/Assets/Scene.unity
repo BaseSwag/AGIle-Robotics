@@ -228,11 +228,144 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8c761657271a8df4280d0d8b0c14edb9, type: 2}
   m_IsPrefabParent: 0
+--- !u!114 &778340356 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114389314356173660, guid: 8c761657271a8df4280d0d8b0c14edb9,
+    type: 2}
+  m_PrefabInternal: {fileID: 736878615}
+  m_Script: {fileID: 11500000, guid: 4ba61f4e80318f144ae153495219dad3, type: 3}
 --- !u!4 &902719708 stripped
 Transform:
   m_PrefabParentObject: {fileID: 4674788593316606, guid: 2004a5b5cddb0a64b9e851c0219660e8,
     type: 2}
   m_PrefabInternal: {fileID: 1643087609}
+--- !u!1001 &1196358105
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4514166045819016, guid: 51052258c4ba0044da5117ee83a76506, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4514166045819016, guid: 51052258c4ba0044da5117ee83a76506, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4514166045819016, guid: 51052258c4ba0044da5117ee83a76506, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4514166045819016, guid: 51052258c4ba0044da5117ee83a76506, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4514166045819016, guid: 51052258c4ba0044da5117ee83a76506, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4514166045819016, guid: 51052258c4ba0044da5117ee83a76506, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4514166045819016, guid: 51052258c4ba0044da5117ee83a76506, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4514166045819016, guid: 51052258c4ba0044da5117ee83a76506, type: 2}
+      propertyPath: m_RootOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4514166045819016, guid: 51052258c4ba0044da5117ee83a76506, type: 2}
+      propertyPath: m_LocalScale.x
+      value: 4.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4514166045819016, guid: 51052258c4ba0044da5117ee83a76506, type: 2}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4514166045819016, guid: 51052258c4ba0044da5117ee83a76506, type: 2}
+      propertyPath: m_LocalScale.y
+      value: 4.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1570196542652804, guid: 51052258c4ba0044da5117ee83a76506, type: 2}
+      propertyPath: m_Name
+      value: circle (1)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: 51052258c4ba0044da5117ee83a76506, type: 2}
+  m_IsPrefabParent: 0
+--- !u!1 &1500869661 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1570196542652804, guid: 51052258c4ba0044da5117ee83a76506,
+    type: 2}
+  m_PrefabInternal: {fileID: 1196358105}
+--- !u!114 &1500869662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1500869661}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d3755269356f5941b421df2cbfc993c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnExit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 778340356}
+        m_MethodName: OnExitOuterCircle
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1638290766}
+        m_MethodName: OnExitOuterCircle
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_TypeName: OnExitListener+UnityOnTriggerEvitEvent, Assembly-CSharp, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+--- !u!114 &1500869663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1500869661}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f57d9112e4aa9524e94a6be9c1747ed0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!58 &1500869664
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1500869661}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 10
 --- !u!1 &1627402444 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 1570196542652804, guid: 51052258c4ba0044da5117ee83a76506,
@@ -255,7 +388,7 @@ CircleCollider2D:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1627402444}
-  m_Enabled: 0
+  m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 1
@@ -264,6 +397,50 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 10
+--- !u!114 &1627402449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1627402444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d3755269356f5941b421df2cbfc993c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnExit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 778340356}
+        m_MethodName: OnExitInnerCircle
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1638290766}
+        m_MethodName: OnExitInnerCircle
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_TypeName: OnExitListener+UnityOnTriggerEvitEvent, Assembly-CSharp, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+--- !u!114 &1638290766 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114869975049438854, guid: 2004a5b5cddb0a64b9e851c0219660e8,
+    type: 2}
+  m_PrefabInternal: {fileID: 1643087609}
+  m_Script: {fileID: 11500000, guid: 4ba61f4e80318f144ae153495219dad3, type: 3}
 --- !u!1001 &1643087609
 Prefab:
   m_ObjectHideFlags: 0
