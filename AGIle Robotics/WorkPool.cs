@@ -9,7 +9,21 @@ namespace AGIle_Robotics
 {
     public class WorkPool
     {
-        public int MaxThreads { get => maxThreads; private set => maxThreads = value; }
+        public int MaxThreads
+        {
+            get => maxThreads;
+            private set
+            {
+                if(value != maxThreads)
+                {
+                    maxThreads = value;
+                    lock (workers)
+                    {
+                        Array.Resize(ref workers, maxThreads);
+                    }
+                }
+            }
+        }
         private int maxThreads;
 
         private Queue<Task> taskList = new Queue<Task>();
@@ -21,7 +35,6 @@ namespace AGIle_Robotics
         public WorkPool(int _maxThreads)
         {
             MaxThreads = _maxThreads;
-            workers = new Task[MaxThreads];
 
             TaskEnqueued += WorkPool_TaskEnqueued;
             TaskFinished += WorkPool_TaskFinished;
@@ -63,6 +76,7 @@ namespace AGIle_Robotics
                 }
             }
         }
+
         private void WorkPool_TaskEnqueued(object sender, Task e)
         {
             CheckScheduling();
