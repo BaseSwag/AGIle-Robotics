@@ -41,7 +41,7 @@ namespace AGIle_Robotics
             {
                 for (int i = 0; i < workers.Length; i++)
                 {
-                    if (workers[i].IsCompleted || workers[i].IsCanceled || workers[i].IsFaulted)
+                    if (workers[i] == null || workers[i].IsCompleted || workers[i].IsCanceled || workers[i].IsFaulted)
                     {
                         worker = i;
                         break;
@@ -58,7 +58,6 @@ namespace AGIle_Robotics
                             workers[worker] = nextTask;
                             nextTask.Start();
                             nextTask.ContinueWith(t => TaskFinished?.Invoke(this, t));
-                            Console.WriteLine($"Started: {nextTask.Id}");
                         }
                     }
                 }
@@ -66,7 +65,6 @@ namespace AGIle_Robotics
         }
         private void WorkPool_TaskEnqueued(object sender, Task e)
         {
-            Console.WriteLine($"Enqueued: {e.Id}");
             CheckScheduling();
         }
 
