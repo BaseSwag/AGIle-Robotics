@@ -43,7 +43,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
     <Compile Include="Environment.cs" />
     <Compile Include="Generation.cs" />
     <Compile Include="Interfaces\IElement.cs" />
