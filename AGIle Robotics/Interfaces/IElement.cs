@@ -8,7 +8,7 @@ namespace AGIle_Robotics.Interfaces
 {
     public interface IElement
     {
-        (double, double) WeightRange { get; }
+        Tuple<double, double> WeightRange { get; }
         Func<double, double> ActivationFunction { get; }
     }
 }

@@ -21,11 +21,13 @@ namespace TestConsole
         {
             var generation = new Generation(
                 size: 50,
-                popSize: (50, 100),
-                ports: (4, 2),
-                length: (10, 100),
-                width: (10, 50),
-                weightRange: (-2, 2));
+                popSize: (50, 100).ToTuple(),
+                ports: (4, 2).ToTuple(),
+                length: (10, 100).ToTuple(),
+                width: (10, 50).ToTuple(),
+                weightRange: (-2.0, 2.0).ToTuple(),
+                activateWith: Math.Tanh
+                );
 
             generation.Create().Wait();
             generation.Evaluate(fitnessFunction);
