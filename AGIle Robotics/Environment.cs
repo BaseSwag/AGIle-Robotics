@@ -12,7 +12,7 @@ namespace AGIle_Robotics
 
         private static Random RNG = new Random();
 
-        public static int RandomInt((int, int) range) => RandomInt(range.Item1, range.Item2);
+        public static int RandomInt(Tuple<int, int> range) => RandomInt(range.Item1, range.Item2);
         public static int RandomInt(int max) => RandomInt(0, max);
         public static int RandomInt(int min, int max)
         {
@@ -44,7 +44,7 @@ namespace AGIle_Robotics
             return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
         }
 
-        public static double Cap(double x, (double, double) caps) => Cap(x, caps.Item1, caps.Item2);
+        public static double Cap(double x, Tuple<double, double> caps) => Cap(x, caps.Item1, caps.Item2);
         public static double Cap(double x, double min, double max)
         {
             x = Math.Max(min, x);
@@ -58,5 +58,6 @@ namespace AGIle_Robotics
             var rand = RandomDouble();
             return rand >= probability;
         }
+
     }
 }

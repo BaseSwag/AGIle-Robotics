@@ -50,29 +50,26 @@ namespace AGIle_Robotics
         }
         public INeuralNetwork best;
 
-        public (int, int) Ports { get => ports; private set => ports = value; }
-        public (int, int) ports;
+        public Tuple<int, int> Ports { get => ports; private set => ports = value; }
+        public Tuple<int, int> ports;
 
-        public (int, int) PopulationSize { get => populationSize; private set => populationSize = value; }
-        public (int, int) populationSize;
+        public Tuple<int, int> PopulationSize { get => populationSize; private set => populationSize = value; }
+        public Tuple<int, int> populationSize;
 
-        public (double, double) WeightRange { get => weightRange; private set => weightRange = value; }
-        private (double, double) weightRange;
+        public Tuple<double, double> WeightRange { get => weightRange; private set => weightRange = value; }
+        private Tuple<double, double> weightRange;
 
         public Func<double, double> ActivationFunction { get => activationFunction; private set => activationFunction = value; }
         private Func<double, double> activationFunction = Math.Tanh;
 
-        public (int, int) Length { get => length; private set => length = value; }
-        public (int, int) length;
+        public Tuple<int, int> Length { get => length; private set => length = value; }
+        public Tuple<int, int> length;
 
-        public (int, int) Width { get => width; private set => width = value; }
-        public (int, int) width;
+        public Tuple<int, int> Width { get => width; private set => width = value; }
+        public Tuple<int, int> width;
 
-        public Generation(int size, (int, int) popSize, (int, int) ports, (int, int) length, (int, int) width, (double, double) weightRange)
-            => Init(size, popSize, ports, length, width, weightRange, Math.Tanh);
-        public Generation(int size, (int, int) popSize, (int, int) ports, (int, int) length, (int, int) width, (double, double) weightRange, Func<double, double> activateWith)
-            => Init(size, popSize, ports, length, width, weightRange, activateWith);
-        private void Init(int size, (int, int) popSize, (int, int) ports, (int, int) length, (int, int) width, (double, double) weightRange, Func<double, double> activateWith)
+
+        public Generation(int size, Tuple<int, int> popSize, Tuple<int, int> ports, Tuple<int, int> length, Tuple<int, int> width, Tuple<double, double> weightRange, Func<double, double> activateWith)
         {
             Size = size;
             PopulationSize = popSize;

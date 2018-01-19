@@ -15,10 +15,10 @@ namespace AGIle_Robotics
         public Func<double, double> ActivationFunction { get => activationFunction; private set => activationFunction = value; }
         private Func<double, double> activationFunction;
 
-        public (double, double) WeightRange { get => weightRange; set => weightRange = value; }
-        private (double, double) weightRange;
+        public Tuple<double, double> WeightRange { get => weightRange; set => weightRange = value; }
+        private Tuple<double, double> weightRange;
 
-        public Neuron(int inputSize, (double, double) weightRange, Func<double, double> activateWith, bool init = true)
+        public Neuron(int inputSize, Tuple<double, double> weightRange, Func<double, double> activateWith, bool init = true)
         {
             WeightRange = weightRange;
             ActivationFunction = activateWith;
