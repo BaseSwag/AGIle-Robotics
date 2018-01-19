@@ -19,7 +19,13 @@ namespace TestConsole
 
         static void Main(string[] args)
         {
-            var generation = new Generation(50, (50, 100), (4, 2), (10, 100), (10, 50), (-2, 2));
+            var generation = new Generation(
+                size: 50,
+                popSize: (50, 100),
+                ports: (4, 2),
+                length: (10, 100),
+                width: (10, 50),
+                weightRange: (-2, 2));
 
             generation.Create().Wait();
 

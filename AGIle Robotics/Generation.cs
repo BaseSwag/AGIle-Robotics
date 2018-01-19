@@ -51,24 +51,22 @@ namespace AGIle_Robotics
         public INeuralNetwork best;
 
         public (int, int) Ports { get => ports; private set => ports = value; }
-        public (int, int) ports = (4, 2);
+        public (int, int) ports;
 
         public (int, int) PopulationSize { get => populationSize; private set => populationSize = value; }
-        public (int, int) populationSize = (10, 20);
+        public (int, int) populationSize;
 
         public (double, double) WeightRange { get => weightRange; private set => weightRange = value; }
-        private (double, double) weightRange = (-2, 2);
+        private (double, double) weightRange;
 
         public Func<double, double> ActivationFunction { get => activationFunction; private set => activationFunction = value; }
         private Func<double, double> activationFunction = Math.Tanh;
 
         public (int, int) Length { get => length; private set => length = value; }
-        public (int, int) length = (5, 10);
+        public (int, int) length;
 
         public (int, int) Width { get => width; private set => width = value; }
-
-
-        public (int, int) width = (5, 10);
+        public (int, int) width;
 
         public Generation(int size, (int, int) popSize, (int, int) ports, (int, int) length, (int, int) width, (double, double) weightRange)
             => Init(size, popSize, ports, length, width, weightRange, Math.Tanh);
@@ -203,7 +201,7 @@ namespace AGIle_Robotics
                 Environment.WorkPool.EnqueueTask(t);
             }
 
-            Generation newGen = new Generation(Size, PopulationSize, Ports, Length, Width, WeightRange);
+            Generation newGen = new Generation(Size, PopulationSize, Ports, Length, Width, WeightRange, activationFunction);
             newGen.Populations = await Task.WhenAll(tasks);
 
             return newGen;

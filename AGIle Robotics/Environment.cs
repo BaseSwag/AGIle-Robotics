@@ -8,9 +8,7 @@ namespace AGIle_Robotics
 {
     public static class Environment
     {
-        public static readonly WorkPool WorkPool = new WorkPool(6);
-
-        public static readonly Func<double, double> DefaultActivationFunction;
+        internal static readonly WorkPool WorkPool = new WorkPool(6);
 
         private static Random RNG = new Random();
 

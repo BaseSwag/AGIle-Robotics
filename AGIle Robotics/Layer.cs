@@ -53,7 +53,7 @@ namespace AGIle_Robotics
                 var newLayer = new Layer(len, inputSize, WeightRange, ActivationFunction, false);
                 for(int i = 0; i < len; i++)
                 {
-                    newLayer.Neurons[i] = (Neuron)Neurons[i].CrossOver(layer2.Neurons[i], p1, p2);
+                    newLayer.Neurons[i] = (INeuron)Neurons[i].CrossOver(layer2.Neurons[i], p1, p2);
                 }
                 return newLayer;
             }
