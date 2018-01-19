@@ -108,9 +108,9 @@ namespace TestConsole
             }
         }
 
-        static Task<(double, double)> fitnessFunction (INeuralNetwork n1, INeuralNetwork n2) 
+        static Task<Tuple<double, double>> fitnessFunction (INeuralNetwork n1, INeuralNetwork n2) 
         {
-            TaskCompletionSource<(double, double)> tcs = new TaskCompletionSource<(double, double)>();
+            TaskCompletionSource<Tuple<double, double>> tcs = new TaskCompletionSource<Tuple<double, double>>();
             TestMethod();
             return tcs.Task;
         }
