@@ -18,8 +18,28 @@ namespace AGIle_Robotics
         public Func<double, double> ActivationFunction { get => activationFunction; private set => activationFunction = value; }
         private Func<double, double> activationFunction;
 
-        public INeuralNetwork Best { get => best; private set => best = value; }
-        private INeuralNetwork best;
+        public INeuralNetwork Best
+        {
+            get
+            {
+                if (best != null) return best;
+
+                double highest = double.MinValue;
+                int net = 0;
+                for(int n = 0; n < Networks.Length; n++)
+                {
+                    if(Networks[n].Fitness > highest)
+                    {
+                        highest = Networks[n].Fitness;
+                        net = n;
+                    }
+                }
+                best = Networks[net];
+                return best;
+            }
+            private set => best = value;
+        }
+        public INeuralNetwork best;
 
         private int size;
         private int[] definition;
@@ -75,11 +95,6 @@ namespace AGIle_Robotics
                 newPopulation.Networks[i] = net;
                 newPopulation.Networks[i].Fitness = 0;
 
-                if(Best == null || Best.Fitness < net.Fitness)
-                {
-                    Best = net;
-                }
-
                 newPopulation.Networks[i].Mutate(mutationRatio); // Mutate
             }
             return newPopulation;
@@ -118,5 +133,7 @@ namespace AGIle_Robotics
                 nextNets.Add((NeuralNetwork)newNet);
             }
         }
+
+        public void ResetBest() => Best = null;
     }
 }

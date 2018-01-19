@@ -27,7 +27,27 @@ namespace AGIle_Robotics
         public double MutationRatio { get => mutationRatio; set => mutationRatio = value; }
         private double mutationRatio = 0.1;
 
-        public INeuralNetwork Best { get => best; private set => best = value; }
+        public INeuralNetwork Best
+        {
+            get
+            {
+                if (best != null) return best;
+
+                double highest = double.MinValue;
+                int pop = 0;
+                for(int p = 0; p < Populations.Length; p++)
+                {
+                    if(Populations[p].Best.Fitness > highest)
+                    {
+                        highest = Populations[p].Best.Fitness;
+                        pop = p;
+                    }
+                }
+                best = Populations[pop].Best;
+                return best;
+            }
+            private set => best = value;
+        }
         public INeuralNetwork best;
 
         public (int, int) Ports { get => ports; private set => ports = value; }
@@ -100,9 +120,69 @@ namespace AGIle_Robotics
             return newPop;
         }
 
-        public void Evaluate(Func<(double, double), (INeuralNetwork, INeuralNetwork)> fitnessFunction)
+        public async void Evaluate(Func<(INeuralNetwork, INeuralNetwork), (double, double)> fitnessFunction)
         {
-            throw new NotImplementedException();
+            await ResetFitness();
+
+            List<Task> tasks = new List<Task>();
+
+            Evaluate(fitnessFunction, ref tasks, 0, 0);
+
+            await Task.WhenAll(tasks.ToArray());
+
+            Best = null;
+        }
+        private void Evaluate(Func<(INeuralNetwork, INeuralNetwork), (double, double)> fitnessFunction, ref List<Task> tasks, int pop, int net)
+        {
+            var p = pop;
+            var n = net;
+            var t = new Task(() => EvaluationCycle(fitnessFunction, p, n));
+            tasks.Add(t);
+            Environment.WorkPool.EnqueueTask(t);
+
+            int nextPop, nextNet;
+
+            if(net < Populations[pop].Networks.Length - 1)
+            {
+                nextPop = pop;
+                nextNet = net + 1;
+            }
+            else
+            {
+                nextPop = pop + 1;
+                if (nextPop >= Populations.Length) return;
+                nextNet = 0;
+            }
+
+            Evaluate(fitnessFunction, ref tasks, nextPop, nextNet);
+        }
+        private void EvaluationCycle(Func<(INeuralNetwork, INeuralNetwork), (double, double)> fitnessFunction, int pop, int net)
+        {
+            var myNet = Populations[pop].Networks[net];
+            for(int p = pop; p < Populations.Length; p++)
+            {
+                for(int n = net; n < Populations[pop].Networks.Length; n++)
+                {
+                    var enemyNet = Populations[p].Networks[n];
+                    var result = fitnessFunction((myNet, enemyNet));
+
+                    Populations[pop].Networks[net].Fitness += result.Item1;
+                    Populations[p].Networks[n].Fitness += result.Item2;
+                }
+            }
+        }
+
+        private async Task ResetFitness()
+        {
+            await Task.Run(() =>
+            {
+                for (int p = 0; p < Populations.Length; p++)
+                {
+                    Populations[p].ResetBest();
+                    for (int n = 0; n < Populations[p].Networks.Length; n++)
+                        Populations[p].Networks[n].Fitness = 0;
+                }
+            });
         }
 
         public async Task<IGeneration> Evolve()
