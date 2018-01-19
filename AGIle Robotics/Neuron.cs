@@ -30,8 +30,6 @@ namespace AGIle_Robotics
                 for(int i = 0; i < InputWeights.Length; i++)
                 {
                     InputWeights[i] = Environment.RandomDouble(weightRange.Item1, weightRange.Item2);
-                    Environment.Weights++;
-                    //Console.WriteLine(++Environment.Weights);
                 }
             }
         }

@@ -8,8 +8,6 @@ namespace AGIle_Robotics
 {
     public static class Environment
     {
-        public static int Weights;
-
         public static readonly WorkPool WorkPool = new WorkPool(6);
 
         public static readonly Func<double, double> DefaultActivationFunction;
