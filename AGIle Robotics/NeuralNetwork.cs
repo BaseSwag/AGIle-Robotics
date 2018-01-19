@@ -20,13 +20,12 @@ namespace AGIle_Robotics
         private (double, double) weightRange;
 
         public double Fitness { get => fitness; set => fitness = value; }
+        private double fitness;
 
         public Func<double, double> ActivationFunction => throw new NotImplementedException();
 
         public int[] Definition { get => definition; set => definition = value; }
         private int[] definition;
-
-        private double fitness;
 
         public NeuralNetwork(int[] definition, (double, double) weightRange, Func<double, double> activateWith, bool init = true)
         {
@@ -61,13 +60,13 @@ namespace AGIle_Robotics
                 var newNetwork = new NeuralNetwork(Definition, WeightRange, ActivationFunction, false);
                 for(int i = 0; i < len; i++)
                 {
-                    newNetwork.Layers[i] = (Layer)Layers[i].CrossOver(net2.Layers[i], p1, p2);
+                    newNetwork.Layers[i] = (ILayer)Layers[i].CrossOver(net2.Layers[i], p1, p2);
                 }
                 return newNetwork;
             }
             else
             {
-                throw new InvalidOperationException("Cannot perform CrossOver on Networks with different inputs.");
+                throw new InvalidOperationException("Cannot perform CrossOver on Networks with different definitions.");
             }
         }
 

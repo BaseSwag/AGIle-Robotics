@@ -9,6 +9,6 @@ namespace AGIle_Robotics.Interfaces
     public interface IEvolvable : IElement
     {
         INeuralNetwork Best { get; }
-        IEvolvable Evolve(double transitionRatio, double randomRatio, double mutationRate);
+        Task<IEvolvable> Evolve(double transitionRatio, double randomRatio, double mutationRate);
     }
 }

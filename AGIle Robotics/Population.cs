@@ -18,8 +18,28 @@ namespace AGIle_Robotics
         public Func<double, double> ActivationFunction { get => activationFunction; private set => activationFunction = value; }
         private Func<double, double> activationFunction;
 
-        public INeuralNetwork Best { get => best; private set => best = value; }
-        private INeuralNetwork best;
+        public INeuralNetwork Best
+        {
+            get
+            {
+                if (best != null) return best;
+
+                double highest = double.MinValue;
+                int net = 0;
+                for(int n = 0; n < Networks.Length; n++)
+                {
+                    if(Networks[n].Fitness > highest)
+                    {
+                        highest = Networks[n].Fitness;
+                        net = n;
+                    }
+                }
+                best = Networks[net];
+                return best;
+            }
+            private set => best = value;
+        }
+        public INeuralNetwork best;
 
         private int size;
         private int[] definition;
@@ -40,14 +60,12 @@ namespace AGIle_Robotics
             }
         }
 
-        public IEvolvable Evolve(double transitionRatio, double randomRatio, double mutationRatio)
+        public async Task<IEvolvable> Evolve(double transitionRatio, double randomRatio, double mutationRatio)
         {
             int len = Networks.Length;
             int transitionAmount = (int)(len * transitionRatio);
             int randomAmount = (int)(len * randomRatio);
             int mutationAmount = (int)(len * mutationRatio);
-
-            // TODO: Stop killing performance
 
             List<INeuralNetwork> nextNets = new List<INeuralNetwork>();
             List<INeuralNetwork> remainingNets = Networks.OrderByDescending(n => n.Fitness).ToList();
@@ -74,11 +92,6 @@ namespace AGIle_Robotics
                 var net = nextNets[i];
                 newPopulation.Networks[i] = net;
                 newPopulation.Networks[i].Fitness = 0;
-
-                if(Best == null || Best.Fitness < net.Fitness)
-                {
-                    Best = net;
-                }
 
                 newPopulation.Networks[i].Mutate(mutationRatio); // Mutate
             }
@@ -110,13 +123,17 @@ namespace AGIle_Robotics
             int left = total - count;
             for(int i = 0; i < left; i++)
             {
-                int rand = Environment.RandomInt(0, count); // Do not include already crossed over nets
-                var net1 = nextNets[rand];
-                rand = Environment.RandomInt(0, count); // Do not include already crossed over nets
-                var net2 = nextNets[rand];
-                var newNet = net1.CrossOver(net2, net1.Fitness, net2.Fitness);
+                var nets = new INeuralNetwork[2];
+                for(int j = 0; j < 2; j++)
+                {
+                    int rand = Environment.RandomInt(0, count); // Do not include already crossed over nets
+                    nets[j] = nextNets[rand];
+                }
+                var newNet = nets[0].CrossOver(nets[1], nets[0].Fitness, nets[1].Fitness);
                 nextNets.Add((NeuralNetwork)newNet);
             }
         }
+
+        public void ResetBest() => Best = null;
     }
 }

@@ -9,5 +9,6 @@ namespace AGIle_Robotics.Interfaces
     public interface IPopulation : IEvolvable
     {
         INeuralNetwork[] Networks { get; }
+        void ResetBest();
     }
 }

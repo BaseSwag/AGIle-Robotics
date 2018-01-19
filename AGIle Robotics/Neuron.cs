@@ -18,7 +18,6 @@ namespace AGIle_Robotics
         public (double, double) WeightRange { get => weightRange; set => weightRange = value; }
         private (double, double) weightRange;
 
-
         public Neuron(int inputSize, (double, double) weightRange, Func<double, double> activateWith, bool init = true)
         {
             WeightRange = weightRange;
@@ -78,7 +77,8 @@ namespace AGIle_Robotics
                 if (Environment.RandomBool(ratio))
                 {
                     double rand = InputWeights[i];
-                    rand += Environment.RandomDouble(-Math.Abs(ratio), Math.Abs(ratio));
+                    var absRatio = Math.Abs(ratio);
+                    rand += Environment.RandomDouble(-absRatio, absRatio);
                     rand = Environment.Cap(rand, WeightRange);
                     InputWeights[i] = rand;
                 }
