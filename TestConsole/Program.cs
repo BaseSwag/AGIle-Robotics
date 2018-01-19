@@ -28,6 +28,7 @@ namespace TestConsole
                 weightRange: (-2, 2));
 
             generation.Create().Wait();
+            generation.Evaluate(fitnessFunction);
 
             Console.WriteLine();
 
@@ -105,6 +106,13 @@ namespace TestConsole
             {
                 var x = Math.Sqrt(r.NextDouble());
             }
+        }
+
+        static Task<(double, double)> fitnessFunction (INeuralNetwork n1, INeuralNetwork n2) 
+        {
+            TaskCompletionSource<(double, double)> tcs = new TaskCompletionSource<(double, double)>();
+            TestMethod();
+            return tcs.Task;
         }
     }
 }

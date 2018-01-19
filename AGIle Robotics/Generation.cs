@@ -118,7 +118,7 @@ namespace AGIle_Robotics
             return newPop;
         }
 
-        public async void Evaluate(Func<(INeuralNetwork, INeuralNetwork), (double, double)> fitnessFunction)
+        public async void Evaluate(Func<INeuralNetwork, INeuralNetwork, Task<(double, double)>> fitnessFunction)
         {
             await ResetFitness();
 
@@ -130,11 +130,11 @@ namespace AGIle_Robotics
 
             Best = null;
         }
-        private void Evaluate(Func<(INeuralNetwork, INeuralNetwork), (double, double)> fitnessFunction, ref List<Task> tasks, int pop, int net)
+        private void Evaluate(Func<INeuralNetwork, INeuralNetwork, Task<(double, double)>> fitnessFunction, ref List<Task> tasks, int pop, int net)
         {
             var p = pop;
             var n = net;
-            var t = new Task(() => EvaluationCycle(fitnessFunction, p, n));
+            var t = new Task(async () => await EvaluationCycle(fitnessFunction, p, n));
             tasks.Add(t);
             Environment.WorkPool.EnqueueTask(t);
 
@@ -154,7 +154,7 @@ namespace AGIle_Robotics
 
             Evaluate(fitnessFunction, ref tasks, nextPop, nextNet);
         }
-        private void EvaluationCycle(Func<(INeuralNetwork, INeuralNetwork), (double, double)> fitnessFunction, int pop, int net)
+        private async Task EvaluationCycle(Func<INeuralNetwork, INeuralNetwork, Task<(double, double)>> fitnessFunction, int pop, int net)
         {
             var myNet = Populations[pop].Networks[net];
             for(int p = pop; p < Populations.Length; p++)
@@ -162,7 +162,7 @@ namespace AGIle_Robotics
                 for(int n = net; n < Populations[pop].Networks.Length; n++)
                 {
                     var enemyNet = Populations[p].Networks[n];
-                    var result = fitnessFunction((myNet, enemyNet));
+                    var result = await fitnessFunction(myNet, enemyNet);
 
                     Populations[pop].Networks[net].Fitness += result.Item1;
                     Populations[p].Networks[n].Fitness += result.Item2;
