@@ -19,6 +19,34 @@ namespace TestConsole
 
         static void Main(string[] args)
         {
+            var generation = new Generation(50, (50, 100), (4, 2), (10, 100), (10, 50), (-2, 2));
+
+            generation.Create().Wait();
+
+            Console.WriteLine(AGIle_Robotics.Environment.Weights);
+            Console.WriteLine();
+
+            for (int i = 0; i < 20; i++)
+            {
+                int rand = AGIle_Robotics.Environment.RandomInt(generation.Populations.Length);
+                var pop = generation.Populations[rand];
+                rand = AGIle_Robotics.Environment.RandomInt(pop.Networks.Length);
+                var net = pop.Networks[rand];
+
+                double[] input = new double[] { .1, .3, -.5, .75 };
+                var result = net.Activate(input);
+                foreach (var d in result)
+                {
+                    Console.Write($"{d} ");
+                }
+                Console.WriteLine();
+            }
+
+            Console.ReadLine();
+        }
+
+        static void TestPerformance()
+        {
             DateTime start;
             DateTime end;
 
@@ -59,6 +87,7 @@ namespace TestConsole
                 tasks[i] = t;
 
                 workPool.EnqueueTask(t);
+                //Console.WriteLine($"Workload: {workPool.Workload}");
             }
 
             Task.WaitAll(tasks);
@@ -69,7 +98,7 @@ namespace TestConsole
             Random r = new Random();
             for (int i = 0; i < 10000000; i++)
             {
-                var x = r.NextDouble() * r.NextDouble();
+                var x = Math.Sqrt(r.NextDouble());
             }
         }
     }

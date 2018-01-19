@@ -24,16 +24,32 @@ namespace AGIle_Robotics
                 }
             }
         }
-        private int maxThreads;
+        private int maxThreads = 4;
 
         private Queue<Task> taskList = new Queue<Task>();
         private Task[] workers;
+
+        public int Workload
+        {
+            get
+            {
+                lock (workers)
+                {
+                    int count = 0;
+                    for (int i = 0; i < workers.Length; i++)
+                        if (workers[i] != null && workers[i].Status == TaskStatus.Running)
+                            count++;
+                    return count;
+                }
+            }
+        }
 
         private event EventHandler<Task> TaskEnqueued;
         private event EventHandler<Task> TaskFinished;
 
         public WorkPool(int _maxThreads)
         {
+            workers = new Task[maxThreads];
             MaxThreads = _maxThreads;
 
             TaskEnqueued += WorkPool_TaskEnqueued;
@@ -84,7 +100,7 @@ namespace AGIle_Robotics
 
         private void WorkPool_TaskFinished(object sender, Task e)
         {
-            Console.WriteLine($"Finished: {e.Id}");
+            //Console.WriteLine($"Finished: {e.Id}");
             CheckScheduling();
         }
     }

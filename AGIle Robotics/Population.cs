@@ -40,7 +40,7 @@ namespace AGIle_Robotics
             }
         }
 
-        public IEvolvable Evolve(double transitionRatio, double randomRatio, double mutationRatio)
+        public async Task<IEvolvable> Evolve(double transitionRatio, double randomRatio, double mutationRatio)
         {
             int len = Networks.Length;
             int transitionAmount = (int)(len * transitionRatio);

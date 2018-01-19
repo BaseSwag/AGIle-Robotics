@@ -10,15 +10,16 @@ namespace AGIle_Robotics.Interfaces
     {
         IPopulation[] Populations { get; }
         int Level { get; }
-        int MaxThreads { get; set; }
+        int Size { get; }
         double TransitionRatio { get; set; }
         double RandomRatio { get; set; }
         double MutationRatio { get; set; }
-        int MinLength { get; }
-        int MaxLength { get; }
-        int MinWidth { get; }
-        int MaxWidth { get; }
-        IGeneration Evolve();
+        (int, int) PopulationSize { get; }
+        (int, int) Length { get; }
+        (int, int) Width { get; }
+        (int, int) Ports { get; }
+        Task Create();
+        Task<IGeneration> Evolve();
         void Evaluate(Func<(double, double), (INeuralNetwork, INeuralNetwork)> fitnessFunction);
     }
 }
