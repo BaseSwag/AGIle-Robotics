@@ -12,8 +12,16 @@ public class OnExitListener : MonoBehaviour {
     [SerializeField]
     public UnityOnTriggerEvitEvent OnExit;
 
+    [SerializeField]
+    public UnityOnTriggerEvitEvent OnEnter;
+
     private void OnTriggerExit2D(Collider2D collision)
     {
         OnExit.Invoke(collision);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        OnEnter.Invoke(collision);
     }
 }

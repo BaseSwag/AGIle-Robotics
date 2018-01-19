@@ -18,7 +18,13 @@ public class CarController : MonoBehaviour
     float hortizontal = 0;
 
     public float lookRotationRelative = 0;
-    public float lookRotationRelativeClamped = 0;
+    public bool inTriggerForward = true;
+    public float sensorForward = 0;
+    public bool inTriggerBackward = true;
+    public float sensorBackward = 0;
+
+    public Transform LightSensorForward;
+    public Transform LightSensorBackward;
 
     public Transform target;
 
@@ -46,35 +52,66 @@ public class CarController : MonoBehaviour
 
         lookRotationRelative = rotationZ - this.transform.rotation.eulerAngles.z;
 
-
         while (lookRotationRelative > 180)
             lookRotationRelative -= 360;
 
         while (lookRotationRelative < -180)
             lookRotationRelative += 360;
 
+        if (inTriggerBackward)
+            if (sensorBackward > 0)
+                sensorBackward -= Time.deltaTime;
+            else
+                sensorBackward = 0;
 
-        lookRotationRelativeClamped = Mathf.Clamp(lookRotationRelative, -45, 45);
+        if (inTriggerForward)
+            if (sensorForward > 0)
+                sensorForward -= Time.deltaTime;
+            else
+                sensorForward = 0;
 
-        Debug.DrawLine(transform.position, target.position);
-
-
-        //this.transform.rotation = Quaternion.Euler(0, 0, rotationZ);
-
-        OnSetAIInputs.Invoke(new float[] { -lookRotationRelative, 0 });
+        OnSetAIInputs.Invoke(new float[] { -lookRotationRelative, 0, hortizontal, vertical, sensorForward, sensorBackward });
 
     }
 
     public void OnExitInnerCircle(Collider2D collider)
     {
-        if (collider.gameObject == this.gameObject)
-            Debug.Log("Exit inner Circle");
+        if (collider.gameObject.transform == this.LightSensorForward)
+        {
+            sensorForward = 1;
+            inTriggerForward = false;
+            Debug.Log("Trigger LightSensor Forward " + gameObject.name);
+        }
+
+        if (collider.gameObject.transform == this.LightSensorBackward)
+        {
+            sensorBackward = 1;
+            inTriggerBackward = false;
+            Debug.Log("Trigger LightSensor Backward " + gameObject.name);
+        }
+    }
+
+    public void OnEnterInnerCircle(Collider2D collider)
+    {
+        if (collider.gameObject.transform == this.LightSensorForward)
+        {
+            sensorForward = 1;
+            inTriggerForward = true;
+            Debug.Log("Enter Trigger LightSensor Forward " + gameObject.name);
+        }
+
+        if (collider.gameObject.transform == this.LightSensorBackward)
+        {
+            sensorBackward = 1;
+            inTriggerForward = true;
+            Debug.Log("Enter Trigger LightSensor Backward " + gameObject.name);
+        }
     }
 
     public void OnExitOuterCircle(Collider2D collider)
     {
         if (collider.gameObject == this.gameObject)
-            Debug.Log("Exit outer Circle");
+            Debug.Log("Lost! " + gameObject.name);
     }
 
     public void OnInput(float[] inputs)
