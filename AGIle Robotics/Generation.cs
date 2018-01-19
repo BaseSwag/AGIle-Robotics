@@ -15,8 +15,8 @@ namespace AGIle_Robotics
         public int Level { get => level; private set => level = value; }
         private int level;
 
-        public int MaxThreads { get => maxThreads; set => maxThreads = value; }
-        private int maxThreads = 4;
+        public int Size { get => size; private set => size = value; }
+        private int size;
 
         public double TransitionRatio { get => transitionRatio; set => transitionRatio = value; }
         private double transitionRatio = 0.5;
@@ -27,8 +27,34 @@ namespace AGIle_Robotics
         public double MutationRatio { get => mutationRatio; set => mutationRatio = value; }
         private double mutationRatio = 0.1;
 
-        public INeuralNetwork Best { get => best; private set => best = value; }
+        public INeuralNetwork Best
+        {
+            get
+            {
+                if (best != null) return best;
+
+                double highest = double.MinValue;
+                int pop = 0;
+                for(int p = 0; p < Populations.Length; p++)
+                {
+                    if(Populations[p].Best.Fitness > highest)
+                    {
+                        highest = Populations[p].Best.Fitness;
+                        pop = p;
+                    }
+                }
+                best = Populations[pop].Best;
+                return best;
+            }
+            private set => best = value;
+        }
         public INeuralNetwork best;
+
+        public (int, int) Ports { get => ports; private set => ports = value; }
+        public (int, int) ports = (4, 2);
+
+        public (int, int) PopulationSize { get => populationSize; private set => populationSize = value; }
+        public (int, int) populationSize = (10, 20);
 
         public (double, double) WeightRange { get => weightRange; private set => weightRange = value; }
         private (double, double) weightRange = (-2, 2);
@@ -36,86 +62,151 @@ namespace AGIle_Robotics
         public Func<double, double> ActivationFunction { get => activationFunction; private set => activationFunction = value; }
         private Func<double, double> activationFunction = Math.Tanh;
 
-        public int MinLength { get => minLength; private set => minLength = value; }
-        public int minLength = 5;
+        public (int, int) Length { get => length; private set => length = value; }
+        public (int, int) length = (5, 10);
 
-        public int MaxLength { get => maxLength; private set => maxLength = value; }
-        public int maxLength = 10;
+        public (int, int) Width { get => width; private set => width = value; }
 
-        public int MinWidth { get => minWidth; private set => minWidth = value; }
-        public int minWidth = 5;
 
-        public int MaxWidth { get => maxWidth; private set => maxWidth = value; }
-        public int maxWidth = 10;
+        public (int, int) width = (5, 10);
 
-        public Generation((int, int) length, (int, int) width, (double, double) weightRange)
-            => Init(length, width, weightRange, Math.Tanh);
-        public Generation((int, int) length, (int, int) width, (double, double) weightRange, Func<double, double> activateWith)
-            => Init(length, width, weightRange, activateWith);
-        private void Init((int, int) length, (int, int) width, (double, double) weightRange, Func<double, double> activateWith)
+        public Generation(int size, (int, int) popSize, (int, int) ports, (int, int) length, (int, int) width, (double, double) weightRange)
+            => Init(size, popSize, ports, length, width, weightRange, Math.Tanh);
+        public Generation(int size, (int, int) popSize, (int, int) ports, (int, int) length, (int, int) width, (double, double) weightRange, Func<double, double> activateWith)
+            => Init(size, popSize, ports, length, width, weightRange, activateWith);
+        private void Init(int size, (int, int) popSize, (int, int) ports, (int, int) length, (int, int) width, (double, double) weightRange, Func<double, double> activateWith)
         {
-            MinLength = length.Item1;
-            MaxLength = length.Item2;
-            MinWidth = width.Item1;
-            MaxWidth = width.Item2;
+            Size = size;
+            PopulationSize = popSize;
+            Ports = ports;
+
+            Length = length;
+            Width = width;
 
             WeightRange = weightRange;
 
             ActivationFunction = activateWith;
         }
 
-        public void Evaluate(Func<(double, double), (INeuralNetwork, INeuralNetwork)> fitnessFunction)
+        public async Task Create()
         {
-            throw new NotImplementedException();
-        }
+            Task<IPopulation>[] tasks = new Task<IPopulation>[Size];
 
-        public IGeneration Evolve()
-        {
-            return (IGeneration)Evolve(TransitionRatio, RandomRatio, MutationRatio);
-        }
-
-        public IEvolvable Evolve(double transitionRatio, double randomRatio, double mutationRatio)
-        {
-            IGeneration newGen = this;
-            List<IPopulation>[] populations = new List<IPopulation>[MaxThreads];
-            for(int i = 0; i < newGen.Populations.Length; i++)
+            for(int i = 0; i < Size; i++)
             {
-                int slot = i % MaxThreads;
-                populations[slot].Add(newGen.Populations[i]);
+                var t = new Task<IPopulation>(() => CreatePopulation());
+                tasks[i] = t;
+
+                Environment.WorkPool.EnqueueTask(t);
             }
 
-            List<Task<List<IPopulation>>> tasks = new List<Task<List<IPopulation>>>();
-            for(int i = 0; i < populations.Length; i++)
+            Populations = await Task.WhenAll(tasks);
+        }
+        private IPopulation CreatePopulation()
+        {
+            var size = Environment.RandomInt(PopulationSize);
+            var length = Environment.RandomInt(Length);
+            var definition = new int[length];
+
+            definition[0] = Ports.Item1;
+            definition[length - 1] = Ports.Item2;
+            for(int i = 1; i < definition.Length - 1; i++)
             {
-                var temp = populations[i];
-                tasks.Add(Task<List<IPopulation>>.Factory.StartNew(
-                    () => EvolvePopulations(temp, transitionRatio, randomRatio, mutationRatio)));
+                var width = Environment.RandomInt(Width);
+                definition[i] = width;
             }
 
-            Task.WaitAll(tasks.ToArray());
+            var newPop = new Population(size, definition, WeightRange, ActivationFunction);
+            return newPop;
+        }
 
-            int count = 0;
-            foreach(var task in tasks)
+        public async void Evaluate(Func<(INeuralNetwork, INeuralNetwork), (double, double)> fitnessFunction)
+        {
+            await ResetFitness();
+
+            List<Task> tasks = new List<Task>();
+
+            Evaluate(fitnessFunction, ref tasks, 0, 0);
+
+            await Task.WhenAll(tasks.ToArray());
+
+            Best = null;
+        }
+        private void Evaluate(Func<(INeuralNetwork, INeuralNetwork), (double, double)> fitnessFunction, ref List<Task> tasks, int pop, int net)
+        {
+            var p = pop;
+            var n = net;
+            var t = new Task(() => EvaluationCycle(fitnessFunction, p, n));
+            tasks.Add(t);
+            Environment.WorkPool.EnqueueTask(t);
+
+            int nextPop, nextNet;
+
+            if(net < Populations[pop].Networks.Length - 1)
             {
-                var list = task.Result;
-                for(int i = 0; i < list.Count; i++)
+                nextPop = pop;
+                nextNet = net + 1;
+            }
+            else
+            {
+                nextPop = pop + 1;
+                if (nextPop >= Populations.Length) return;
+                nextNet = 0;
+            }
+
+            Evaluate(fitnessFunction, ref tasks, nextPop, nextNet);
+        }
+        private void EvaluationCycle(Func<(INeuralNetwork, INeuralNetwork), (double, double)> fitnessFunction, int pop, int net)
+        {
+            var myNet = Populations[pop].Networks[net];
+            for(int p = pop; p < Populations.Length; p++)
+            {
+                for(int n = net; n < Populations[pop].Networks.Length; n++)
                 {
-                    newGen.Populations[count] = list[i];
-                    count++;
+                    var enemyNet = Populations[p].Networks[n];
+                    var result = fitnessFunction((myNet, enemyNet));
+
+                    Populations[pop].Networks[net].Fitness += result.Item1;
+                    Populations[p].Networks[n].Fitness += result.Item2;
                 }
             }
-            return newGen;
         }
 
-        private List<IPopulation> EvolvePopulations(List<IPopulation> populations, double transition, double random, double mutation)
+        private async Task ResetFitness()
         {
-            List<IPopulation> newPopulations = new List<IPopulation>();
-            for(int i = 0; i < populations.Count; i++)
+            await Task.Run(() =>
             {
-                var newPop = (IPopulation)populations[i].Evolve(transition, random, mutation);
-                newPopulations.Add(newPop);
+                for (int p = 0; p < Populations.Length; p++)
+                {
+                    Populations[p].ResetBest();
+                    for (int n = 0; n < Populations[p].Networks.Length; n++)
+                        Populations[p].Networks[n].Fitness = 0;
+                }
+            });
+        }
+
+        public async Task<IGeneration> Evolve()
+        {
+            return (IGeneration) await Evolve(TransitionRatio, RandomRatio, MutationRatio);
+        }
+        public async Task<IEvolvable> Evolve(double transitionRatio, double randomRatio, double mutationRatio)
+        {
+            Task<IPopulation>[] tasks = new Task<IPopulation>[Size];
+
+            for(int i = 0; i < Size; i++)
+            {
+                var x = i;
+                var t = new Task<IPopulation>(
+                    () => (IPopulation)Populations[x].Evolve(TransitionRatio, RandomRatio, MutationRatio));
+                tasks[i] = t;
+
+                Environment.WorkPool.EnqueueTask(t);
             }
-            return populations;
+
+            Generation newGen = new Generation(Size, PopulationSize, Ports, Length, Width, WeightRange);
+            newGen.Populations = await Task.WhenAll(tasks);
+
+            return newGen;
         }
     }
 }
