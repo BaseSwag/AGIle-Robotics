@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SuperTuple;
 
 namespace AGIle_Robotics.Interfaces
 {
@@ -12,11 +13,11 @@ namespace AGIle_Robotics.Interfaces
         double RandomRatio { get; set; }
         double MutationRatio { get; set; }
         IGeneration CurrentGeneration { get; }
-        Func<INeuralNetwork, INeuralNetwork, Task<Tuple<double, double>>> FitnessFunction { get; set; }
-        Task Initialize(int size, Tuple<int, int> popSize, Tuple<int, int> ports, Tuple<int, int> length, Tuple<int, int> width, Tuple<double, double> weightRange, Func<double, double> activateWith);
+        Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> FitnessFunction { get; set; }
+        Task Initialize(int size, STuple<int, int> popSize, STuple<int, int> ports, STuple<int, int> length, STuple<int, int> width, STuple<double, double> weightRange, Func<double, double> activateWith);
         Task Create();
         Task Evolve();
         Task Evaluate();
-        Task Evaluate(Func<INeuralNetwork, INeuralNetwork, Task<Tuple<double, double>>> fitnessFunction);
+        Task Evaluate(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction);
     }
 }

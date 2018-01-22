@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AGIle_Robotics.Interfaces;
+using SuperTuple;
 
 namespace AGIle_Robotics
 {
@@ -12,15 +13,15 @@ namespace AGIle_Robotics
         public INeuron[] Neurons { get => neurons; private set => neurons = value; }
         private INeuron[] neurons;
 
-        public Tuple<double, double> WeightRange { get => weightRange; private set => weightRange = value; }
-        private Tuple<double, double> weightRange;
+        public (double, double) WeightRange { get => weightRange; private set => weightRange = value; }
+        private (double, double) weightRange;
 
         public Func<double, double> ActivationFunction { get => activationFunction; private set => activationFunction = value; }
         private Func<double, double> activationFunction;
 
         private int inputSize;
 
-        public Layer(int size, int inputSize, Tuple<double, double> weightRange, Func<double, double> activateWith, bool init = true)
+        public Layer(int size, int inputSize, STuple<double, double> weightRange, Func<double, double> activateWith, bool init = true)
         {
             WeightRange = weightRange;
             ActivationFunction = activateWith;
