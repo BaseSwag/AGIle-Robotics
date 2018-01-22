@@ -22,9 +22,6 @@ namespace SuperTuple
         public static implicit operator STuple<T1, T2>(ValueTuple<T1,T2> t) => new STuple<T1, T2>(t);
         public static implicit operator STuple<T1, T2>(Tuple<T1,T2> t) => new STuple<T1, T2>(t);
 
-        public override string ToString()
-        {
-            return $"({Item1.ToString()}, {Item2.ToString()})";
-        }
+        public override string ToString() => $"({Item1.ToString()}, {Item2.ToString()})";
     }
 }
