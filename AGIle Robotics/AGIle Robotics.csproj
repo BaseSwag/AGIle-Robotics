@@ -53,6 +53,7 @@
     <Compile Include="Interfaces\INeuron.cs" />
     <Compile Include="Interfaces\INeuralElement.cs" />
     <Compile Include="Interfaces\IPopulation.cs" />
+    <Compile Include="Interfaces\ITrainer.cs" />
     <Compile Include="Layer.cs" />
     <Compile Include="NeuralNetwork.cs" />
     <Compile Include="Neuron.cs" />

@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+VisualStudioVersion = 15.0.27130.2024
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AGIle Robotics", "AGIle Robotics\AGIle Robotics.csproj", "{7B741AB8-509A-4EFD-BE7C-AD90DC735EB2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConsole", "TestConsole\TestConsole.csproj", "{FFE49E87-5E63-4F2C-B48B-FD5E19B3DBA7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageClassifier", "ImageClassifier\ImageClassifier.csproj", "{DDA063A6-6998-45EB-B7E3-4F02B43FADFF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperTuple", "SuperTuple\SuperTuple.csproj", "{24B29DEB-C11A-4862-9FE7-C4657CD97590}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{DDA063A6-6998-45EB-B7E3-4F02B43FADFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDA063A6-6998-45EB-B7E3-4F02B43FADFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DDA063A6-6998-45EB-B7E3-4F02B43FADFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24B29DEB-C11A-4862-9FE7-C4657CD97590}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24B29DEB-C11A-4862-9FE7-C4657CD97590}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24B29DEB-C11A-4862-9FE7-C4657CD97590}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24B29DEB-C11A-4862-9FE7-C4657CD97590}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
