@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AGIle_Robotics;
 using AGIle_Robotics.Interfaces;
+using SuperTuple;
 
 namespace TestConsole
 {
@@ -21,11 +22,11 @@ namespace TestConsole
         {
             var generation = new Generation(
                 size: 50,
-                popSize: (50, 100).ToTuple(),
-                ports: (4, 2).ToTuple(),
-                length: (10, 100).ToTuple(),
-                width: (10, 50).ToTuple(),
-                weightRange: (-2.0, 2.0).ToTuple(),
+                popSize: (50, 100),
+                ports: (4, 2),
+                length: (10, 100),
+                width: (10, 50),
+                weightRange: (-2.0, 2.0),
                 activateWith: Math.Tanh
                 );
 
@@ -110,9 +111,9 @@ namespace TestConsole
             }
         }
 
-        static Task<Tuple<double, double>> fitnessFunction (INeuralNetwork n1, INeuralNetwork n2) 
+        static Task<STuple<double, double>> fitnessFunction (INeuralNetwork n1, INeuralNetwork n2) 
         {
-            TaskCompletionSource<Tuple<double, double>> tcs = new TaskCompletionSource<Tuple<double, double>>();
+            TaskCompletionSource<STuple<double, double>> tcs = new TaskCompletionSource<STuple<double, double>>();
             TestMethod();
             return tcs.Task;
         }

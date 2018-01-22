@@ -57,6 +57,10 @@
       <Project>{7b741ab8-509a-4efd-be7c-ad90dc735eb2}</Project>
       <Name>AGIle Robotics</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SuperTuple\SuperTuple.csproj">
+      <Project>{24b29deb-c11a-4862-9fe7-c4657cd97590}</Project>
+      <Name>SuperTuple</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SuperTuple;
 
 namespace AGIle_Robotics
 {
     public class Population : IPopulation
     {
-        public Tuple<double, double> WeightRange { get => weightRange; private set => weightRange = value; }
-        private Tuple<double, double> weightRange;
+        public STuple<double, double> WeightRange { get => weightRange; private set => weightRange = value; }
+        private STuple<double, double> weightRange;
 
         public INeuralNetwork[] Networks { get => networks; private set => networks = value; }
         private INeuralNetwork[] networks;
@@ -44,9 +45,9 @@ namespace AGIle_Robotics
         private int size;
         private int[] definition;
 
-        public Population(int size, int[] definition, Tuple<double, double> weightRange) => Init(size, definition, weightRange, Math.Tanh);
-        public Population(int size, int[] definition, Tuple<double, double> weightRange, Func<double, double> activateWith, bool init = true) => Init(size, definition, weightRange, activateWith, init);
-        private void Init(int size, int[] definition, Tuple<double, double> weightRange, Func<double, double> activateWith, bool init = true)
+        public Population(int size, int[] definition, STuple<double, double> weightRange) => Init(size, definition, weightRange, Math.Tanh);
+        public Population(int size, int[] definition, STuple<double, double> weightRange, Func<double, double> activateWith, bool init = true) => Init(size, definition, weightRange, activateWith, init);
+        private void Init(int size, int[] definition, STuple<double, double> weightRange, Func<double, double> activateWith, bool init = true)
         {
             WeightRange = weightRange;
             ActivationFunction = activateWith;
