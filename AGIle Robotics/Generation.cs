@@ -13,9 +13,6 @@ namespace AGIle_Robotics
         public IPopulation[] Populations { get => populations; set => populations = value; }
         private IPopulation[] populations;
 
-        public int Level { get => level; private set => level = value; }
-        private int level;
-
         public int Size { get => size; private set => size = value; }
         private int size;
 
@@ -116,7 +113,7 @@ namespace AGIle_Robotics
             return newPop;
         }
 
-        public async void Evaluate(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction)
+        public async Task Evaluate(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction)
         {
             await ResetFitness();
 
@@ -127,6 +124,7 @@ namespace AGIle_Robotics
             await Task.WhenAll(tasks.ToArray());
 
             Best = null;
+
         }
         private void Evaluate(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction, ref List<Task> tasks, int pop, int net)
         {

@@ -10,7 +10,6 @@ namespace AGIle_Robotics.Interfaces
     public interface IGeneration : IEvolvable
     {
         IPopulation[] Populations { get; }
-        int Level { get; }
         int Size { get; }
         double TransitionRatio { get; set; }
         double RandomRatio { get; set; }
@@ -21,6 +20,6 @@ namespace AGIle_Robotics.Interfaces
         (int, int) Ports { get; }
         Task Create();
         Task<IGeneration> Evolve();
-        void Evaluate(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction);
+        Task Evaluate(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction);
     }
 }
