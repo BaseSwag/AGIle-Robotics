@@ -167,9 +167,9 @@ namespace AGIle_Robotics
             }
         }
 
-        private async Task ResetFitness()
+        private Task ResetFitness()
         {
-            await Task.Run(() =>
+            return Task.Run(() =>
             {
                 for (int p = 0; p < Populations.Length; p++)
                 {
@@ -193,8 +193,8 @@ namespace AGIle_Robotics
                 var x = i;
                 var t = new Task<IPopulation>(
                     () => (IPopulation)Populations[x].Evolve(TransitionRatio, RandomRatio, MutationRatio));
+                
                 tasks[i] = t;
-
                 Environment.WorkPool.EnqueueTask(t);
             }
 
