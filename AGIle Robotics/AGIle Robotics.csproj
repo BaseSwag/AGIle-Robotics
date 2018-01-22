@@ -64,5 +64,11 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SuperTuple\SuperTuple.csproj">
+      <Project>{24b29deb-c11a-4862-9fe7-c4657cd97590}</Project>
+      <Name>SuperTuple</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

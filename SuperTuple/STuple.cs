@@ -13,11 +13,14 @@ namespace SuperTuple
         public T2 Item2 { get => tuple.Item2; set => tuple.Item2 = value; }
 
         public STuple(T1 o1, T2 o2) => tuple = (o1, o2);
-        public STuple((T1, T2) t) => tuple = t;
+        public STuple(ValueTuple<T1, T2> t) => tuple = t;
         public STuple(Tuple<T1, T2> t) => tuple = t.ToValueTuple();
+        public STuple(STuple<T1, T2> t) => tuple = t.tuple;
 
         public static implicit operator ValueTuple<T1, T2>(STuple<T1, T2> t) => t.tuple;
         public static implicit operator Tuple<T1, T2>(STuple<T1, T2> t) => t.tuple.ToTuple();
+        public static implicit operator STuple<T1, T2>(ValueTuple<T1,T2> t) => new STuple<T1, T2>(t);
+        public static implicit operator STuple<T1, T2>(Tuple<T1,T2> t) => new STuple<T1, T2>(t);
 
         public override string ToString()
         {
