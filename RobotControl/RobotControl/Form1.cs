@@ -5,36 +5,52 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.IO;
 using System.Net.Sockets;
 using System.Windows.Forms;
+using BrandonPotter.XBox;
 
 namespace RobotControl
 {
     public partial class Form1 : Form
     {
+        XBoxController xBoxController = XBoxController.GetConnectedControllers().FirstOrDefault();
+        Timer timer = new Timer();
         Stream s;
         TcpClient tcpClient;
         public Form1()
         {
             InitializeComponent();
+            timer.Interval = 100;
+            timer.Tick += Timer_Tick;
+        }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            var x = Map(xBoxController.ThumbLeftX, 0, 100, -1, 1);
+            var y = Map(xBoxController.ThumbLeftY, 0, 100, -1, 1);
+            var c = Map(xBoxController.ThumbRightX, 0, 100, 0, 1);
+
+            WriteStream(s, x, y, c);
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            tcpClient = new TcpClient();
-            tcpClient.Connect("192.168.1.187", 8342);
-            s = tcpClient.GetStream();
-            while(true)
+             tcpClient = new TcpClient();
+             tcpClient.Connect("10.0.0.1", 8376);
+             s = tcpClient.GetStream();
+
+            timer.Start();
+
+            /*while (true)
             {
                 double x = -.13;
                 double y = 1;
                 double c = 1;
 
                 WriteStream(s, x, y, c);
-            }
-            
+            }*/
+
         }
 
         double Map(double x, double in_min, double in_max, double out_min, double out_max)
@@ -55,58 +71,24 @@ namespace RobotControl
             s.Flush();
         }
 
-        void Forward()
-        {
-            s.Write(new byte[] { 0 }, 0, 1);
-            s.Flush();
-        }
-
-        void Right()
-        {
-            s.Write(new byte[] { 1 }, 0, 1);
-            s.Flush();
-        }
-
-        void Left()
-        {
-            s.Write(new byte[] { 2 }, 0, 1);
-            s.Flush();
-        }
-
-        void Backward()
-        {
-            s.Write(new byte[] { 3 }, 0, 1);
-            s.Flush();
-        }
-
-        void Stop()
-        {
-            s.Write(new byte[] { 4 }, 0, 1);
-            s.Flush();
-        }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
-           /* switch(e.KeyCode)
-            {
-                case Keys.Up:
-                    Forward();
-                    break;
-                case Keys.Down:
-                    Backward();
-                    break;
-                case Keys.Left:
-                    Left();
-                    break;
-                case Keys.Right:
-                    Right();
-                    break;
-            }*/
-        }
-
-        private void Form1_KeyUp(object sender, KeyEventArgs e)
-        {
-            Stop();
+            /* switch(e.KeyCode)
+             {
+                 case Keys.Up:
+                     Forward();
+                     break;
+                 case Keys.Down:
+                     Backward();
+                     break;
+                 case Keys.Left:
+                     Left();
+                     break;
+                 case Keys.Right:
+                     Right();
+                     break;
+             }*/
         }
 
         private void timer1_Tick(object sender, EventArgs e)
