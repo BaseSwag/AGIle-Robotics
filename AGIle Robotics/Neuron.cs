@@ -50,6 +50,8 @@ namespace AGIle_Robotics
             return new double[] { output };
         }
 
+        public Task<double[]> ActivateAsync(double[] input) => Task.Run(() => Activate(input));
+
         public INeuralElement CrossOver(INeuralElement e, double p1, double p2)
         {
             var neuron2 = e as Neuron;

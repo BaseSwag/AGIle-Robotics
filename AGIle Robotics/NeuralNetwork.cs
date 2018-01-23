@@ -23,7 +23,8 @@ namespace AGIle_Robotics
         public double Fitness { get => fitness; set => fitness = value; }
         private double fitness;
 
-        public Func<double, double> ActivationFunction => throw new NotImplementedException();
+        public Func<double, double> ActivationFunction { get => activationFunction; set => activationFunction = value; }
+        private Func<double, double> activationFunction;
 
         public int[] Definition { get => definition; set => definition = value; }
         private int[] definition;
@@ -32,6 +33,7 @@ namespace AGIle_Robotics
         {
             WeightRange = weightRange;
             Definition = definition;
+            ActivationFunction = activateWith;
 
             Layers = new ILayer[definition.Length];
             for(int i = 0; i < definition.Length; i++)
@@ -47,6 +49,15 @@ namespace AGIle_Robotics
             for (int i = 0; i < Layers.Length; i++)
             {
                 input = Layers[i].Activate(input);
+            }
+            return input;
+        }
+
+        public async Task<double[]> ActivateAsync(double[] input)
+        {
+            for (int i = 0; i < Layers.Length; i++)
+            {
+                input = await Layers[i].ActivateAsync(input);
             }
             return input;
         }

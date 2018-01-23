@@ -155,7 +155,7 @@ namespace AGIle_Robotics
             var myNet = Populations[pop].Networks[net];
             for(int p = pop; p < Populations.Length; p++)
             {
-                for(int n = net; n < Populations[pop].Networks.Length; n++)
+                for(int n = net; n < Populations[p].Networks.Length; n++)
                 {
                     var enemyNet = Populations[p].Networks[n];
                     var result = await fitnessFunction(myNet, enemyNet);
@@ -179,19 +179,16 @@ namespace AGIle_Robotics
             });
         }
 
-        public async Task<IGeneration> Evolve()
-        {
-            return (IGeneration) await Evolve(TransitionRatio, RandomRatio, MutationRatio);
-        }
-        public async Task<IEvolvable> Evolve(double transitionRatio, double randomRatio, double mutationRatio)
+        public Task<IGeneration> Evolve() => Evolve(TransitionRatio, RandomRatio, MutationRatio);
+        public async Task<IGeneration> Evolve(double transitionRatio, double randomRatio, double mutationRatio)
         {
             Task<IPopulation>[] tasks = new Task<IPopulation>[Size];
 
             for(int i = 0; i < Size; i++)
             {
                 var x = i;
-                var t = new Task<IPopulation>(
-                    () => (IPopulation)Populations[x].Evolve(TransitionRatio, RandomRatio, MutationRatio));
+
+                var t = new Task<IPopulation>(() => Populations[x].Evolve(transitionRatio, randomRatio, mutationRatio).Result);
                 
                 tasks[i] = t;
                 Environment.WorkPool.EnqueueTask(t);
@@ -201,6 +198,10 @@ namespace AGIle_Robotics
             newGen.Populations = await Task.WhenAll(tasks);
 
             return newGen;
+        }
+        async Task<IEvolvable> IEvolvable.Evolve(double transitionRatio, double randomRatio, double mutationRatio)
+        {
+            return (IEvolvable) await Evolve(TransitionRatio, RandomRatio, MutationRatio);
         }
     }
 }
