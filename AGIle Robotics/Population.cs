@@ -55,10 +55,10 @@ namespace AGIle_Robotics
             this.definition = definition;
 
             Networks = new INeuralNetwork[size];
-            for(int i = 0; i < size; i++)
+            Parallel.For(0, size, index =>
             {
-                Networks[i] = new NeuralNetwork(definition, weightRange, activateWith, init);
-            }
+                Networks[index] = new NeuralNetwork(definition, weightRange, activateWith, init);
+            });
         }
 
         async Task<IEvolvable> IEvolvable.Evolve(double transitionRatio, double randomRatio, double mutationRatio) => await Evolve(transitionRatio, randomRatio, mutationRatio);
@@ -90,23 +90,20 @@ namespace AGIle_Robotics
             }
 
             Population newPopulation = new Population(size, definition, WeightRange, ActivationFunction, false);
-            for(int i = 0; i < len; i++)
+            Parallel.For(0, len, index =>
             {
-                var net = nextNets[i];
-                newPopulation.Networks[i] = net;
-                newPopulation.Networks[i].Fitness = 0;
+                var net = nextNets[index];
+                newPopulation.Networks[index] = net;
+                newPopulation.Networks[index].Fitness = 0;
 
-                newPopulation.Networks[i].Mutate(mutationRatio); // Mutate
-            }
+                newPopulation.Networks[index].Mutate(mutationRatio); // Mutate
+            });
             return newPopulation;
         }
 
         private void ChooseBest(ref List<INeuralNetwork> nextNets, ref List<INeuralNetwork> remainingNets, int amount)
         {
-            for (int i = 0; i < amount; i++)
-            {
-                nextNets.Add(remainingNets[i]);
-            }
+            nextNets.AddRange(remainingNets.GetRange(0, amount));
             remainingNets.RemoveRange(0, amount);
         }
 

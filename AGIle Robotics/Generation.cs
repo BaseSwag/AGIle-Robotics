@@ -155,14 +155,15 @@ namespace AGIle_Robotics
             var myNet = Populations[pop].Networks[net];
             for(int p = pop; p < Populations.Length; p++)
             {
-                for(int n = net; n < Populations[p].Networks.Length; n++)
+                var p2 = p;
+                Parallel.For(net, Populations[p2].Networks.Length, async n =>
                 {
-                    var enemyNet = Populations[p].Networks[n];
+                    var enemyNet = Populations[p2].Networks[n];
                     var result = await fitnessFunction(myNet, enemyNet);
-                    
+
                     Populations[pop].Networks[net].Fitness += result.Item1;
-                    Populations[p].Networks[n].Fitness += result.Item2;
-                }
+                    Populations[p2].Networks[n].Fitness += result.Item2;
+                });
             }
         }
 
