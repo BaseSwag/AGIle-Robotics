@@ -58,14 +58,18 @@ namespace AGIle_Robotics
 
         public void EnqueueTask(Task _task)
         {
-            taskList.Enqueue(_task);
+            _task.ContinueWith(t => TaskFinished?.Invoke(this, t));
+            lock (taskList)
+            {
+                taskList.Enqueue(_task);
+            }
             TaskEnqueued?.Invoke(this, _task);
         }
 
         private void CheckScheduling()
         {
             int worker = -1;
-            Task nextTask;
+            Task nextTask = Task.CompletedTask;
             lock (workers)
             {
                 for (int i = 0; i < workers.Length; i++)
@@ -83,10 +87,16 @@ namespace AGIle_Robotics
                     {
                         if (taskList.Count > 0)
                         {
-                            nextTask = taskList.Dequeue();
-                            workers[worker] = nextTask;
-                            nextTask.Start();
-                            nextTask.ContinueWith(t => TaskFinished?.Invoke(this, t));
+                            try
+                            {
+                                nextTask = taskList.Dequeue();
+                                workers[worker] = nextTask;
+                                nextTask.Start();
+                            }
+                            catch (Exception ex)
+                            {
+
+                            }
                         }
                     }
                 }

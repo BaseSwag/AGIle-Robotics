@@ -10,6 +10,7 @@ namespace AGIle_Robotics
     public static class Environment
     {
         internal static readonly WorkPool WorkPool = new WorkPool(6);
+        public static int WorkCapacity = 4;
 
         private static Random RNG = new Random();
 

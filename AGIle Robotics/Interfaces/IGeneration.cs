@@ -19,7 +19,7 @@ namespace AGIle_Robotics.Interfaces
         (int, int) Width { get; }
         (int, int) Ports { get; }
         Task Create();
-        Task<IGeneration> Evolve();
+        new Task<IGeneration> Evolve(double transitionRatio, double randomRatio, double mutationRatio);
         Task Evaluate(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction);
     }
 }

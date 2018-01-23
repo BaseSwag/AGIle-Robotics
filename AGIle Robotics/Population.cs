@@ -10,8 +10,8 @@ namespace AGIle_Robotics
 {
     public class Population : IPopulation
     {
-        public STuple<double, double> WeightRange { get => weightRange; private set => weightRange = value; }
-        private STuple<double, double> weightRange;
+        public (double, double) WeightRange { get => weightRange; private set => weightRange = value; }
+        private (double, double) weightRange;
 
         public INeuralNetwork[] Networks { get => networks; private set => networks = value; }
         private INeuralNetwork[] networks;
@@ -61,7 +61,8 @@ namespace AGIle_Robotics
             }
         }
 
-        public async Task<IEvolvable> Evolve(double transitionRatio, double randomRatio, double mutationRatio)
+        async Task<IEvolvable> IEvolvable.Evolve(double transitionRatio, double randomRatio, double mutationRatio) => await Evolve(transitionRatio, randomRatio, mutationRatio);
+        public async Task<IPopulation> Evolve(double transitionRatio, double randomRatio, double mutationRatio)
         {
             int len = Networks.Length;
             int transitionAmount = (int)(len * transitionRatio);
@@ -69,7 +70,8 @@ namespace AGIle_Robotics
             int mutationAmount = (int)(len * mutationRatio);
 
             List<INeuralNetwork> nextNets = new List<INeuralNetwork>();
-            List<INeuralNetwork> remainingNets = Networks.OrderByDescending(n => n.Fitness).ToList();
+            List<INeuralNetwork> remainingNets = await Task.Run(
+                () => Networks.OrderByDescending(n => n.Fitness).ToList());
             int count = 0;
             int left = len;
 
@@ -101,11 +103,11 @@ namespace AGIle_Robotics
 
         private void ChooseBest(ref List<INeuralNetwork> nextNets, ref List<INeuralNetwork> remainingNets, int amount)
         {
-            for(int i = 0; i < amount; i++)
+            for (int i = 0; i < amount; i++)
             {
-                nextNets.Add(remainingNets[0]);
-                remainingNets.RemoveAt(0);
+                nextNets.Add(remainingNets[i]);
             }
+            remainingNets.RemoveRange(0, amount);
         }
 
         private void ChooseRandom(ref List<INeuralNetwork> nextNets, ref List<INeuralNetwork> remainingNets, ref int left, int amount)

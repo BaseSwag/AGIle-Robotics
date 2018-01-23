@@ -20,102 +20,96 @@ namespace TestConsole
 
         static void Main(string[] args)
         {
-            var generation = new Generation(
-                size: 50,
-                popSize: (50, 100),
-                ports: (4, 2),
-                length: (10, 100),
-                width: (10, 50),
+            var trainer = new Trainer(
+                transitionRatio: 0.5,
+                randomRatio: 0.1,
+                mutationRatio: 0.1);
+
+            trainer.Initialize(
+                size: 5,
+                popSize: (5, 10),
+                ports: (1, 1),
+                length: (2, 5),
+                width: (2, 5),
                 weightRange: (-2.0, 2.0),
                 activateWith: Math.Tanh
-                );
+                ).Wait();
 
-            generation.Create().Wait();
-            generation.Evaluate(fitnessFunction);
+            trainer.Create().Wait();
 
-            Console.WriteLine();
+            trainer.FitnessFunction = FitnessFunction;
 
-            for (int i = 0; i < 20; i++)
+            for(int i = 0; i < 10000; i++)
             {
-                int rand = AGIle_Robotics.Environment.RandomInt(generation.Populations.Length);
-                var pop = generation.Populations[rand];
-                rand = AGIle_Robotics.Environment.RandomInt(pop.Networks.Length);
-                var net = pop.Networks[rand];
-
-                double[] input = new double[] { .1, .3, -.5, .75 };
-                var result = net.Activate(input);
-                foreach (var d in result)
-                {
-                    Console.Write($"{d} ");
-                }
-                Console.WriteLine();
+                Console.WriteLine($"Generation: {trainer.Level}");
+                //trainer.EvaluateAndEvolve(FitnessFunction).Wait();
+                trainer.Evaluate().Wait();
+                trainer.Evolve().Wait();
             }
 
+            for(int i = 0; i < 1; i++)
+            {
+                var testTask = trainer.CurrentGeneration.Best.ActivateAsync(new double[] { 1 });
+                testTask.Wait();
+                var test = testTask.Result[0];
+
+                Console.WriteLine($"{test}");
+            }
+
+            Console.WriteLine();
             Console.ReadLine();
         }
 
-        static void TestPerformance()
+        static async Task<double> TestSumFitness(INeuralNetwork n)
         {
-            DateTime start;
-            DateTime end;
-
-            Console.WriteLine("Linear");
-            start = DateTime.Now;
-            for(int i = 0; i < steps; i++)
-            {
-                Console.WriteLine(i);
-                TestMethod();
-            }
-            end = DateTime.Now;
-            Console.WriteLine(end - start);
-
-            Console.WriteLine();
-
-            Console.WriteLine("WorkPool");
-            start = DateTime.Now;
-            TestPool();
-            end = DateTime.Now;
-            Console.WriteLine(end - start);
-
-            Console.WriteLine();
-
-            workPool.MaxThreads = 8;
-            Console.WriteLine("WorkPool 2");
-            start = DateTime.Now;
-            TestPool();
-            end = DateTime.Now;
-            Console.WriteLine(end - start);
-            Console.ReadLine();
+            var result = await TestSum(n);
+            return result.Item1;
         }
-
-        static void TestPool()
-        {
-            for(int i = 0; i < steps; i++)
-            {
-                Task t = new Task(() => TestMethod());
-                tasks[i] = t;
-
-                workPool.EnqueueTask(t);
-                //Console.WriteLine($"Workload: {workPool.Workload}");
-            }
-
-            Task.WaitAll(tasks);
-        }
-
-        static void TestMethod()
+        static async Task<(double, double, double, double)> TestSum(INeuralNetwork n)
         {
             Random r = new Random();
-            for (int i = 0; i < 10000000; i++)
-            {
-                var x = Math.Sqrt(r.NextDouble());
-            }
+            var a = r.NextDouble();
+            var b = r.NextDouble();
+            var correct = a + b;
+
+            var result = await n.ActivateAsync(new double[] { a, b });
+            double sum = result[0];
+
+            double fitness = correct - sum;
+            fitness = -Math.Abs(fitness);
+            return (fitness, a, b, sum);
         }
 
-        static Task<STuple<double, double>> fitnessFunction (INeuralNetwork n1, INeuralNetwork n2) 
+        static async Task<(double, double)> TestLarger(INeuralNetwork n1, INeuralNetwork n2, TaskCompletionSource<STuple<double, double>> tcs)
+        {
+            var a = await n1.ActivateAsync(new double[] { 1 });
+            var b = await n2.ActivateAsync(new double[] { 1 });
+
+            (double, double) result;
+            if(a[0] < b[0])
+            {
+                result = (-1, 1);
+                tcs.SetResult(result);
+            }
+            else
+            {
+                result = (1, -1);
+                tcs.SetResult(result);
+            }
+            return result;
+        }
+
+        static Task<STuple<double, double>> FitnessFunction (INeuralNetwork n1, INeuralNetwork n2) 
         {
             TaskCompletionSource<STuple<double, double>> tcs = new TaskCompletionSource<STuple<double, double>>();
-            TestMethod();
+            TestLarger(n1, n2, tcs);
             return tcs.Task;
+        }
+
+        static async Task TestFitnessFunction(INeuralNetwork n1, INeuralNetwork n2, TaskCompletionSource<STuple<double, double>> tcs)
+        {
+            var results = await Task.WhenAll(new Task<double>[] { TestSumFitness(n1), TestSumFitness(n1) });
+            tcs.SetResult((results[0], results[1]));
         }
     }
 }
