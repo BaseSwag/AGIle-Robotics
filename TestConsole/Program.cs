@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,11 +27,11 @@ namespace TestConsole
                 mutationRatio: 0.1);
 
             trainer.Initialize(
-                size: 5,
-                popSize: (5, 10),
+                size: 20,
+                popSize: (10, 20),
                 ports: (1, 1),
-                length: (2, 5),
-                width: (2, 5),
+                length: (5, 15),
+                width: (2, 15),
                 weightRange: (-2.0, 2.0),
                 activateWith: Math.Tanh
                 ).Wait();
@@ -39,12 +40,16 @@ namespace TestConsole
 
             trainer.FitnessFunction = FitnessFunction;
 
+            Stopwatch watch;
             for(int i = 0; i < 10000; i++)
             {
-                Console.WriteLine($"Generation: {trainer.Level}");
-                //trainer.EvaluateAndEvolve(FitnessFunction).Wait();
+                watch = Stopwatch.StartNew();
                 trainer.Evaluate().Wait();
+                var time1 = watch.Elapsed.TotalSeconds;
+                watch = Stopwatch.StartNew();
                 trainer.Evolve().Wait();
+                var time2 = watch.Elapsed.TotalSeconds;
+                Console.WriteLine("Generation: {0}, Evaluation: {1:f2}s, Evolution: {2:f2}s", trainer.Level, time1, time2);
             }
 
             for(int i = 0; i < 1; i++)

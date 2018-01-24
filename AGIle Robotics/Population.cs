@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SuperTuple;
+using System.Diagnostics;
 
 namespace AGIle_Robotics
 {
@@ -72,6 +73,7 @@ namespace AGIle_Robotics
             List<INeuralNetwork> nextNets = new List<INeuralNetwork>();
             List<INeuralNetwork> remainingNets = await Task.Run(
                 () => Networks.OrderByDescending(n => n.Fitness).ToList());
+
             int count = 0;
             int left = len;
 
