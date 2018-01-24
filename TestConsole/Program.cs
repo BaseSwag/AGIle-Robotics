@@ -21,7 +21,8 @@ namespace TestConsole
 
         static void Main(string[] args)
         {
-            PerformanceTests.ListPop();
+            //PerformanceTests.ListPop();
+            Usage.Init().Wait();
             Console.ReadLine();
         }
 

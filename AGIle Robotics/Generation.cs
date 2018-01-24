@@ -150,33 +150,42 @@ namespace AGIle_Robotics
 
             Evaluate(fitnessFunction, ref tasks, nextPop, nextNet);
         }
-        private async Task EvaluationCycle(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction, int pop, int net)
+        private Task EvaluationCycle(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction, int pop, int net)
         {
             var myNet = Populations[pop].Networks[net];
-            for(int p = pop; p < Populations.Length; p++)
+            var tasks = new List<Task>();
+            for (int p = pop; p < Populations.Length; p++)
             {
                 var p2 = p;
-                Parallel.For(net, Populations[p2].Networks.Length, async n =>
+                for(int n = net; n < Populations[p2].Networks.Length; n++)
                 {
-                    var enemyNet = Populations[p2].Networks[n];
-                    var result = await fitnessFunction(myNet, enemyNet);
+                    Task t = Task.Run(async () =>
+                    {
+                        var enemyNet = Populations[p2].Networks[n];
+                        var result = await fitnessFunction(myNet, enemyNet);
 
-                    Populations[pop].Networks[net].Fitness += result.Item1;
-                    Populations[p2].Networks[n].Fitness += result.Item2;
-                });
+                        Populations[pop].Networks[net].Fitness += result.Item1;
+                        Populations[p2].Networks[n].Fitness += result.Item2;
+                    });
+                    tasks.Add(t);
+                }
             }
+            return Task.WhenAll(tasks.ToArray());
         }
 
         private Task ResetFitness()
         {
             return Task.Run(() =>
             {
-                for (int p = 0; p < Populations.Length; p++)
+                Parallel.For(0, Populations.Length, (p) =>
                 {
-                    Populations[p].ResetBest();
-                    for (int n = 0; n < Populations[p].Networks.Length; n++)
+                    int p2 = p;
+                    Populations[p2].ResetBest();
+                    Parallel.For(0, Populations[p2].Networks.Length, n =>
+                    {
                         Populations[p].Networks[n].Fitness = 0;
-                }
+                    });
+                });
             });
         }
 
