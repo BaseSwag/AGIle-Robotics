@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AGIle_Robotics.Interfaces;
+using SuperTuple;
 
 namespace AGIle_Robotics
 {
@@ -12,15 +13,15 @@ namespace AGIle_Robotics
         public INeuron[] Neurons { get => neurons; private set => neurons = value; }
         private INeuron[] neurons;
 
-        public Tuple<double, double> WeightRange { get => weightRange; private set => weightRange = value; }
-        private Tuple<double, double> weightRange;
+        public (double, double) WeightRange { get => weightRange; private set => weightRange = value; }
+        private (double, double) weightRange;
 
         public Func<double, double> ActivationFunction { get => activationFunction; private set => activationFunction = value; }
         private Func<double, double> activationFunction;
 
         private int inputSize;
 
-        public Layer(int size, int inputSize, Tuple<double, double> weightRange, Func<double, double> activateWith, bool init = true)
+        public Layer(int size, int inputSize, STuple<double, double> weightRange, Func<double, double> activateWith, bool init = true)
         {
             WeightRange = weightRange;
             ActivationFunction = activateWith;
@@ -35,12 +36,38 @@ namespace AGIle_Robotics
 
         public double[] Activate(double[] input)
         {
-            double[] output = new double[Neurons.Length];
-            for(int i = 0; i < Neurons.Length; i++)
+            var output = new double[Neurons.Length];
+            for (int i = 0; i < Neurons.Length; i++)
             {
                 output[i] = Neurons[i].Activate(input)[0];
             }
             return output;
+        }
+
+        public async Task<double[]> ActivateAsync(double[] input)
+        {
+            if (input.Length < Environment.WorkCapacity)
+            {
+                return await Task.Run(() => Activate(input));
+            }
+            else
+            {
+                WorkPool workPool = new WorkPool(Environment.WorkCapacity);
+                Task<double>[] tasks = new Task<double>[Neurons.Length];
+
+                for (int i = 0; i < Neurons.Length; i++)
+                {
+                    var x = i;
+
+                    Task<double> t = new Task<double>(() => Neurons[x].ActivateAsync(input).Result[0]);
+
+                    tasks[i] = t;
+
+                    workPool.EnqueueTask(t);
+                }
+
+                return await Task.WhenAll(tasks);
+            }
         }
 
         public INeuralElement CrossOver(INeuralElement e, double p1, double p2)

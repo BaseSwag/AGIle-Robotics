@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AGIle_Robotics.Interfaces;
+using SuperTuple;
 
 namespace AGIle_Robotics
 {
@@ -16,21 +17,23 @@ namespace AGIle_Robotics
 
         public int OutputSize => Layers.Length > 0 ? Layers[Layers.Length - 1].Neurons.Length : 0;
 
-        public Tuple<double, double> WeightRange { get => weightRange; private set => weightRange = value; }
-        private Tuple<double, double> weightRange;
+        public (double, double) WeightRange { get => weightRange; private set => weightRange = value; }
+        private (double, double) weightRange;
 
         public double Fitness { get => fitness; set => fitness = value; }
         private double fitness;
 
-        public Func<double, double> ActivationFunction => throw new NotImplementedException();
+        public Func<double, double> ActivationFunction { get => activationFunction; set => activationFunction = value; }
+        private Func<double, double> activationFunction;
 
         public int[] Definition { get => definition; set => definition = value; }
         private int[] definition;
 
-        public NeuralNetwork(int[] definition, Tuple<double, double> weightRange, Func<double, double> activateWith, bool init = true)
+        public NeuralNetwork(int[] definition, STuple<double, double> weightRange, Func<double, double> activateWith, bool init = true)
         {
             WeightRange = weightRange;
             Definition = definition;
+            ActivationFunction = activateWith;
 
             Layers = new ILayer[definition.Length];
             for(int i = 0; i < definition.Length; i++)
@@ -46,6 +49,15 @@ namespace AGIle_Robotics
             for (int i = 0; i < Layers.Length; i++)
             {
                 input = Layers[i].Activate(input);
+            }
+            return input;
+        }
+
+        public async Task<double[]> ActivateAsync(double[] input)
+        {
+            for (int i = 0; i < Layers.Length; i++)
+            {
+                input = await Layers[i].ActivateAsync(input);
             }
             return input;
         }

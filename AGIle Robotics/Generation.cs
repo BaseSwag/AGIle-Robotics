@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AGIle_Robotics.Interfaces;
+using SuperTuple;
 
 namespace AGIle_Robotics
 {
@@ -11,9 +12,6 @@ namespace AGIle_Robotics
     {
         public IPopulation[] Populations { get => populations; set => populations = value; }
         private IPopulation[] populations;
-
-        public int Level { get => level; private set => level = value; }
-        private int level;
 
         public int Size { get => size; private set => size = value; }
         private int size;
@@ -50,26 +48,26 @@ namespace AGIle_Robotics
         }
         public INeuralNetwork best;
 
-        public Tuple<int, int> Ports { get => ports; private set => ports = value; }
-        public Tuple<int, int> ports;
+        public (int, int) Ports { get => ports; private set => ports = value; }
+        public (int, int) ports;
 
-        public Tuple<int, int> PopulationSize { get => populationSize; private set => populationSize = value; }
-        public Tuple<int, int> populationSize;
+        public (int, int) PopulationSize { get => populationSize; private set => populationSize = value; }
+        public (int, int) populationSize;
 
-        public Tuple<double, double> WeightRange { get => weightRange; private set => weightRange = value; }
-        private Tuple<double, double> weightRange;
+        public (double, double) WeightRange { get => weightRange; private set => weightRange = value; }
+        private (double, double) weightRange;
 
         public Func<double, double> ActivationFunction { get => activationFunction; private set => activationFunction = value; }
         private Func<double, double> activationFunction = Math.Tanh;
 
-        public Tuple<int, int> Length { get => length; private set => length = value; }
-        public Tuple<int, int> length;
+        public (int, int) Length { get => length; private set => length = value; }
+        public (int, int) length;
 
-        public Tuple<int, int> Width { get => width; private set => width = value; }
-        public Tuple<int, int> width;
+        public (int, int) Width { get => width; private set => width = value; }
+        public (int, int) width;
 
 
-        public Generation(int size, Tuple<int, int> popSize, Tuple<int, int> ports, Tuple<int, int> length, Tuple<int, int> width, Tuple<double, double> weightRange, Func<double, double> activateWith)
+        public Generation(int size, STuple<int, int> popSize, STuple<int, int> ports, STuple<int, int> length, STuple<int, int> width, STuple<double, double> weightRange, Func<double, double> activateWith)
         {
             Size = size;
             PopulationSize = popSize;
@@ -115,7 +113,7 @@ namespace AGIle_Robotics
             return newPop;
         }
 
-        public async void Evaluate(Func<INeuralNetwork, INeuralNetwork, Task<Tuple<double, double>>> fitnessFunction)
+        public async Task Evaluate(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction)
         {
             await ResetFitness();
 
@@ -126,8 +124,9 @@ namespace AGIle_Robotics
             await Task.WhenAll(tasks.ToArray());
 
             Best = null;
+
         }
-        private void Evaluate(Func<INeuralNetwork, INeuralNetwork, Task<Tuple<double, double>>> fitnessFunction, ref List<Task> tasks, int pop, int net)
+        private void Evaluate(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction, ref List<Task> tasks, int pop, int net)
         {
             var p = pop;
             var n = net;
@@ -151,12 +150,12 @@ namespace AGIle_Robotics
 
             Evaluate(fitnessFunction, ref tasks, nextPop, nextNet);
         }
-        private async Task EvaluationCycle(Func<INeuralNetwork, INeuralNetwork, Task<Tuple<double, double>>> fitnessFunction, int pop, int net)
+        private async Task EvaluationCycle(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction, int pop, int net)
         {
             var myNet = Populations[pop].Networks[net];
             for(int p = pop; p < Populations.Length; p++)
             {
-                for(int n = net; n < Populations[pop].Networks.Length; n++)
+                for(int n = net; n < Populations[p].Networks.Length; n++)
                 {
                     var enemyNet = Populations[p].Networks[n];
                     var result = await fitnessFunction(myNet, enemyNet);
@@ -167,9 +166,9 @@ namespace AGIle_Robotics
             }
         }
 
-        private async Task ResetFitness()
+        private Task ResetFitness()
         {
-            await Task.Run(() =>
+            return Task.Run(() =>
             {
                 for (int p = 0; p < Populations.Length; p++)
                 {
@@ -180,21 +179,18 @@ namespace AGIle_Robotics
             });
         }
 
-        public async Task<IGeneration> Evolve()
-        {
-            return (IGeneration) await Evolve(TransitionRatio, RandomRatio, MutationRatio);
-        }
-        public async Task<IEvolvable> Evolve(double transitionRatio, double randomRatio, double mutationRatio)
+        public Task<IGeneration> Evolve() => Evolve(TransitionRatio, RandomRatio, MutationRatio);
+        public async Task<IGeneration> Evolve(double transitionRatio, double randomRatio, double mutationRatio)
         {
             Task<IPopulation>[] tasks = new Task<IPopulation>[Size];
 
             for(int i = 0; i < Size; i++)
             {
                 var x = i;
-                var t = new Task<IPopulation>(
-                    () => (IPopulation)Populations[x].Evolve(TransitionRatio, RandomRatio, MutationRatio));
-                tasks[i] = t;
 
+                var t = new Task<IPopulation>(() => Populations[x].Evolve(transitionRatio, randomRatio, mutationRatio).Result);
+                
+                tasks[i] = t;
                 Environment.WorkPool.EnqueueTask(t);
             }
 
@@ -202,6 +198,10 @@ namespace AGIle_Robotics
             newGen.Populations = await Task.WhenAll(tasks);
 
             return newGen;
+        }
+        async Task<IEvolvable> IEvolvable.Evolve(double transitionRatio, double randomRatio, double mutationRatio)
+        {
+            return (IEvolvable) await Evolve(TransitionRatio, RandomRatio, MutationRatio);
         }
     }
 }
