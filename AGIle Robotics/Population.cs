@@ -74,17 +74,24 @@ namespace AGIle_Robotics
             List<INeuralNetwork> remainingNets = await Task.Run(
                 () => Networks.OrderByDescending(n => n.Fitness).ToList());
 
-            int count = 0;
-            int left = len;
+            Task[] tasks = new Task[2];
 
-            ChooseBest(ref nextNets, ref remainingNets, transitionAmount);
-            count += transitionAmount;
-            left -= transitionAmount;
+            tasks[0] = Task.Run(() =>
+            nextNets.AddRange(remainingNets.Take(transitionAmount)));
 
-            ChooseRandom(ref nextNets, ref remainingNets, ref left, randomAmount);
-            count += randomAmount;
+            tasks[1] = Task.Run(() =>
+            {
+                for (int i = 0; i < randomAmount; i++)
+                {
+                    int rand = Environment.RandomInt(transitionAmount, remainingNets.Count);
+                    nextNets.Add(remainingNets[rand]);
+                    remainingNets.RemoveAt(rand);
+                }
+            });
 
-            CrossOver(ref nextNets, count, len);
+            await Task.WhenAll(tasks);
+
+            CrossOver(ref nextNets, nextNets.Count, len);
 
             if(nextNets.Count != len)
             {
@@ -101,23 +108,6 @@ namespace AGIle_Robotics
                 newPopulation.Networks[index].Mutate(mutationRatio); // Mutate
             });
             return newPopulation;
-        }
-
-        private void ChooseBest(ref List<INeuralNetwork> nextNets, ref List<INeuralNetwork> remainingNets, int amount)
-        {
-            nextNets.AddRange(remainingNets.GetRange(0, amount));
-            remainingNets.RemoveRange(0, amount);
-        }
-
-        private void ChooseRandom(ref List<INeuralNetwork> nextNets, ref List<INeuralNetwork> remainingNets, ref int left, int amount)
-        {
-            for(int i = 0; i < amount; i++)
-            {
-                int rand = Environment.RandomInt(0, left);
-                nextNets.Add(remainingNets[rand]);
-                remainingNets.RemoveAt(rand);
-                left--;
-            }
         }
 
         private void CrossOver(ref List<INeuralNetwork> nextNets, int count, int total)
