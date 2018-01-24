@@ -22,8 +22,8 @@ GameObject:
   - component: {fileID: 212082712488524550}
   - component: {fileID: 50054053525720918}
   - component: {fileID: 70291868777974912}
-  - component: {fileID: 114389314356173660}
-  - component: {fileID: 114445248402684836}
+  - component: {fileID: 114590562566245878}
+  - component: {fileID: 114113989867308174}
   m_Layer: 0
   m_Name: car-blue
   m_TagString: Untagged
@@ -219,7 +219,7 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0}
   m_Size: {x: 25, y: 11}
   m_Direction: 1
---- !u!114 &114389314356173660
+--- !u!114 &114113989867308174
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -227,13 +227,40 @@ MonoBehaviour:
   m_GameObject: {fileID: 1146139668089658}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4ba61f4e80318f144ae153495219dad3, type: 3}
+  m_Script: {fileID: 11500000, guid: 9cec4ab2a5b70d64fa2cd7b58997990d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnInput:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 114590562566245878}
+        m_MethodName: OnInput
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_TypeName: AIInput+UnityFloatEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+--- !u!114 &114590562566245878
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1146139668089658}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 109b74d5496fdb8488639119557c48fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   OnSetAIInputs:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 114445248402684836}
+      - m_Target: {fileID: 114113989867308174}
         m_MethodName: SetAIInputs
         m_Mode: 0
         m_Arguments:
@@ -247,37 +274,13 @@ MonoBehaviour:
     m_TypeName: CarController+UnityFloatEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   lookRotationRelative: 0
-  lookRotationRelativeClamped: 0
-  LightSensorForward: {fileID: 0}
-  LightSensorBackward: {fileID: 0}
+  inTriggerForward: 1
+  sensorForward: 0
+  inTriggerBackward: 1
+  sensorBackward: 0
+  LightSensorForward: {fileID: 4717537162026618}
+  LightSensorBackward: {fileID: 4256961902994816}
   target: {fileID: 0}
---- !u!114 &114445248402684836
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1146139668089658}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2a39099af82490048a3dec93f8a2f443, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  OnInput:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 114389314356173660}
-        m_MethodName: OnInput
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-    m_TypeName: AIInput+UnityFloatEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
 --- !u!212 &212082712488524550
 SpriteRenderer:
   m_ObjectHideFlags: 1
@@ -312,7 +315,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 1ec4fc25cff45c14383424060c5cae52, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 76c7a631bebb3ee4198092a9c72c0bdc, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -356,7 +359,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 9c13386005d06b0468dec52ab68714c5, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 4b1790bbafd20cd4791507742ddbee49, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

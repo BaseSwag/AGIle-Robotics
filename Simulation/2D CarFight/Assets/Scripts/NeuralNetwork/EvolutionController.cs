@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using AGIle_Robotics.Interfaces;
 using AGIle_Robotics;
@@ -30,7 +31,7 @@ public class EvolutionController : MonoBehaviour {
     public Task<Tuple<double, double>> fitnessFunction(INeuralNetwork n1, INeuralNetwork n2)
     {
         TaskCompletionSource<Tuple<double, double>> tcs = new TaskCompletionSource<Tuple<double, double>>();
-        fights.Add(new Fight(n1, n2, tcs));
+        //fights.Add(new Fight(n1, n2, tcs));
         return tcs.Task;
 
     }
