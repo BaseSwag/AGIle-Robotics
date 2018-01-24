@@ -75,17 +75,17 @@ namespace AGIle_Robotics
 
         public void Mutate(double ratio)
         {
-            for(int i = 0; i < InputWeights.Length; i++)
+            Parallel.For(0, InputWeights.Length, index =>
             {
                 if (Environment.RandomBool(ratio))
                 {
-                    double rand = InputWeights[i];
+                    double rand = InputWeights[index];
                     var absRatio = Math.Abs(ratio);
                     rand += Environment.RandomDouble(-absRatio, absRatio);
                     rand = Environment.Cap(rand, WeightRange);
-                    InputWeights[i] = rand;
+                    InputWeights[index] = rand;
                 }
-            }
+            });
         }
     }
 }

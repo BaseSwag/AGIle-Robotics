@@ -28,19 +28,19 @@ namespace AGIle_Robotics
             this.inputSize = inputSize;
 
             Neurons = new INeuron[size];
-            for(int i = 0; i < Neurons.Length; i++)
+            Parallel.For(0, Neurons.Length, index =>
             {
-                Neurons[i] = new Neuron(inputSize, weightRange, activateWith, init);
-            }
+                Neurons[index] = new Neuron(inputSize, weightRange, activateWith, init);
+            });
         }
 
         public double[] Activate(double[] input)
         {
             var output = new double[Neurons.Length];
-            for (int i = 0; i < Neurons.Length; i++)
+            Parallel.For(0, Neurons.Length, index =>
             {
-                output[i] = Neurons[i].Activate(input)[0];
-            }
+                output[index] = Neurons[index].Activate(input)[0];
+            });
             return output;
         }
 
@@ -60,9 +60,7 @@ namespace AGIle_Robotics
                     var x = i;
 
                     Task<double> t = new Task<double>(() => Neurons[x].ActivateAsync(input).Result[0]);
-
                     tasks[i] = t;
-
                     workPool.EnqueueTask(t);
                 }
 
@@ -78,10 +76,10 @@ namespace AGIle_Robotics
             if(len == layer2?.Neurons.Length && inputSize == layer2.inputSize)
             {
                 var newLayer = new Layer(len, inputSize, WeightRange, ActivationFunction, false);
-                for(int i = 0; i < len; i++)
+                Parallel.For(0, len, index =>
                 {
-                    newLayer.Neurons[i] = (INeuron)Neurons[i].CrossOver(layer2.Neurons[i], p1, p2);
-                }
+                    newLayer.Neurons[index] = (INeuron)Neurons[index].CrossOver(layer2.Neurons[index], p1, p2);
+                });
                 return newLayer;
             }
             else
@@ -92,10 +90,10 @@ namespace AGIle_Robotics
 
         public void Mutate(double ratio)
         {
-            for(int i = 0; i < Neurons.Length; i++)
+            Parallel.For(0, Neurons.Length, index =>
             {
-                Neurons[i].Mutate(ratio);
-            }
+                Neurons[index].Mutate(ratio);
+            });
         }
     }
 }

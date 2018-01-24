@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SuperTuple;
+using System.Diagnostics;
 
 namespace AGIle_Robotics
 {
@@ -55,10 +56,10 @@ namespace AGIle_Robotics
             this.definition = definition;
 
             Networks = new INeuralNetwork[size];
-            for(int i = 0; i < size; i++)
+            Parallel.For(0, size, index =>
             {
-                Networks[i] = new NeuralNetwork(definition, weightRange, activateWith, init);
-            }
+                Networks[index] = new NeuralNetwork(definition, weightRange, activateWith, init);
+            });
         }
 
         async Task<IEvolvable> IEvolvable.Evolve(double transitionRatio, double randomRatio, double mutationRatio) => await Evolve(transitionRatio, randomRatio, mutationRatio);
@@ -72,17 +73,25 @@ namespace AGIle_Robotics
             List<INeuralNetwork> nextNets = new List<INeuralNetwork>();
             List<INeuralNetwork> remainingNets = await Task.Run(
                 () => Networks.OrderByDescending(n => n.Fitness).ToList());
-            int count = 0;
-            int left = len;
 
-            ChooseBest(ref nextNets, ref remainingNets, transitionAmount);
-            count += transitionAmount;
-            left -= transitionAmount;
+            Task[] tasks = new Task[2];
 
-            ChooseRandom(ref nextNets, ref remainingNets, ref left, randomAmount);
-            count += randomAmount;
+            tasks[0] = Task.Run(() =>
+            nextNets.AddRange(remainingNets.Take(transitionAmount)));
 
-            CrossOver(ref nextNets, count, len);
+            tasks[1] = Task.Run(() =>
+            {
+                for (int i = 0; i < randomAmount; i++)
+                {
+                    int rand = Environment.RandomInt(transitionAmount, remainingNets.Count);
+                    nextNets.Add(remainingNets[rand]);
+                    remainingNets.RemoveAt(rand);
+                }
+            });
+
+            await Task.WhenAll(tasks);
+
+            CrossOver(ref nextNets, nextNets.Count, len);
 
             if(nextNets.Count != len)
             {
@@ -90,35 +99,15 @@ namespace AGIle_Robotics
             }
 
             Population newPopulation = new Population(size, definition, WeightRange, ActivationFunction, false);
-            for(int i = 0; i < len; i++)
+            Parallel.For(0, len, index =>
             {
-                var net = nextNets[i];
-                newPopulation.Networks[i] = net;
-                newPopulation.Networks[i].Fitness = 0;
+                var net = nextNets[index];
+                newPopulation.Networks[index] = net;
+                newPopulation.Networks[index].Fitness = 0;
 
-                newPopulation.Networks[i].Mutate(mutationRatio); // Mutate
-            }
+                newPopulation.Networks[index].Mutate(mutationRatio); // Mutate
+            });
             return newPopulation;
-        }
-
-        private void ChooseBest(ref List<INeuralNetwork> nextNets, ref List<INeuralNetwork> remainingNets, int amount)
-        {
-            for (int i = 0; i < amount; i++)
-            {
-                nextNets.Add(remainingNets[i]);
-            }
-            remainingNets.RemoveRange(0, amount);
-        }
-
-        private void ChooseRandom(ref List<INeuralNetwork> nextNets, ref List<INeuralNetwork> remainingNets, ref int left, int amount)
-        {
-            for(int i = 0; i < amount; i++)
-            {
-                int rand = Environment.RandomInt(0, left);
-                nextNets.Add(remainingNets[rand]);
-                remainingNets.RemoveAt(rand);
-                left--;
-            }
         }
 
         private void CrossOver(ref List<INeuralNetwork> nextNets, int count, int total)

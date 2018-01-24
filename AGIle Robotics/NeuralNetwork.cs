@@ -36,12 +36,12 @@ namespace AGIle_Robotics
             ActivationFunction = activateWith;
 
             Layers = new ILayer[definition.Length];
-            for(int i = 0; i < definition.Length; i++)
+            Parallel.For(0, definition.Length, index =>
             {
-                int inputSize = i > 0 ? definition[i - 1] : definition[i];
-                ILayer layer = new Layer(definition[i], inputSize, weightRange, activateWith, init);
-                Layers[i] = layer;
-            }
+                int inputSize = index > 0 ? definition[index - 1] : definition[index];
+                ILayer layer = new Layer(definition[index], inputSize, weightRange, activateWith, init);
+                Layers[index] = layer;
+            });
         }
 
         public double[] Activate(double[] input)
@@ -70,10 +70,10 @@ namespace AGIle_Robotics
             if(len == net2?.Layers.Length && InputSize == net2.InputSize && OutputSize == net2.OutputSize)
             {
                 var newNetwork = new NeuralNetwork(Definition, WeightRange, ActivationFunction, false);
-                for(int i = 0; i < len; i++)
+                Parallel.For(0, len, index =>
                 {
-                    newNetwork.Layers[i] = (ILayer)Layers[i].CrossOver(net2.Layers[i], p1, p2);
-                }
+                    newNetwork.Layers[index] = (ILayer)Layers[index].CrossOver(net2.Layers[index], p1, p2);
+                });
                 return newNetwork;
             }
             else
@@ -84,10 +84,10 @@ namespace AGIle_Robotics
 
         public void Mutate(double ratio)
         {
-            for(int i = 0; i < Layers.Length; i++)
+            Parallel.For(0, Layers.Length, index =>
             {
-                Layers[i].Mutate(ratio);
-            }
+                Layers[index].Mutate(ratio);
+            });
         }
     }
 }
