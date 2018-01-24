@@ -1,8 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using System.Threading.Tasks;
+using AGIle_Robotics.Interfaces;
+using System;
 
 public class AIInput : MonoBehaviour
 {
@@ -13,6 +16,10 @@ public class AIInput : MonoBehaviour
 
     [SerializeField]
     public UnityFloatEvent OnInput;
+
+
+
+    public INeuralNetwork neuralNetwork;
 
 
     float[] inputs = new float[6];
@@ -31,23 +38,11 @@ public class AIInput : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float hor = Mathf.Clamp(inputs[0] / 90, -1f, 1f);
-        float vert = 1;
-
-        if (inputs[4] > 0.1f)
+        if (neuralNetwork != null)
         {
-            vert = -1;
-            hor = -0.2f;
+            double[] outputs = neuralNetwork.Activate(Array.ConvertAll(inputs, x => (double)x));
+            OnInput?.Invoke(Array.ConvertAll(outputs, x => (float)x));
         }
-
-        if (inputs[5] > 0.1f)
-        {
-            vert = 1;
-            hor = 0.2f;
-        }
-
-        if (OnInput != null)
-            OnInput.Invoke(new float[] { hor, vert });
 
     }
 }
