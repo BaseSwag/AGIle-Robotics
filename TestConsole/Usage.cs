@@ -36,7 +36,7 @@ namespace TestConsole
             Trainer.FitnessFunction = FitnessFunction;
         }
 
-        public static async Task EvaluateAndEvolve(int a)
+        public static async Task EvaluateAndEvolve(int a = 1)
         {
             for(int i = 0; i < a; i++)
             {
@@ -47,8 +47,7 @@ namespace TestConsole
 
         static async Task<STuple<double, double>> FitnessFunction (INeuralNetwork n1, INeuralNetwork n2) 
         {
-            TaskCompletionSource<STuple<double, double>> tcs = new TaskCompletionSource<STuple<double, double>>();
-            await Task.Delay(10);
+            await Task.Delay(1000);
             Random r = new Random();
             var result = (r.NextDouble(), r.NextDouble());
             return result;
