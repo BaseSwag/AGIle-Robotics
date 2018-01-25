@@ -159,13 +159,14 @@ namespace AGIle_Robotics
                 var p2 = p;
                 for(int n = net; n < Populations[p2].Networks.Length; n++)
                 {
+                    var n2 = n;
                     Task t = Task.Run(async () =>
                     {
-                        var enemyNet = Populations[p2].Networks[n];
+                        var enemyNet = Populations[p2].Networks[n2];
                         var result = await fitnessFunction(myNet, enemyNet);
 
                         Populations[pop].Networks[net].Fitness += result.Item1;
-                        Populations[p2].Networks[n].Fitness += result.Item2;
+                        Populations[p2].Networks[n2].Fitness += result.Item2;
                     });
                     tasks.Add(t);
                 }

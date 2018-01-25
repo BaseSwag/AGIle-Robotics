@@ -23,6 +23,7 @@ namespace TestConsole
         {
             //PerformanceTests.ListPop();
             Usage.Init().Wait();
+            Usage.EvaluateAndEvolve(100).Wait();
             Console.ReadLine();
         }
 

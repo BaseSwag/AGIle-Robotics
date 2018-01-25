@@ -13,16 +13,6 @@ namespace TestConsole
     {
         static Trainer Trainer;
         static Queue<Fight> Fights = new Queue<Fight>();
-        public static Fight Fight
-        {
-            get => fight;
-            set
-            {
-                // asdfasdf
-                fight = value;
-            }
-        }
-        static Fight fight;
 
         public static async Task Init()
         {
@@ -32,11 +22,11 @@ namespace TestConsole
                 mutationRatio: 0.1);
 
             await Trainer.Initialize(
-                size: 20,
-                popSize: (10, 20),
+                size: 10,
+                popSize: (10, 15),
                 ports: (1, 1),
                 length: (5, 15),
-                width: (2, 15),
+                width: (2, 10),
                 weightRange: (-2.0, 2.0),
                 activateWith: Math.Tanh
                 );
@@ -50,19 +40,18 @@ namespace TestConsole
         {
             for(int i = 0; i < a; i++)
             {
+                Console.WriteLine(Trainer.Level);
                 await Trainer.EvaluateAndEvolve();
             }
         }
 
-        static Task<STuple<double, double>> FitnessFunction (INeuralNetwork n1, INeuralNetwork n2) 
+        static async Task<STuple<double, double>> FitnessFunction (INeuralNetwork n1, INeuralNetwork n2) 
         {
             TaskCompletionSource<STuple<double, double>> tcs = new TaskCompletionSource<STuple<double, double>>();
-            var fight = new Fight(n1, n2, tcs);
-            lock (Fights)
-            {
-                Fights.Enqueue(fight);
-            }
-            return tcs.Task;
+            await Task.Delay(10);
+            Random r = new Random();
+            var result = (r.NextDouble(), r.NextDouble());
+            return result;
         }
     }
 }

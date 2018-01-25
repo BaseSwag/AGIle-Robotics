@@ -77,15 +77,24 @@ namespace AGIle_Robotics
             Task[] tasks = new Task[2];
 
             tasks[0] = Task.Run(() =>
-            nextNets.AddRange(remainingNets.Take(transitionAmount)));
+            {
+                lock (nextNets)
+                {
+                    nextNets.AddRange(remainingNets.Take(transitionAmount));
+                }
+            });
 
             tasks[1] = Task.Run(() =>
             {
                 for (int i = 0; i < randomAmount; i++)
                 {
-                    int rand = Environment.RandomInt(transitionAmount, remainingNets.Count);
-                    nextNets.Add(remainingNets[rand]);
-                    remainingNets.RemoveAt(rand);
+                    lock(nextNets)
+                        lock (remainingNets)
+                        {
+                            int rand = Environment.RandomInt(transitionAmount, remainingNets.Count);
+                            nextNets.Add(remainingNets[rand]);
+                            remainingNets.RemoveAt(rand);
+                        }
                 }
             });
 
