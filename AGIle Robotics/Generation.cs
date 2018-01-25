@@ -159,7 +159,7 @@ namespace AGIle_Robotics
             for (int p = pop; p < Populations.Length; p++)
             {
                 var p2 = p;
-                for(int n = net; n < Populations[p2].Networks.Length; n++)
+                for(int n = net + 1; n < Populations[p2].Networks.Length; n++)
                 {
                     var n2 = n;
                     Task t = Task.Run(() =>
