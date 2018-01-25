@@ -13,6 +13,16 @@ namespace TestConsole
     {
         static Trainer Trainer;
         static Queue<Fight> Fights = new Queue<Fight>();
+        public static Fight Fight
+        {
+            get => fight;
+            set
+            {
+                // asdfasdf
+                fight = value;
+            }
+        }
+        static Fight fight;
 
         public static async Task Init()
         {
