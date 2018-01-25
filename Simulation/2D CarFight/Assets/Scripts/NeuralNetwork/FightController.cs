@@ -11,9 +11,15 @@ public class FightController : MonoBehaviour {
 
     private GameObject thisGameObject;
 
-    private bool done = false;
+    public bool done = false;
     private bool isReset = true;
-    
+
+    public Vector3 StartPosCar1;
+    public Vector3 StartRotationCar1;
+
+    public Vector3 StartPosCar2;
+    public Vector3 StartRotationCar2;
+
     public Fight Fight
     {
         get
@@ -23,6 +29,7 @@ public class FightController : MonoBehaviour {
 
         set
         {
+            Debug.Log($"Fight assigned to {gameObject.name}");
             this.Reset();
             fight = value;
             car1.neuralNetwork = fight.n1;
@@ -36,8 +43,8 @@ public class FightController : MonoBehaviour {
         thisGameObject = gameObject;
 	}
 	
-	// Update is called once per frame
-	void Update () {
+	// FixedUpdate is called once per frame
+	void FixedUpdate () {
 		
 	}
 
@@ -45,7 +52,6 @@ public class FightController : MonoBehaviour {
     {
         if (!done)
         {
-            done = true;
             if (collider.gameObject == car1.gameObject)
             {
                 fight.tcs.SetResult(new Tuple<double, double>(1, -1));
@@ -54,11 +60,26 @@ public class FightController : MonoBehaviour {
             {
                 fight.tcs.SetResult(new Tuple<double, double>(-1, 1));
             }
+            done = true;
         }
     }
 
     public void Reset()
     {
-        PrefabUtility.ResetToPrefabState(thisGameObject);
+        car1.transform.localPosition = StartPosCar1;
+        car1.transform.localRotation = Quaternion.Euler(StartRotationCar1);
+
+        car2.transform.localPosition = StartPosCar2;
+        car2.transform.localRotation = Quaternion.Euler(StartRotationCar2);
+
+        car1.GetComponent<CarController>().dead = false;
+        car2.GetComponent<CarController>().dead = false;
+
+        car1.neuralNetwork = null;
+        car1.neuralNetwork = null;
+
+        this.fight = null;
+        this.isReset = true;
+        this.done = false;
     }
 }

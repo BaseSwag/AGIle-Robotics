@@ -17,8 +17,8 @@ public class HumanInput : MonoBehaviour {
 		
 	}
 	
-	// Update is called once per frame
-	void Update () {
+	// FixedUpdate is called once per frame
+	void FixedUpdate () {
         OnInput.Invoke(new float[] { Input.GetAxis("Horizontal"), Input.GetAxis("Vertical") });
 	}
 }

@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
@@ -13,9 +13,10 @@ using System;
 
 public class EvolutionController : MonoBehaviour
 {
-
+    public int fightCountPerRow = 10;
+    public int fightRows = 2;
     public GameObject fightPrefab;
-    public FightController[] fights = new FightController[5];
+    public FightController[] fights = new FightController[10];
     public Queue<Fight> fightsQueue = new Queue<Fight>();
 
     public Task Task;
@@ -23,25 +24,7 @@ public class EvolutionController : MonoBehaviour
     public volatile bool needsRechecking = false;
 
     public Trainer trainer;
-    Generation newGeneration()
-    {
-
-        var generation = new Generation(
-                size: 50,
-                popSize: new Tuple<int, int>(25, 50),
-                ports: new Tuple<int, int>(6, 3),
-                length: new Tuple<int, int>(5, 25),
-                width: new Tuple<int, int>(5, 20),
-                weightRange: new Tuple<double, double>(-2, 2),
-                activateWith: Math.Tanh);
-
-        generation.Create().Wait();
-        generation.Evaluate(fitnessFunction);
-
-        return generation;
-    }
-
-
+   
     public void CheckForNewFight()
     {
         needsRechecking = false;
@@ -49,6 +32,7 @@ public class EvolutionController : MonoBehaviour
         for (int i = 0; i < fights.Length; i++)
         {
             if (fights[i].Fight == null || fights[i].Fight.tcs.Task.IsCompleted || fights[i].Fight.tcs.Task.IsFaulted || fights[i].Fight.tcs.Task.IsCanceled)
+            //if (fights[i].done)
             {
                 fightIndex = i;
                 break;
@@ -83,12 +67,17 @@ public class EvolutionController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        for (int i = 0; i < fights.Length; i++)
-        {
-            GameObject arena = (GameObject)Instantiate(fightPrefab, new Vector3(4000 * i, 0, 0), new Quaternion(), this.transform);
-            FightController controller = arena.GetComponent<FightController>();
-            fights[i] = controller;
-        }
+        fights = new FightController[fightRows * fightCountPerRow];
+        for (int r = 0; r < fightRows; r++)
+            for (int i = 0; i < fightCountPerRow; i++)
+            {
+                GameObject arena = (GameObject)Instantiate(fightPrefab, new Vector3(4000 * i, 4000 * r, 0), new Quaternion(), this.transform);
+                FightController controller = arena.GetComponent<FightController>();
+                fights[r * fightCountPerRow + i] = controller;
+                arena.name = $"Arena {r * fightCountPerRow + i}";
+            }
+
+        Camera.main.GetComponent<SmartCamera>().targets = fights.Select((x) => x.gameObject.transform).ToArray();
 
         
         Debug.Log("Arenas created");
@@ -120,12 +109,12 @@ public class EvolutionController : MonoBehaviour
         });
     }
 
-    // Update is called once per frame
-    void Update()
+    // FixedUpdate is called once per frame
+    void FixedUpdate()
     {
-        if(initialized && (Task == null || Task.IsCompleted))
+        if(initialized && (Task == null || Task.IsCompleted) && fightsQueue.Count == 0)
         {
-            Debug.Log($"Generation {trainer.Level}");
+            Debug.Log("New Generation");
             Task = trainer.EvaluateAndEvolve();
         }
 

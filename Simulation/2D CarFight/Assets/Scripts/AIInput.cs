@@ -35,8 +35,8 @@ public class AIInput : MonoBehaviour
 
     }
 
-    // Update is called once per frame
-    void Update()
+    // FixedUpdate is called once per frame
+    void FixedUpdate()
     {
         if (neuralNetwork != null)
         {

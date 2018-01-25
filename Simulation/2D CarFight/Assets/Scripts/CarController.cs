@@ -48,8 +48,8 @@ public class CarController : MonoBehaviour
         lastPos = transform.position;
     }
 
-    // Update is called once per frame
-    void Update()
+    // FixedUpdate is called once per frame
+    void FixedUpdate()
     {
         if (!dead)
         {
@@ -58,7 +58,7 @@ public class CarController : MonoBehaviour
             if (vertical > 0.1 || vertical < -0.1)
             {
                 rigidbody2D.drag = 2;
-                rigidbody2D.AddForce(transform.right * vertical * Time.deltaTime * speedMultiplier, ForceMode2D.Force);
+                rigidbody2D.AddForce(transform.right * vertical * Time.fixedDeltaTime * speedMultiplier, ForceMode2D.Force);
             }
             else
             {
@@ -68,7 +68,7 @@ public class CarController : MonoBehaviour
 
             if (hortizontal > 0.1 || hortizontal < -0.1)
                 rigidbody2D.angularVelocity = -hortizontal * 360 / 1.2f;
-            //transform.rotation *= Quaternion.Euler(new Vector3(0, 0, -hortizontal * Time.deltaTime * 360 / 1.2f));
+            //transform.rotation *= Quaternion.Euler(new Vector3(0, 0, -hortizontal * Time.fixedDeltaTime * 360 / 1.2f));
 
             Vector3 difference = target.position - transform.position;
             float rotationZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
@@ -83,19 +83,19 @@ public class CarController : MonoBehaviour
 
             if (inTriggerBackward)
                 if (sensorBackward > 0)
-                    sensorBackward -= Time.deltaTime;
+                    sensorBackward -= Time.fixedDeltaTime;
                 else
                     sensorBackward = 0;
 
             if (inTriggerForward)
                 if (sensorForward > 0)
-                    sensorForward -= Time.deltaTime;
+                    sensorForward -= Time.fixedDeltaTime;
                 else
                     sensorForward = 0;
 
             OnSetAIInputs.Invoke(new float[] { -lookRotationRelative, 0, hortizontal, vertical, sensorForward, sensorBackward });
 
-            count += Time.deltaTime;
+            count += Time.fixedDeltaTime;
 
             if (count > 2)
             {

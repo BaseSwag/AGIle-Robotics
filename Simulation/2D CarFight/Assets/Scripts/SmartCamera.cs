@@ -5,7 +5,7 @@ using UnityEngine;
 public class SmartCamera : MonoBehaviour {
 
     [SerializeField]
-    Transform[] targets;
+    public Transform[] targets;
 
     [SerializeField]
     float boundingBoxPadding = 2f;
