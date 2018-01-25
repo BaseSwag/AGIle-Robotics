@@ -19,20 +19,24 @@ public class EvolutionController : MonoBehaviour
     public FightController[] fights = new FightController[10];
     public Queue<Fight> fightsQueue = new Queue<Fight>();
 
+    public static int fightsDone = 0;
+
     public Task Task;
     public bool initialized = false;
     public volatile bool needsRechecking = false;
+    public int timeScale = 1;
+
 
     public Trainer trainer;
-   
+
     public void CheckForNewFight()
     {
+        Debug.Log("Checking for Fight");
         needsRechecking = false;
         int fightIndex = -1;
         for (int i = 0; i < fights.Length; i++)
         {
             if (fights[i].Fight == null || fights[i].Fight.tcs.Task.IsCompleted || fights[i].Fight.tcs.Task.IsFaulted || fights[i].Fight.tcs.Task.IsCanceled)
-            //if (fights[i].done)
             {
                 fightIndex = i;
                 break;
@@ -56,7 +60,8 @@ public class EvolutionController : MonoBehaviour
         {
             fightsQueue.Enqueue(fight);
         }
-        fight.tcs.Task.ContinueWith(t => {
+        fight.tcs.Task.ContinueWith(t =>
+        {
             Debug.Log("Continuing");
             needsRechecking = true;
         });
@@ -64,9 +69,17 @@ public class EvolutionController : MonoBehaviour
         return tcs.Task;
 
     }
+
+    private void OnGUI()
+    {
+        lock(fightsQueue)
+        GUI.Label(new Rect(0, 0, 500, 500), $"Generation: {trainer.Level}\nFight processed: {fightsDone}\nFight queue count: {fightsQueue.Count}");
+    }
+
     // Use this for initialization
     void Start()
     {
+        Time.timeScale = timeScale;
         fights = new FightController[fightRows * fightCountPerRow];
         for (int r = 0; r < fightRows; r++)
             for (int i = 0; i < fightCountPerRow; i++)
@@ -77,9 +90,10 @@ public class EvolutionController : MonoBehaviour
                 arena.name = $"Arena {r * fightCountPerRow + i}";
             }
 
+        if(Camera.main != null)
         Camera.main.GetComponent<SmartCamera>().targets = fights.Select((x) => x.gameObject.transform).ToArray();
 
-        
+
         Debug.Log("Arenas created");
 
         trainer = new Trainer(
@@ -89,10 +103,11 @@ public class EvolutionController : MonoBehaviour
             );
 
         trainer.FitnessFunction = fitnessFunction;
-        
+
         Debug.Log("Trainer object created");
 
-        Task = Task.Run(async () => {
+        Task = Task.Run(async () =>
+        {
             await trainer.Initialize(
             size: 10,
             popSize: new Tuple<int, int>(10, 20),
@@ -112,7 +127,7 @@ public class EvolutionController : MonoBehaviour
     // FixedUpdate is called once per frame
     void FixedUpdate()
     {
-        if(initialized && (Task == null || Task.IsCompleted) && fightsQueue.Count == 0)
+        if (initialized && (Task == null || Task.IsCompleted) && fightsQueue.Count == 0)
         {
             Debug.Log("New Generation");
             Task = trainer.EvaluateAndEvolve();
@@ -120,7 +135,22 @@ public class EvolutionController : MonoBehaviour
 
         if (needsRechecking)
         {
-            CheckForNewFight();
+            int count = 0;
+            while (canAssignNewFight() && count < fightRows * fightCountPerRow)
+            {
+                count++;
+                CheckForNewFight();
+            }
         }
+    }
+
+    bool canAssignNewFight()
+    {
+        for (int i = 0; i < fights.Length; i++)
+        {
+            if (fights[i].Fight == null || fights[i].Fight.tcs.Task.IsCompleted || fights[i].Fight.tcs.Task.IsFaulted || fights[i].Fight.tcs.Task.IsCanceled)
+                return true;
+        }
+        return false;
     }
 }

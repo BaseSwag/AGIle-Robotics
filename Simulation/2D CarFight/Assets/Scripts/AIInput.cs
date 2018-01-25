@@ -21,6 +21,9 @@ public class AIInput : MonoBehaviour
 
     public INeuralNetwork neuralNetwork;
 
+    public int delay = 10;
+
+    private int currentdelay = 10;
 
     float[] inputs = new float[6];
 
@@ -38,11 +41,13 @@ public class AIInput : MonoBehaviour
     // FixedUpdate is called once per frame
     void FixedUpdate()
     {
-        if (neuralNetwork != null)
+        if (currentdelay++ % delay == 0)
         {
-            double[] outputs = neuralNetwork.Activate(Array.ConvertAll(inputs, x => (double)x));
-            OnInput?.Invoke(Array.ConvertAll(outputs, x => (float)x));
+            if (neuralNetwork != null)
+            {
+                double[] outputs = neuralNetwork.Activate(Array.ConvertAll(inputs, x => (double)x));
+                OnInput?.Invoke(Array.ConvertAll(outputs, x => (float)x));
+            }
         }
-
     }
 }

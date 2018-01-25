@@ -58,6 +58,7 @@ GameObject:
   - component: {fileID: 70056840657807226}
   - component: {fileID: 114000676451622724}
   - component: {fileID: 114117384576434206}
+  - component: {fileID: 61377270884439930}
   m_Layer: 0
   m_Name: car-red
   m_TagString: Untagged
@@ -209,6 +210,7 @@ GameObject:
   - component: {fileID: 70308825463920676}
   - component: {fileID: 114586302196545698}
   - component: {fileID: 114660816393705330}
+  - component: {fileID: 61375354834943460}
   m_Layer: 0
   m_Name: car-blue
   m_TagString: Untagged
@@ -590,6 +592,56 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!61 &61375354834943460
+BoxCollider2D:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1899514522789416}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 24, y: 11.900001}
+    newSize: {x: 24, y: 11.900001}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.1, y: 0.1}
+  m_EdgeRadius: 0
+--- !u!61 &61377270884439930
+BoxCollider2D:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1096336270795812}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 24, y: 11.900001}
+    newSize: {x: 24, y: 11.900001}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.1, y: 0.1}
+  m_EdgeRadius: 0
 --- !u!61 &61390796515590964
 BoxCollider2D:
   m_ObjectHideFlags: 1
@@ -810,6 +862,7 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: AIInput+UnityFloatEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  delay: 10
 --- !u!114 &114135174477880676
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -877,6 +930,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   car1: {fileID: 114117384576434206}
   car2: {fileID: 114660816393705330}
+  done: 0
+  fightTimeoutSeconds: 30
+  tickTimeoutLeft: 0
+  circleTransform: {fileID: 4471772798834738}
   StartPosCar1: {x: 430, y: 0, z: -1}
   StartRotationCar1: {x: 0, y: 0, z: 180}
   StartPosCar2: {x: -430, y: 0, z: -1}
@@ -946,6 +1003,7 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: AIInput+UnityFloatEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  delay: 10
 --- !u!114 &114758411922693176
 MonoBehaviour:
   m_ObjectHideFlags: 1

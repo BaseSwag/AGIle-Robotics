@@ -140,13 +140,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a395034682d2a6f4ea9e4e6a48a43cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fightCountPerRow: 1
-  fightRows: 1
+  fightCountPerRow: 6
+  fightRows: 3
   fightPrefab: {fileID: 1588469257560516, guid: ad89dd48ca64b0545b5f12faf9b67168,
     type: 2}
   fights: []
   initialized: 0
   needsRechecking: 0
+  timeScale: 100
 --- !u!4 &402381942
 Transform:
   m_ObjectHideFlags: 0

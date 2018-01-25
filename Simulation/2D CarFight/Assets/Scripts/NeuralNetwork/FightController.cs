@@ -1,8 +1,8 @@
 ﻿using System;
-using UnityEditor;
 using UnityEngine;
 
-public class FightController : MonoBehaviour {
+public class FightController : MonoBehaviour
+{
 
     public AIInput car1;
     public AIInput car2;
@@ -13,6 +13,11 @@ public class FightController : MonoBehaviour {
 
     public bool done = false;
     private bool isReset = true;
+
+    public int fightTimeoutSeconds = 30;
+    public float tickTimeoutLeft = 0;
+
+    public Transform circleTransform;
 
     public Vector3 StartPosCar1;
     public Vector3 StartRotationCar1;
@@ -29,7 +34,7 @@ public class FightController : MonoBehaviour {
 
         set
         {
-            Debug.Log($"Fight assigned to {gameObject.name}");
+            //Debug.Log($"Fight assigned to {gameObject.name}");
             this.Reset();
             fight = value;
             car1.neuralNetwork = fight.n1;
@@ -37,47 +42,70 @@ public class FightController : MonoBehaviour {
         }
     }
 
-
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
+        tickTimeoutLeft = fightTimeoutSeconds;
         thisGameObject = gameObject;
-	}
-	
-	// FixedUpdate is called once per frame
-	void FixedUpdate () {
-		
-	}
+    }
 
-    public void OnExitOuterCircle(Collider2D collider)
+    void OnCarLost(bool car1)
     {
         if (!done)
         {
-            if (collider.gameObject == car1.gameObject)
+            EvolutionController.fightsDone++;
+            Debug.Log("Fight over");
+            done = true;
+            if (car1)
             {
-                fight.tcs.SetResult(new Tuple<double, double>(1, -1));
+                Fight.tcs.SetResult(new Tuple<double, double>(1, -1));
             }
             else
             {
-                fight.tcs.SetResult(new Tuple<double, double>(-1, 1));
+                Fight.tcs.SetResult(new Tuple<double, double>(-1, 1));
             }
-            done = true;
         }
+    }
+
+    // FixedUpdate is called once per frame
+    void FixedUpdate()
+    {
+        if (!done)
+        {
+            tickTimeoutLeft -= Time.fixedDeltaTime;
+            if (tickTimeoutLeft <= 0)
+            {
+                if (Fight != null)
+                    OnCarLost(Vector2.Distance(car1.transform.position, circleTransform.position) > Vector2.Distance(car2.transform.position, circleTransform.position));
+                tickTimeoutLeft = fightTimeoutSeconds;
+            }
+        }
+
+    }
+
+    public void OnExitOuterCircle(Collider2D collider)
+    {
+        if (collider.gameObject == car1.gameObject || collider.gameObject == car2.gameObject)
+            OnCarLost(collider.gameObject == car1.gameObject);
     }
 
     public void Reset()
     {
         car1.transform.localPosition = StartPosCar1;
         car1.transform.localRotation = Quaternion.Euler(StartRotationCar1);
+        car1.GetComponent<CarController>().dead = false;
+        car1.GetComponent<Rigidbody2D>().velocity = new Vector3();
+        car1.GetComponent<Rigidbody2D>().angularVelocity = 0;
+        car1.neuralNetwork = null;
 
         car2.transform.localPosition = StartPosCar2;
         car2.transform.localRotation = Quaternion.Euler(StartRotationCar2);
-
-        car1.GetComponent<CarController>().dead = false;
         car2.GetComponent<CarController>().dead = false;
+        car2.GetComponent<Rigidbody2D>().velocity = new Vector3();
+        car2.GetComponent<Rigidbody2D>().angularVelocity = 0;
+        car2.neuralNetwork = null;
 
-        car1.neuralNetwork = null;
-        car1.neuralNetwork = null;
-
+        tickTimeoutLeft = fightTimeoutSeconds;
         this.fight = null;
         this.isReset = true;
         this.done = false;

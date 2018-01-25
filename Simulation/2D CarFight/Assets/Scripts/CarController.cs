@@ -93,7 +93,18 @@ public class CarController : MonoBehaviour
                 else
                     sensorForward = 0;
 
-            OnSetAIInputs.Invoke(new float[] { -lookRotationRelative, 0, hortizontal, vertical, sensorForward, sensorBackward });
+            float newLookRotation;
+            if(lookRotationRelative <= -45 / 2 || lookRotationRelative >= 45 / 2)
+            {
+                newLookRotation = -1;
+            }
+            else
+            {
+                newLookRotation = lookRotationRelative / 45 + 0.5f;
+            }
+            
+
+            OnSetAIInputs.Invoke(new float[] { newLookRotation, 0, hortizontal, vertical, sensorForward, sensorBackward });
 
             count += Time.fixedDeltaTime;
 
@@ -142,7 +153,6 @@ public class CarController : MonoBehaviour
     {
         if (collider.gameObject == this.gameObject)
         {
-            Debug.Log("Lost! " + gameObject.name);
             dead = true;
         }
     }
