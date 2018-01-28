@@ -64,13 +64,19 @@ namespace AGIle_Robotics
 
         public INeuralElement CrossOver(INeuralElement e, double p1, double p2)
         {
+            var task = CrossOverAsync(e, p1, p2);
+            task.Wait();
+            return task.Result;
+        }
+        public async Task<INeuralElement> CrossOverAsync(INeuralElement e, double p1, double p2)
+        {
             var layer2 = e as Layer;
             int len = Neurons.Length;
 
             if(len == layer2?.Neurons.Length && inputSize == layer2.inputSize)
             {
                 var newLayer = new Layer(len, inputSize, WeightRange, ActivationFunction, false);
-                Environment.TaskFor(0, len, index =>
+                await Environment.TaskForAsync(0, len, index =>
                 {
                     newLayer.Neurons[index] = (INeuron)Neurons[index].CrossOver(layer2.Neurons[index], p1, p2);
                 });
@@ -82,12 +88,11 @@ namespace AGIle_Robotics
             }
         }
 
-        public void Mutate(double ratio)
+        public void Mutate(double ratio) => MutateAsync(ratio).Wait();
+        public Task MutateAsync(double ratio)
         {
-            Environment.TaskFor(0, Neurons.Length, index =>
-            {
-                Neurons[index].Mutate(ratio);
-            });
+            return Environment.TaskForAsync(0, Neurons.Length, index =>
+                Neurons[index].Mutate(ratio));
         }
     }
 }
