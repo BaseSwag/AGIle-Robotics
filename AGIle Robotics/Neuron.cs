@@ -60,11 +60,11 @@ namespace AGIle_Robotics
             if(len == neuron2?.InputWeights.Length)
             {
                 var newNeuron = new Neuron(len, WeightRange, ActivationFunction, false);
-                for(int i = 0; i < len; i++)
+                Environment.TaskFor(0, len, i =>
                 {
                     var decision = Environment.DecideByProbability(p1, p2);
                     newNeuron.InputWeights[i] = decision ? neuron2.InputWeights[i] : InputWeights[i];
-                }
+                });
                 return newNeuron;
             }
             else
@@ -75,7 +75,7 @@ namespace AGIle_Robotics
 
         public void Mutate(double ratio)
         {
-            Parallel.For(0, InputWeights.Length, index =>
+            Environment.TaskFor(0, InputWeights.Length, index =>
             {
                 if (Environment.RandomBool(ratio))
                 {

@@ -56,7 +56,7 @@ namespace AGIle_Robotics
             this.definition = definition;
 
             Networks = new INeuralNetwork[size];
-            Parallel.For(0, size, index =>
+            Environment.TaskFor(0, size, index =>
             {
                 Networks[index] = new NeuralNetwork(definition, weightRange, activateWith, init);
             });
@@ -74,31 +74,13 @@ namespace AGIle_Robotics
             List<INeuralNetwork> remainingNets = await Task.Run(
                 () => Networks.OrderByDescending(n => n.Fitness).ToList());
 
-            Task[] tasks = new Task[2];
-
-            tasks[0] = Task.Run(() =>
+            nextNets.AddRange(remainingNets.Take(transitionAmount));
+            for (int i = 0; i < randomAmount; i++)
             {
-                lock (nextNets)
-                {
-                    nextNets.AddRange(remainingNets.Take(transitionAmount));
-                }
-            });
-
-            tasks[1] = Task.Run(() =>
-            {
-                for (int i = 0; i < randomAmount; i++)
-                {
-                    lock(nextNets)
-                        lock (remainingNets)
-                        {
-                            int rand = Environment.RandomInt(transitionAmount, remainingNets.Count);
-                            nextNets.Add(remainingNets[rand]);
-                            remainingNets.RemoveAt(rand);
-                        }
-                }
-            });
-
-            await Task.WhenAll(tasks);
+                int rand = Environment.RandomInt(transitionAmount, remainingNets.Count);
+                nextNets.Add(remainingNets[rand]);
+                remainingNets.RemoveAt(rand);
+            }
 
             CrossOver(ref nextNets, nextNets.Count, len);
 
@@ -108,7 +90,7 @@ namespace AGIle_Robotics
             }
 
             Population newPopulation = new Population(size, definition, WeightRange, ActivationFunction, false);
-            Parallel.For(0, len, index =>
+            await Environment.TaskForAsync(0, len, index =>
             {
                 var net = nextNets[index];
                 newPopulation.Networks[index] = net;

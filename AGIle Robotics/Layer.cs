@@ -28,7 +28,7 @@ namespace AGIle_Robotics
             this.inputSize = inputSize;
 
             Neurons = new INeuron[size];
-            Parallel.For(0, Neurons.Length, index =>
+            Environment.TaskFor(0, Neurons.Length, index =>
             {
                 Neurons[index] = new Neuron(inputSize, weightRange, activateWith, init);
             });
@@ -37,21 +37,17 @@ namespace AGIle_Robotics
         public double[] Activate(double[] input)
         {
             var output = new double[Neurons.Length];
-            Parallel.For(0, Neurons.Length, index =>
+            Environment.TaskFor(0, Neurons.Length, index =>
             {
                 output[index] = Neurons[index].Activate(input)[0];
             });
             return output;
         }
 
-        public async Task<double[]> ActivateAsync(double[] input)
+        public Task<double[]> ActivateAsync(double[] input)
         {
-            if (input.Length < Environment.WorkCapacity)
-            {
-                return await Task.Run(() => Activate(input));
-            }
-            else
-            {
+            return Environment.TaskForAsync(0, Neurons.Length, i => Neurons[i].ActivateAsync(input).Result[0]);
+            /*
                 WorkPool workPool = new WorkPool(Environment.WorkCapacity);
                 Task<double>[] tasks = new Task<double>[Neurons.Length];
 
@@ -63,9 +59,7 @@ namespace AGIle_Robotics
                     tasks[i] = t;
                     workPool.EnqueueTask(t);
                 }
-
-                return await Task.WhenAll(tasks);
-            }
+            */
         }
 
         public INeuralElement CrossOver(INeuralElement e, double p1, double p2)
@@ -76,7 +70,7 @@ namespace AGIle_Robotics
             if(len == layer2?.Neurons.Length && inputSize == layer2.inputSize)
             {
                 var newLayer = new Layer(len, inputSize, WeightRange, ActivationFunction, false);
-                Parallel.For(0, len, index =>
+                Environment.TaskFor(0, len, index =>
                 {
                     newLayer.Neurons[index] = (INeuron)Neurons[index].CrossOver(layer2.Neurons[index], p1, p2);
                 });
@@ -90,7 +84,7 @@ namespace AGIle_Robotics
 
         public void Mutate(double ratio)
         {
-            Parallel.For(0, Neurons.Length, index =>
+            Environment.TaskFor(0, Neurons.Length, index =>
             {
                 Neurons[index].Mutate(ratio);
             });

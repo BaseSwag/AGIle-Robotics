@@ -36,7 +36,7 @@ namespace AGIle_Robotics
             ActivationFunction = activateWith;
 
             Layers = new ILayer[definition.Length];
-            Parallel.For(0, definition.Length, index =>
+            Environment.TaskFor(0, definition.Length, index =>
             {
                 int inputSize = index > 0 ? definition[index - 1] : definition[index];
                 ILayer layer = new Layer(definition[index], inputSize, weightRange, activateWith, init);
@@ -70,7 +70,7 @@ namespace AGIle_Robotics
             if(len == net2?.Layers.Length && InputSize == net2.InputSize && OutputSize == net2.OutputSize)
             {
                 var newNetwork = new NeuralNetwork(Definition, WeightRange, ActivationFunction, false);
-                Parallel.For(0, len, index =>
+                Environment.TaskFor(0, len, index =>
                 {
                     newNetwork.Layers[index] = (ILayer)Layers[index].CrossOver(net2.Layers[index], p1, p2);
                 });
@@ -84,7 +84,7 @@ namespace AGIle_Robotics
 
         public void Mutate(double ratio)
         {
-            Parallel.For(0, Layers.Length, index =>
+            Environment.TaskFor(0, Layers.Length, index =>
             {
                 Layers[index].Mutate(ratio);
             });

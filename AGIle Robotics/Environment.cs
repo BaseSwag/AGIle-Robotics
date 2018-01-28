@@ -64,5 +64,34 @@ namespace AGIle_Robotics
             return rand >= probability;
         }
 
+        public static void TaskFor(int fromInclusive, int toExclusive, Action<int> body)
+            => TaskForAsync(fromInclusive, toExclusive, body).Wait();
+        public static Task TaskForAsync(int fromInclusive, int toExclusive, Action<int> body)
+        {
+            int count = toExclusive - fromInclusive;
+            Task[] tasks = new Task[count];
+            int counter = 0;
+            for(int i = fromInclusive; i < toExclusive; i++)
+            {
+                int i2 = i;
+                var t = Task.Run(() => body(i2));
+                tasks[counter++] = t;
+            }
+            return Task.WhenAll(tasks);
+        }
+        public static Task<T[]> TaskForAsync<T>(int fromInclusive, int toExclusive, Func<int, T> body)
+        {
+            int count = toExclusive - fromInclusive;
+            Task<T>[] tasks = new Task<T>[count];
+            int counter = 0;
+            for(int i = fromInclusive; i < toExclusive; i++)
+            {
+                int i2 = i;
+                var t = Task.Run(() => body(i2));
+               tasks[counter++] = t;
+            }
+            return Task.WhenAll(tasks);
+        }
+
     }
 }
