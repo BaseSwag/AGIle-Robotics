@@ -1,4 +1,5 @@
 ﻿using AGIle_Robotics.Interfaces;
+using AGIle_Robotics.Extension;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,7 +57,7 @@ namespace AGIle_Robotics
             this.definition = definition;
 
             Networks = new INeuralNetwork[size];
-            Environment.TaskFor(0, size, index =>
+            Extensions.TaskFor(0, size, index =>
             {
                 Networks[index] = new NeuralNetwork(definition, weightRange, activateWith, init);
             });
@@ -77,7 +78,7 @@ namespace AGIle_Robotics
             nextNets.AddRange(remainingNets.Take(transitionAmount));
             for (int i = 0; i < randomAmount; i++)
             {
-                int rand = Environment.RandomInt(transitionAmount, remainingNets.Count);
+                int rand = Extensions.RandomInt(transitionAmount, remainingNets.Count);
                 nextNets.Add(remainingNets[rand]);
                 remainingNets.RemoveAt(rand);
             }
@@ -90,7 +91,7 @@ namespace AGIle_Robotics
             }
 
             Population newPopulation = new Population(size, definition, WeightRange, ActivationFunction, false);
-            await Environment.TaskForAsync(0, len, index =>
+            await Extensions.TaskForAsync(0, len, index =>
             {
                 var net = nextNets[index];
                 newPopulation.Networks[index] = net;
@@ -109,7 +110,7 @@ namespace AGIle_Robotics
                 var nets = new INeuralNetwork[2];
                 for(int j = 0; j < 2; j++)
                 {
-                    int rand = Environment.RandomInt(0, count); // Do not include already crossed over nets
+                    int rand = Extensions.RandomInt(0, count); // Do not include already crossed over nets
                     nets[j] = nextNets[rand];
                 }
                 var newNet = nets[0].CrossOver(nets[1], nets[0].Fitness, nets[1].Fitness);

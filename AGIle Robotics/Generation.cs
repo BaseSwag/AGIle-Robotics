@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AGIle_Robotics.Interfaces;
 using SuperTuple;
+using AGIle_Robotics.Extension;
 
 namespace AGIle_Robotics
 {
@@ -83,20 +84,20 @@ namespace AGIle_Robotics
 
         public async Task Create()
         {
-            Task<IPopulation>[] tasks = Environment.WorkPool.For(0, Size, () => CreatePopulation());
+            Task<IPopulation>[] tasks = Extensions.WorkPool.For(0, Size, () => CreatePopulation());
             Populations = await Task.WhenAll(tasks);
         }
         private IPopulation CreatePopulation()
         {
-            var size = Environment.RandomInt(PopulationSize);
-            var length = Environment.RandomInt(Length);
+            var size = Extensions.RandomInt(PopulationSize);
+            var length = Extensions.RandomInt(Length);
             var definition = new int[length];
 
             definition[0] = Ports.Item1;
             definition[length - 1] = Ports.Item2;
             for(int i = 1; i < definition.Length - 1; i++)
             {
-                var width = Environment.RandomInt(Width);
+                var width = Extensions.RandomInt(Width);
                 definition[i] = width;
             }
 
@@ -122,7 +123,7 @@ namespace AGIle_Robotics
             var n = net;
             var t = new Task(() => EvaluationCycle(fitnessFunction, p, n));
             tasks.Add(t);
-            Environment.WorkPool.EnqueueTask(t);
+            Extensions.WorkPool.EnqueueTask(t);
 
             int nextPop, nextNet;
 
@@ -164,7 +165,7 @@ namespace AGIle_Robotics
 
         private Task ResetFitness()
         {
-            return Environment.TaskForAsync(0, Populations.Length, p =>
+            return Extensions.TaskForAsync(0, Populations.Length, p =>
             {
                 Populations[p].ResetBest();
                 for(int n = 0; n < Populations[p].Networks.Length; n++)
@@ -175,7 +176,7 @@ namespace AGIle_Robotics
         public Task<IGeneration> Evolve() => Evolve(TransitionRatio, RandomRatio, MutationRatio);
         public async Task<IGeneration> Evolve(double transitionRatio, double randomRatio, double mutationRatio)
         {
-            Task<IPopulation>[] tasks = Environment.WorkPool.For(0, Size, i
+            Task<IPopulation>[] tasks = Extensions.WorkPool.For(0, Size, i
                 => Populations[i].Evolve(transitionRatio, randomRatio, mutationRatio).Result);
             
             Generation newGen = new Generation(Size, PopulationSize, Ports, Length, Width, WeightRange, activationFunction);

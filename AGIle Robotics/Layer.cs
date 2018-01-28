@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AGIle_Robotics.Interfaces;
+using AGIle_Robotics.Extension;
 using SuperTuple;
 
 namespace AGIle_Robotics
@@ -28,7 +29,7 @@ namespace AGIle_Robotics
             this.inputSize = inputSize;
 
             Neurons = new INeuron[size];
-            Environment.TaskFor(0, Neurons.Length, index =>
+            Extensions.TaskFor(0, Neurons.Length, index =>
             {
                 Neurons[index] = new Neuron(inputSize, weightRange, activateWith, init);
             });
@@ -37,7 +38,7 @@ namespace AGIle_Robotics
         public double[] Activate(double[] input)
         {
             var output = new double[Neurons.Length];
-            Environment.TaskFor(0, Neurons.Length, index =>
+            Extensions.TaskFor(0, Neurons.Length, index =>
             {
                 output[index] = Neurons[index].Activate(input)[0];
             });
@@ -46,7 +47,7 @@ namespace AGIle_Robotics
 
         public Task<double[]> ActivateAsync(double[] input)
         {
-            return Environment.TaskForAsync(0, Neurons.Length, i => Neurons[i].ActivateAsync(input).Result[0]);
+            return Extensions.TaskForAsync(0, Neurons.Length, i => Neurons[i].ActivateAsync(input).Result[0]);
             /*
                 WorkPool workPool = new WorkPool(Environment.WorkCapacity);
                 Task<double>[] tasks = new Task<double>[Neurons.Length];
@@ -76,7 +77,7 @@ namespace AGIle_Robotics
             if(len == layer2?.Neurons.Length && inputSize == layer2.inputSize)
             {
                 var newLayer = new Layer(len, inputSize, WeightRange, ActivationFunction, false);
-                await Environment.TaskForAsync(0, len, index =>
+                await Extensions.TaskForAsync(0, len, index =>
                 {
                     newLayer.Neurons[index] = (INeuron)Neurons[index].CrossOver(layer2.Neurons[index], p1, p2);
                 });
@@ -91,7 +92,7 @@ namespace AGIle_Robotics
         public void Mutate(double ratio) => MutateAsync(ratio).Wait();
         public Task MutateAsync(double ratio)
         {
-            return Environment.TaskForAsync(0, Neurons.Length, index =>
+            return Extensions.TaskForAsync(0, Neurons.Length, index =>
                 Neurons[index].Mutate(ratio));
         }
     }

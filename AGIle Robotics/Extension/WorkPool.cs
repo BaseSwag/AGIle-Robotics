@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AGIle_Robotics
+namespace AGIle_Robotics.Extension
 {
     public class WorkPool
     {

@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using SuperTuple;
 
-namespace AGIle_Robotics
+namespace AGIle_Robotics.Extension
 {
-    public static class Environment
+    public static class Extensions
     {
         internal static readonly WorkPool WorkPool = new WorkPool(6);
         public static int WorkCapacity = 4;

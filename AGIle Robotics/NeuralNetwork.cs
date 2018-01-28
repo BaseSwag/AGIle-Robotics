@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AGIle_Robotics.Interfaces;
+using AGIle_Robotics.Extension;
 using SuperTuple;
 
 namespace AGIle_Robotics
@@ -36,7 +37,7 @@ namespace AGIle_Robotics
             ActivationFunction = activateWith;
 
             Layers = new ILayer[definition.Length];
-            Environment.TaskFor(0, definition.Length, index =>
+            Extensions.TaskFor(0, definition.Length, index =>
             {
                 int inputSize = index > 0 ? definition[index - 1] : definition[index];
                 ILayer layer = new Layer(definition[index], inputSize, weightRange, activateWith, init);
@@ -76,7 +77,7 @@ namespace AGIle_Robotics
             if(len == net2?.Layers.Length && InputSize == net2.InputSize && OutputSize == net2.OutputSize)
             {
                 var newNetwork = new NeuralNetwork(Definition, WeightRange, ActivationFunction, false);
-                await Environment.TaskForAsync(0, len, index =>
+                await Extensions.TaskForAsync(0, len, index =>
                 {
                     newNetwork.Layers[index] = (ILayer)Layers[index].CrossOver(net2.Layers[index], p1, p2);
                 });
@@ -91,7 +92,7 @@ namespace AGIle_Robotics
         public void Mutate(double ratio) => MutateAsync(ratio).Wait();
         public Task MutateAsync(double ratio)
         {
-            return Environment.TaskForAsync(0, Layers.Length, index =>
+            return Extensions.TaskForAsync(0, Layers.Length, index =>
                 Layers[index].Mutate(ratio));
         }
     }
