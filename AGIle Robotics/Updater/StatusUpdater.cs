@@ -1,6 +1,7 @@
 ﻿using AGIle_Robotics.Extension;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,6 +22,15 @@ namespace AGIle_Robotics.Updater
         public FrameworkActivity Activity { get => GetProperty(ref activity); set => SetProperty(ref activity, value); }
         private FrameworkActivity activity = FrameworkActivity.NotReady;
 
+        public double TransitionRatio { get => transitionRatio; set => transitionRatio = value; }
+        private double transitionRatio;
+
+        public double RandomRatio { get => randomRatio; set => randomRatio = value; }
+        private double randomRatio;
+
+        public double MutationRatio { get => mutationRatio; set => mutationRatio = value; }
+        private double mutationRatio;
+
         public int GenerationLevel { get => GetProperty(ref generationLevel); set => SetProperty(ref generationLevel, value); }
         private int generationLevel;
 
@@ -33,15 +43,27 @@ namespace AGIle_Robotics.Updater
         public int NetworkCount { get => GetProperty(ref networkCount); set => SetProperty(ref networkCount, value); }
         private int networkCount;
 
-        public double BestFitness { get => GetProperty(ref bestFitness); set => SetProperty(ref bestFitness, value); }
+        public double BestFitness
+        {
+            get => GetProperty(ref bestFitness);
+            set
+            {
+                SetProperty(ref bestFitness, value);
+                FitnessHistory.Add(value);
+            }
+        }
         private double bestFitness;
 
-        public LimitedQueue<double> FitnessHistory { get => GetProperty(ref fitnessHistory); set => SetProperty(ref fitnessHistory, value); }
-        private LimitedQueue<double> fitnessHistory;
+        public ObservableCollection<double> FitnessHistory { get => GetProperty(ref fitnessHistory); set => SetProperty(ref fitnessHistory, value); }
+        private ObservableCollection<double> fitnessHistory;
+
+        public ObservableCollection<double> PopulationFitnesses { get => GetProperty(ref populationFitnesses); set => SetProperty(ref populationFitnesses, value); }
+        private ObservableCollection<double> populationFitnesses;
 
         public StatusUpdater(int historySize = 100)
         {
-            FitnessHistory = new LimitedQueue<double>(historySize);
+            FitnessHistory = new ObservableCollection<double>();
+            PopulationFitnesses = new ObservableCollection<double>();
         }
     }
 }
