@@ -17,18 +17,18 @@ namespace AGIle_Robotics.Updater
             Initializing,
             Creating,
             Evaluating,
-            Evolving
+            Evolving,
         }
         public FrameworkActivity Activity { get => GetProperty(ref activity); set => SetProperty(ref activity, value); }
         private FrameworkActivity activity = FrameworkActivity.NotReady;
 
-        public double TransitionRatio { get => transitionRatio; set => transitionRatio = value; }
+        public double TransitionRatio { get => GetProperty(ref transitionRatio); set => SetProperty(ref transitionRatio, value); }
         private double transitionRatio;
 
-        public double RandomRatio { get => randomRatio; set => randomRatio = value; }
+        public double RandomRatio { get => GetProperty(ref randomRatio); set => SetProperty(ref randomRatio, value); }
         private double randomRatio;
 
-        public double MutationRatio { get => mutationRatio; set => mutationRatio = value; }
+        public double MutationRatio { get => GetProperty(ref mutationRatio); set => SetProperty(ref mutationRatio, value); }
         private double mutationRatio;
 
         public int GenerationLevel { get => GetProperty(ref generationLevel); set => SetProperty(ref generationLevel, value); }

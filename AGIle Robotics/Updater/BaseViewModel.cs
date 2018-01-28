@@ -6,9 +6,9 @@ namespace AGIle_Robotics.Updater
 {
     public class BaseViewModel
     {
-        protected Dictionary<string, object> Locks { get => locks; set => locks = value; }
+        internal Dictionary<string, object> Locks { get => locks; set => locks = value; }
         private Dictionary<string, object> locks = new Dictionary<string, object>();
-        protected void AddLock(string name)
+        public void AddLock(string name)
         {
             lock (Locks)
             {
@@ -30,15 +30,12 @@ namespace AGIle_Robotics.Updater
 
         protected virtual bool SetProperty<T>(ref T target, T value, [CallerMemberName] string propertyName = null)
         {
-            lock (Locks)
+            if (!Locks.ContainsKey(propertyName))
             {
-                if (!Locks.ContainsKey(propertyName))
-                {
-                    AddLock(propertyName);
-                }
+                AddLock(propertyName);
             }
 
-            lock (Locks[propertyName]) // TryGetValue just repeats what ContainsKey did
+            lock (Locks[propertyName])
             {
                 if (Equals(target, value)) return false;
 
@@ -50,12 +47,9 @@ namespace AGIle_Robotics.Updater
 
         protected virtual T GetProperty<T>(ref T target, [CallerMemberName] string propertyName = null)
         {
-            lock (Locks)
+            if (!Locks.ContainsKey(propertyName))
             {
-                if (!Locks.ContainsKey(propertyName))
-                {
-                    AddLock(propertyName);
-                }
+                AddLock(propertyName);
             }
 
             lock (Locks[propertyName])
