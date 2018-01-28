@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AGIle_Robotics.Interfaces;
 using SuperTuple;
 using AGIle_Robotics.Extension;
+using System.Threading;
 
 namespace AGIle_Robotics
 {
@@ -125,7 +126,7 @@ namespace AGIle_Robotics
 
             Evaluate(fitnessFunction, ref tasks, 0, 0);
 
-            await Task.WhenAll(tasks.ToArray());
+            await Task.WhenAll(tasks);
 
             Best = null;
         }
@@ -133,7 +134,7 @@ namespace AGIle_Robotics
         {
             var p = pop;
             var n = net;
-            var t = new Task(() => EvaluationCycle(fitnessFunction, p, n));
+            var t = new Task<object>(() => EvaluationCycle(fitnessFunction, p, n).Result);
             tasks.Add(t);
             Extensions.WorkPool.EnqueueTask(t);
 
@@ -153,33 +154,42 @@ namespace AGIle_Robotics
 
             Evaluate(fitnessFunction, ref tasks, nextPop, nextNet);
         }
-        private Task EvaluationCycle(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction, int pop, int net)
+        private Task<object[]> EvaluationCycle(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction, int pop, int net)
         {
             var myNet = Populations[pop].Networks[net];
-            var tasks = new List<Task>();
+            var tasks = new List<Task<object>>();
             for (int p = pop; p < Populations.Length; p++)
             {
-                for (int n = net + 1; n < Populations[p].Networks.Length; n++)
+                int p2 = p;
+                for (int n = net + 1; n < Populations[p2].Networks.Length; n++)
                 {
-                    var enemyNet = Populations[p].Networks[n];
-                    var t = EvaluationCycle(fitnessFunction, (pop, net), myNet, (p, n), enemyNet);
-                    tasks.Add(t);
+                    int n2 = n;
+                    var enemyNet = Populations[p2].Networks[n2];
+                    var tcs = new TaskCompletionSource<object>();
+                    var t = EvaluationCycle(fitnessFunction, (pop, net), myNet, (p2, n2), enemyNet);
+                    t.ContinueWith(finished =>
+                    {
+                        lock(Populations[pop].Networks[net])
+                            Populations[pop].Networks[net].Fitness += finished.Result.Item1;
+                        lock(Populations[p2].Networks[n2])
+                            Populations[p2].Networks[n2].Fitness += finished.Result.Item2;
+                        Extensions.StatusUpdater.EvaluationsRunning--;
+                        tcs.SetResult(null);
+                    });
+                    tasks.Add(tcs.Task);
                 }
             }
-            return Task.WhenAll(tasks.ToArray());
+            return Task.WhenAll(tasks);
         }
-        public async Task EvaluationCycle(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction, (int p, int n) i1, INeuralNetwork n1, (int p, int n) i2, INeuralNetwork n2)
+        public Task<STuple<double, double>> EvaluationCycle(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction, (int p, int n) i1, INeuralNetwork n1, (int p, int n) i2, INeuralNetwork n2)
         {
             Extensions.StatusUpdater.EvaluationsRunning++;
-            var result = await fitnessFunction(n1, n2);
-            Populations[i1.p].Networks[i1.n].Fitness += result.Item1;
-            Populations[i2.p].Networks[i2.n].Fitness += result.Item2;
-            Extensions.StatusUpdater.EvaluationsRunning--;
+            return fitnessFunction(n1, n2);
         }
 
-        private Task ResetFitness()
+        private async Task ResetFitness()
         {
-            return Extensions.TaskForAsync(0, Populations.Length, p =>
+            await Extensions.WorkPool.ForToTask(0, Populations.Length, p =>
             {
                 Populations[p].ResetBest();
                 for(int n = 0; n < Populations[p].Networks.Length; n++)

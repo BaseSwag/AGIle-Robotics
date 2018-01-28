@@ -57,14 +57,14 @@ namespace AGIle_Robotics
             this.definition = definition;
 
             Networks = new INeuralNetwork[size];
-            Extensions.TaskFor(0, size, index =>
+            Extensions.WorkPool.For(0, size, index =>
             {
                 Networks[index] = new NeuralNetwork(definition, weightRange, activateWith, init);
             });
         }
 
         async Task<IEvolvable> IEvolvable.Evolve(double transitionRatio, double randomRatio, double mutationRatio) => await Evolve(transitionRatio, randomRatio, mutationRatio);
-        public async Task<IPopulation> Evolve(double transitionRatio, double randomRatio, double mutationRatio)
+        public Task<IPopulation> Evolve(double transitionRatio, double randomRatio, double mutationRatio)
         {
             int len = Networks.Length;
             int transitionAmount = (int)(len * transitionRatio);
@@ -72,10 +72,10 @@ namespace AGIle_Robotics
             int mutationAmount = (int)(len * mutationRatio);
 
             List<INeuralNetwork> nextNets = new List<INeuralNetwork>();
-            List<INeuralNetwork> remainingNets = await Task.Run(
-                () => Networks.OrderByDescending(n => n.Fitness).ToList());
+            List<INeuralNetwork> remainingNets = Networks.OrderByDescending(n => n.Fitness).ToList();
 
             nextNets.AddRange(remainingNets.Take(transitionAmount));
+
             for (int i = 0; i < randomAmount; i++)
             {
                 int rand = Extensions.RandomInt(transitionAmount, remainingNets.Count);
@@ -91,15 +91,18 @@ namespace AGIle_Robotics
             }
 
             Population newPopulation = new Population(size, definition, WeightRange, ActivationFunction, false);
-            await Extensions.TaskForAsync(0, len, index =>
+            for(int i = 0; i < len; i++)
             {
-                var net = nextNets[index];
-                newPopulation.Networks[index] = net;
-                newPopulation.Networks[index].Fitness = 0;
+                var net = nextNets[i];
+                newPopulation.Networks[i] = net;
+                newPopulation.Networks[i].Fitness = 0;
 
-                newPopulation.Networks[index].Mutate(mutationRatio); // Mutate
-            });
-            return newPopulation;
+                newPopulation.Networks[i].Mutate(mutationRatio); // Mutate
+            }
+
+            TaskCompletionSource<IPopulation> tcs = new TaskCompletionSource<IPopulation>();
+            tcs.SetResult(newPopulation);
+            return tcs.Task;
         }
 
         private void CrossOver(ref List<INeuralNetwork> nextNets, int count, int total)

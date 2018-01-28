@@ -29,25 +29,25 @@ namespace AGIle_Robotics
             this.inputSize = inputSize;
 
             Neurons = new INeuron[size];
-            Extensions.TaskFor(0, Neurons.Length, index =>
+            for(int i = 0; i < Neurons.Length; i++)
             {
-                Neurons[index] = new Neuron(inputSize, weightRange, activateWith, init);
-            });
+                Neurons[i] = new Neuron(inputSize, weightRange, activateWith, init);
+            }
         }
 
         public double[] Activate(double[] input)
         {
             var output = new double[Neurons.Length];
-            Extensions.TaskFor(0, Neurons.Length, index =>
+            for(int i = 0; i < Neurons.Length; i++)
             {
-                output[index] = Neurons[index].Activate(input)[0];
-            });
+                output[i] = Neurons[i].Activate(input)[0];
+            }
             return output;
         }
 
         public Task<double[]> ActivateAsync(double[] input)
         {
-            return Extensions.TaskForAsync(0, Neurons.Length, i => Neurons[i].ActivateAsync(input).Result[0]);
+            return Task.WhenAll(Extensions.WorkPool.For(0, Neurons.Length, i => Neurons[i].ActivateAsync(input).Result[0]));
             /*
                 WorkPool workPool = new WorkPool(Environment.WorkCapacity);
                 Task<double>[] tasks = new Task<double>[Neurons.Length];
@@ -65,22 +65,16 @@ namespace AGIle_Robotics
 
         public INeuralElement CrossOver(INeuralElement e, double p1, double p2)
         {
-            var task = CrossOverAsync(e, p1, p2);
-            task.Wait();
-            return task.Result;
-        }
-        public async Task<INeuralElement> CrossOverAsync(INeuralElement e, double p1, double p2)
-        {
             var layer2 = e as Layer;
             int len = Neurons.Length;
 
             if(len == layer2?.Neurons.Length && inputSize == layer2.inputSize)
             {
                 var newLayer = new Layer(len, inputSize, WeightRange, ActivationFunction, false);
-                await Extensions.TaskForAsync(0, len, index =>
+                for(int i = 0; i < len; i++)
                 {
-                    newLayer.Neurons[index] = (INeuron)Neurons[index].CrossOver(layer2.Neurons[index], p1, p2);
-                });
+                    newLayer.Neurons[i] = (INeuron)Neurons[i].CrossOver(layer2.Neurons[i], p1, p2);
+                }
                 return newLayer;
             }
             else
@@ -89,11 +83,10 @@ namespace AGIle_Robotics
             }
         }
 
-        public void Mutate(double ratio) => MutateAsync(ratio).Wait();
-        public Task MutateAsync(double ratio)
+        public void Mutate(double ratio)
         {
-            return Extensions.TaskForAsync(0, Neurons.Length, index =>
-                Neurons[index].Mutate(ratio));
+            for(int i = 0; i < Neurons.Length; i++)
+                Neurons[i].Mutate(ratio);
         }
     }
 }

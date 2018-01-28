@@ -6,11 +6,14 @@ using System.Threading.Tasks;
 using AGIle_Robotics.Interfaces;
 using AGIle_Robotics.Extension;
 using SuperTuple;
+using AGIle_Robotics.Updater;
 
 namespace AGIle_Robotics
 {
     public class Trainer : ITrainer
     {
+        public StatusUpdater StatusUpdater => Extensions.StatusUpdater;
+
         public double TransitionRatio
         {
             get => transitionRatio;

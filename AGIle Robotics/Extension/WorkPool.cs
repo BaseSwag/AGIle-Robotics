@@ -66,6 +66,8 @@ namespace AGIle_Robotics.Extension
             TaskEnqueued?.Invoke(this, _task);
         }
 
+        public Task ForToTask(int fromInclusive, int toExclusive, Action body) => Task.WhenAll(For(fromInclusive, toExclusive, body));
+        public Task ForToTask(int fromInclusive, int toExclusive, Action<int> body) => Task.WhenAll(For(fromInclusive, toExclusive, body));
         public Task[] For(int fromInclusive, int toExclusive, Action body)
         {
             int count = toExclusive - fromInclusive;

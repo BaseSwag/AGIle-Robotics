@@ -37,7 +37,7 @@ namespace AGIle_Robotics
             ActivationFunction = activateWith;
 
             Layers = new ILayer[definition.Length];
-            Extensions.TaskFor(0, definition.Length, index =>
+            Extensions.WorkPool.For(0, definition.Length, index =>
             {
                 int inputSize = index > 0 ? definition[index - 1] : definition[index];
                 ILayer layer = new Layer(definition[index], inputSize, weightRange, activateWith, init);
@@ -65,22 +65,16 @@ namespace AGIle_Robotics
 
         public INeuralElement CrossOver(INeuralElement e, double p1, double p2)
         {
-            var task = CrossOverAsync(e, p1, p2);
-            task.Wait();
-            return task.Result;
-        }
-        public async Task<INeuralElement> CrossOverAsync(INeuralElement e, double p1, double p2)
-        {
             var net2 = e as NeuralNetwork;
             int len = Layers.Length;
 
             if(len == net2?.Layers.Length && InputSize == net2.InputSize && OutputSize == net2.OutputSize)
             {
                 var newNetwork = new NeuralNetwork(Definition, WeightRange, ActivationFunction, false);
-                await Extensions.TaskForAsync(0, len, index =>
+                for(int i = 0; i < len; i++)
                 {
-                    newNetwork.Layers[index] = (ILayer)Layers[index].CrossOver(net2.Layers[index], p1, p2);
-                });
+                    newNetwork.Layers[i] = (ILayer)Layers[i].CrossOver(net2.Layers[i], p1, p2);
+                }
                 return newNetwork;
             }
             else
@@ -89,11 +83,10 @@ namespace AGIle_Robotics
             }
         }
 
-        public void Mutate(double ratio) => MutateAsync(ratio).Wait();
-        public Task MutateAsync(double ratio)
+        public void Mutate(double ratio)
         {
-            return Extensions.TaskForAsync(0, Layers.Length, index =>
-                Layers[index].Mutate(ratio));
+            for(int i = 0; i < Layers.Length; i++)
+                Layers[i].Mutate(ratio);
         }
     }
 }

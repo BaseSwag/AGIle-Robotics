@@ -55,23 +55,17 @@ namespace AGIle_Robotics
 
         public INeuralElement CrossOver(INeuralElement e, double p1, double p2)
         {
-            var t = CrossOverAsync(e, p1, p2);
-            t.Wait();
-            return t.Result;
-        }
-        public async Task<INeuralElement> CrossOverAsync(INeuralElement e, double p1, double p2)
-        {
             var neuron2 = e as Neuron;
             int len = InputWeights.Length;
 
             if(len == neuron2?.InputWeights.Length)
             {
                 var newNeuron = new Neuron(len, WeightRange, ActivationFunction, false);
-                await Extensions.TaskForAsync(0, len, i =>
+                for(int i = 0; i < len; i++)
                 {
                     var decision = Extensions.DecideByProbability(p1, p2);
                     newNeuron.InputWeights[i] = decision ? neuron2.InputWeights[i] : InputWeights[i];
-                });
+                }
                 return newNeuron;
             }
             else
@@ -80,20 +74,19 @@ namespace AGIle_Robotics
             }
         }
 
-        public void Mutate(double ratio) => MutateAsync(ratio).Wait();
-        public Task MutateAsync(double ratio)
+        public void Mutate(double ratio)
         {
-            return Extensions.TaskForAsync(0, InputWeights.Length, index =>
+            for (int i = 0; i < InputWeights.Length; i++)
             {
                 if (Extensions.RandomBool(ratio))
                 {
-                    double rand = InputWeights[index];
+                    double rand = InputWeights[i];
                     var absRatio = Math.Abs(ratio);
                     rand += Extensions.RandomDouble(-absRatio, absRatio);
                     rand = Extensions.Cap(rand, WeightRange);
-                    InputWeights[index] = rand;
+                    InputWeights[i] = rand;
                 }
-            });
+            };
         }
     }
 }
