@@ -66,6 +66,61 @@ namespace AGIle_Robotics
             TaskEnqueued?.Invoke(this, _task);
         }
 
+        public Task[] For(int fromInclusive, int toExclusive, Action body)
+        {
+            int count = toExclusive - fromInclusive;
+            Task[] tasks = new Task[count];
+            int counter = 0;
+            for(int i = fromInclusive; i < toExclusive; i++)
+            {
+                var t = new Task(body);
+                tasks[counter++] = t;
+                EnqueueTask(t);
+            }
+            return tasks;
+        }
+        public Task[] For(int fromInclusive, int toExclusive, Action<int> body)
+        {
+            int count = toExclusive - fromInclusive;
+            Task[] tasks = new Task[count];
+            int counter = 0;
+            for(int i = fromInclusive; i < toExclusive; i++)
+            {
+                int i2 = i;
+                var t = new Task(() => body(i2));
+                tasks[counter++] = t;
+                EnqueueTask(t);
+            }
+            return tasks;
+        }
+        public Task<T>[] For<T>(int fromInclusive, int toExclusive, Func<T> body)
+        {
+            int count = toExclusive - fromInclusive;
+            Task<T>[] tasks = new Task<T>[count];
+            int counter = 0;
+            for(int i = fromInclusive; i < toExclusive; i++)
+            {
+                var t = new Task<T>(() => body());
+                tasks[counter++] = t;
+                EnqueueTask(t);
+            }
+            return tasks;
+        }
+        public Task<T>[] For<T>(int fromInclusive, int toExclusive, Func<int, T> body)
+        {
+            int count = toExclusive - fromInclusive;
+            Task<T>[] tasks = new Task<T>[count];
+            int counter = 0;
+            for(int i = fromInclusive; i < toExclusive; i++)
+            {
+                int i2 = i;
+                var t = new Task<T>(() => body(i2));
+                tasks[counter++] = t;
+                EnqueueTask(t);
+            }
+            return tasks;
+        }
+
         private void CheckScheduling()
         {
             int worker = -1;

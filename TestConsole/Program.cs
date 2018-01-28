@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,44 +21,14 @@ namespace TestConsole
 
         static void Main(string[] args)
         {
-            var trainer = new Trainer(
-                transitionRatio: 0.5,
-                randomRatio: 0.1,
-                mutationRatio: 0.1);
-
-            trainer.Initialize(
-                size: 5,
-                popSize: (5, 10),
-                ports: (1, 1),
-                length: (2, 5),
-                width: (2, 5),
-                weightRange: (-2.0, 2.0),
-                activateWith: Math.Tanh
-                ).Wait();
-
-            trainer.Create().Wait();
-
-            trainer.FitnessFunction = FitnessFunction;
-
-            for(int i = 0; i < 10000; i++)
-            {
-                Console.WriteLine($"Generation: {trainer.Level}");
-                //trainer.EvaluateAndEvolve(FitnessFunction).Wait();
-                trainer.Evaluate().Wait();
-                trainer.Evolve().Wait();
-            }
-
-            for(int i = 0; i < 1; i++)
-            {
-                var testTask = trainer.CurrentGeneration.Best.ActivateAsync(new double[] { 1 });
-                testTask.Wait();
-                var test = testTask.Result[0];
-
-                Console.WriteLine($"{test}");
-            }
-
-            Console.WriteLine();
+            //PerformanceTests.ListPop();
+            Usage.Init().Wait();
+            Usage.EvaluateAndEvolve(5).Wait();
             Console.ReadLine();
+        }
+
+        static void TestTrainer()
+        {
         }
 
         static async Task<double> TestSumFitness(INeuralNetwork n)

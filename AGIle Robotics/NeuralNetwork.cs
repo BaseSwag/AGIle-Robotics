@@ -36,12 +36,12 @@ namespace AGIle_Robotics
             ActivationFunction = activateWith;
 
             Layers = new ILayer[definition.Length];
-            for(int i = 0; i < definition.Length; i++)
+            Environment.TaskFor(0, definition.Length, index =>
             {
-                int inputSize = i > 0 ? definition[i - 1] : definition[i];
-                ILayer layer = new Layer(definition[i], inputSize, weightRange, activateWith, init);
-                Layers[i] = layer;
-            }
+                int inputSize = index > 0 ? definition[index - 1] : definition[index];
+                ILayer layer = new Layer(definition[index], inputSize, weightRange, activateWith, init);
+                Layers[index] = layer;
+            });
         }
 
         public double[] Activate(double[] input)
@@ -64,16 +64,22 @@ namespace AGIle_Robotics
 
         public INeuralElement CrossOver(INeuralElement e, double p1, double p2)
         {
+            var task = CrossOverAsync(e, p1, p2);
+            task.Wait();
+            return task.Result;
+        }
+        public async Task<INeuralElement> CrossOverAsync(INeuralElement e, double p1, double p2)
+        {
             var net2 = e as NeuralNetwork;
             int len = Layers.Length;
 
             if(len == net2?.Layers.Length && InputSize == net2.InputSize && OutputSize == net2.OutputSize)
             {
                 var newNetwork = new NeuralNetwork(Definition, WeightRange, ActivationFunction, false);
-                for(int i = 0; i < len; i++)
+                await Environment.TaskForAsync(0, len, index =>
                 {
-                    newNetwork.Layers[i] = (ILayer)Layers[i].CrossOver(net2.Layers[i], p1, p2);
-                }
+                    newNetwork.Layers[index] = (ILayer)Layers[index].CrossOver(net2.Layers[index], p1, p2);
+                });
                 return newNetwork;
             }
             else
@@ -82,12 +88,11 @@ namespace AGIle_Robotics
             }
         }
 
-        public void Mutate(double ratio)
+        public void Mutate(double ratio) => MutateAsync(ratio).Wait();
+        public Task MutateAsync(double ratio)
         {
-            for(int i = 0; i < Layers.Length; i++)
-            {
-                Layers[i].Mutate(ratio);
-            }
+            return Environment.TaskForAsync(0, Layers.Length, index =>
+                Layers[index].Mutate(ratio));
         }
     }
 }
