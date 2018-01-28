@@ -14,7 +14,15 @@ namespace AGIle_Robotics
         public IPopulation[] Populations { get => populations; set => populations = value; }
         private IPopulation[] populations;
 
-        public int Size { get => size; private set => size = value; }
+        public int Size
+        {
+            get => size;
+            private set
+            {
+                size = value;
+                Extensions.StatusUpdater.PopulationCount = value;
+            }
+        }
         private int size;
 
         public double TransitionRatio { get => transitionRatio; set => transitionRatio = value; }
@@ -36,13 +44,16 @@ namespace AGIle_Robotics
                 int pop = 0;
                 for(int p = 0; p < Populations.Length; p++)
                 {
-                    if(Populations[p].Best.Fitness > highest)
+                    var f = Populations[p].Best.Fitness;
+                    Extensions.StatusUpdater.PopulationFitnesses[p] = f;
+                    if(f > highest)
                     {
-                        highest = Populations[p].Best.Fitness;
+                        highest = f;
                         pop = p;
                     }
                 }
                 best = Populations[pop].Best;
+                Extensions.StatusUpdater.BestFitness = best.Fitness;
                 return best;
             }
             private set => best = value;
@@ -102,6 +113,7 @@ namespace AGIle_Robotics
             }
 
             var newPop = new Population(size, definition, WeightRange, ActivationFunction);
+            Extensions.StatusUpdater.NetworkCount += size;
             return newPop;
         }
 
@@ -158,9 +170,11 @@ namespace AGIle_Robotics
         }
         public async Task EvaluationCycle(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction, (int p, int n) i1, INeuralNetwork n1, (int p, int n) i2, INeuralNetwork n2)
         {
+            Extensions.StatusUpdater.EvaluationsRunning++;
             var result = await fitnessFunction(n1, n2);
             Populations[i1.p].Networks[i1.n].Fitness += result.Item1;
             Populations[i2.p].Networks[i2.n].Fitness += result.Item2;
+            Extensions.StatusUpdater.EvaluationsRunning--;
         }
 
         private Task ResetFitness()

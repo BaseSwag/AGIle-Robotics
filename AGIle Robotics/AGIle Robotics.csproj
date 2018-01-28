@@ -43,7 +43,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Environment.cs" />
+    <Compile Include="Extension\Extensions.cs" />
+    <Compile Include="Extension\LimitedQueue.cs" />
     <Compile Include="Generation.cs" />
     <Compile Include="Interfaces\IElement.cs" />
     <Compile Include="Interfaces\IEvolvable.cs" />
@@ -62,7 +63,7 @@
     <Compile Include="Updater\BaseViewModel.cs" />
     <Compile Include="Trainer.cs" />
     <Compile Include="Updater\StatusUpdater.cs" />
-    <Compile Include="WorkPool.cs" />
+    <Compile Include="Extension\WorkPool.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

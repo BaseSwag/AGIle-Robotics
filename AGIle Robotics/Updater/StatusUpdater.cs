@@ -37,7 +37,16 @@ namespace AGIle_Robotics.Updater
         public int EvaluationsRunning { get => GetProperty(ref evaluationsRunning); set => SetProperty(ref evaluationsRunning, value); }
         private int evaluationsRunning;
 
-        public int PopulationCount { get => GetProperty(ref populationCount); set => SetProperty(ref populationCount, value); }
+        public int PopulationCount
+        {
+            get => GetProperty(ref populationCount);
+            set
+            {
+                SetProperty(ref populationCount, value);
+                while (PopulationFitnesses.Count < value)
+                    PopulationFitnesses.Add(0.0);
+            }
+        }
         private int populationCount;
 
         public int NetworkCount { get => GetProperty(ref networkCount); set => SetProperty(ref networkCount, value); }
