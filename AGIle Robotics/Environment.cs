@@ -14,6 +14,9 @@ namespace AGIle_Robotics
 
         private static Random RNG = new Random();
 
+        public static int FightsLeft = 0;
+        public static object FightsLock = new object();
+
         public static int RandomInt(STuple<int, int> range) => RandomInt(range.Item1, range.Item2);
         public static int RandomInt(int max) => RandomInt(0, max);
         public static int RandomInt(int min, int max)

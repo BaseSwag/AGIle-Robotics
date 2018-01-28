@@ -121,9 +121,7 @@ namespace AGIle_Robotics
 
             Evaluate(fitnessFunction, ref tasks, 0, 0);
 
-            System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
             await Task.WhenAll(tasks.ToArray());
-            Console.WriteLine("Waited " + sw.ElapsedMilliseconds);
 
             Best = null;
 
@@ -165,16 +163,16 @@ namespace AGIle_Robotics
                     Task t = Task.Run(() =>
                     {
                         var enemyNet = Populations[p2].Networks[n2];
-                        System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-                        sw.Start();
                         var task = fitnessFunction(myNet, enemyNet);
                         task.Wait();
-                        sw.Stop();
-                        Console.WriteLine($"Fitnessfunction took {sw.ElapsedMilliseconds}");
+                        lock (Environment.FightsLock)
+                            Console.WriteLine(--Environment.FightsLeft);
 
                         Populations[pop].Networks[net].Fitness += task.Result.Item1;
                         Populations[p2].Networks[n2].Fitness += task.Result.Item2;
                     });
+                    lock (Environment.FightsLock)
+                        Environment.FightsLeft++;
                     tasks.Add(t);
                 }
             }
