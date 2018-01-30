@@ -31,6 +31,9 @@ namespace AGIle_Robotics.Updater
         public double MutationRatio { get => GetProperty(ref mutationRatio); set => SetProperty(ref mutationRatio, value); }
         private double mutationRatio;
 
+        public double CreationRatio { get => GetProperty(ref creationRatio); set => SetProperty(ref creationRatio, value); }
+        private double creationRatio;
+
         public int GenerationLevel { get => GetProperty(ref generationLevel); set => SetProperty(ref generationLevel, value); }
         private int generationLevel;
 
