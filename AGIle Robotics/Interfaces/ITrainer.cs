@@ -14,6 +14,7 @@ namespace AGIle_Robotics.Interfaces
         double TransitionRatio { get; set; }
         double RandomRatio { get; set; }
         double MutationRatio { get; set; }
+        double CreationRatio { get; set; }
         int Level { get; }
         INeuralNetwork Best { get; }
         IGeneration CurrentGeneration { get; }

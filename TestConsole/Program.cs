@@ -22,7 +22,8 @@ namespace TestConsole
             Trainer = new Trainer(
                 transitionRatio: 0.5,
                 randomRatio: 0.1,
-                mutationRatio: 0.1);
+                mutationRatio: 0.1,
+                creationRatio: 0.1);
 
             Task = Trainer.InitializeAndCreate(
                 size: 10,
