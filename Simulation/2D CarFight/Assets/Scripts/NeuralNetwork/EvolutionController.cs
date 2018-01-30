@@ -127,6 +127,9 @@ public class EvolutionController : MonoBehaviour
     // FixedUpdate is called once per frame
     void FixedUpdate()
     {
+        if (Time.timeScale != timeScale)
+            Time.timeScale = timeScale;
+
         if (initialized && (Task == null || Task.IsCompleted) && fightsQueue.Count == 0)
         {
             Debug.Log("New Generation");

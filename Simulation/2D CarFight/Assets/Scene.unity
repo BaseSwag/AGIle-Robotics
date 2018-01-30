@@ -141,13 +141,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fightCountPerRow: 6
-  fightRows: 3
+  fightRows: 4
   fightPrefab: {fileID: 1588469257560516, guid: ad89dd48ca64b0545b5f12faf9b67168,
     type: 2}
   fights: []
   initialized: 0
   needsRechecking: 0
-  timeScale: 100
+  timeScale: 10
 --- !u!4 &402381942
 Transform:
   m_ObjectHideFlags: 0
