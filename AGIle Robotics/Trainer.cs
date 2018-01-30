@@ -76,11 +76,12 @@ namespace AGIle_Robotics
         public INeuralNetwork Best { get => best; private set => best = value; }
         private INeuralNetwork best;
 
-        public Trainer(double transitionRatio = 0.5, double randomRatio = 0.1, double mutationRatio = 0.1)
+        public Trainer(double transitionRatio = 0.5, double randomRatio = 0.1, double mutationRatio = 0.1, double creationRatio = 0.1)
         {
             TransitionRatio = transitionRatio;
             RandomRatio = randomRatio;
             MutationRatio = mutationRatio;
+            CreationRatio = creationRatio;
         }
 
         public async Task Initialize(int size, STuple<int, int> popSize, STuple<int, int> ports, STuple<int, int> length, STuple<int, int> width, STuple<double, double> weightRange, Func<double, double> activateWith)
