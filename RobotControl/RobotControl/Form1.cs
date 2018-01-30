@@ -28,7 +28,8 @@ namespace RobotControl
         private void Timer_Tick(object sender, EventArgs e)
         {
             var x = Map(xBoxController.ThumbLeftX, 0, 100, -1, 1);
-            var y = Map(xBoxController.ThumbLeftY, 0, 100, -1, 1);
+            var y = xBoxController.TriggerRightPosition - xBoxController.TriggerLeftPosition;
+            y = Map(y, -100, 100, -1, 1);
             var c = Map(xBoxController.ThumbRightX, 0, 100, 0, 1);
 
             WriteStream(s, x, y, c);
@@ -37,7 +38,7 @@ namespace RobotControl
         private void Form1_Load(object sender, EventArgs e)
         {
              tcpClient = new TcpClient();
-             tcpClient.Connect("10.0.0.1", 8376);
+             tcpClient.Connect("10.0.0.1", 8006);
              s = tcpClient.GetStream();
 
             timer.Start();
