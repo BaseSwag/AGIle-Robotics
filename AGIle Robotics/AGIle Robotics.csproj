@@ -43,7 +43,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Environment.cs" />
+    <Compile Include="Extension\Extensions.cs" />
+    <Compile Include="Extension\LimitedQueue.cs" />
     <Compile Include="Generation.cs" />
     <Compile Include="Interfaces\IElement.cs" />
     <Compile Include="Interfaces\IEvolvable.cs" />
@@ -59,8 +60,10 @@
     <Compile Include="Neuron.cs" />
     <Compile Include="Population.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Updater\BaseViewModel.cs" />
     <Compile Include="Trainer.cs" />
-    <Compile Include="WorkPool.cs" />
+    <Compile Include="Updater\StatusUpdater.cs" />
+    <Compile Include="Extension\WorkPool.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -71,5 +74,6 @@
       <Name>SuperTuple</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
