@@ -83,16 +83,7 @@ namespace AGIle_Robotics
 
         public async Task Create()
         {
-            Task<IPopulation>[] tasks = new Task<IPopulation>[Size];
-
-            for(int i = 0; i < Size; i++)
-            {
-                var t = new Task<IPopulation>(() => CreatePopulation());
-                tasks[i] = t;
-
-                Environment.WorkPool.EnqueueTask(t);
-            }
-
+            Task<IPopulation>[] tasks = Environment.WorkPool.For(0, Size, () => CreatePopulation());
             Populations = await Task.WhenAll(tasks);
         }
         private IPopulation CreatePopulation()
@@ -121,18 +112,15 @@ namespace AGIle_Robotics
 
             Evaluate(fitnessFunction, ref tasks, 0, 0);
 
-            System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
             await Task.WhenAll(tasks.ToArray());
-            Console.WriteLine("Waited " + sw.ElapsedMilliseconds);
 
             Best = null;
-
         }
         private void Evaluate(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction, ref List<Task> tasks, int pop, int net)
         {
             var p = pop;
             var n = net;
-            var t = new Task(async () => await EvaluationCycle(fitnessFunction, p, n));
+            var t = new Task(() => EvaluationCycle(fitnessFunction, p, n));
             tasks.Add(t);
             Environment.WorkPool.EnqueueTask(t);
 
@@ -158,60 +146,38 @@ namespace AGIle_Robotics
             var tasks = new List<Task>();
             for (int p = pop; p < Populations.Length; p++)
             {
-                var p2 = p;
-                for(int n = net; n < Populations[p2].Networks.Length; n++)
+                for (int n = net + 1; n < Populations[p].Networks.Length; n++)
                 {
-                    var n2 = n;
-                    Task t = Task.Run(() =>
-                    {
-                        var enemyNet = Populations[p2].Networks[n2];
-                        System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-                        sw.Start();
-                        var task = fitnessFunction(myNet, enemyNet);
-                        task.Wait();
-                        sw.Stop();
-                        Console.WriteLine($"Fitnessfunction took {sw.ElapsedMilliseconds}");
-
-                        Populations[pop].Networks[net].Fitness += task.Result.Item1;
-                        Populations[p2].Networks[n2].Fitness += task.Result.Item2;
-                    });
+                    var enemyNet = Populations[p].Networks[n];
+                    var t = EvaluationCycle(fitnessFunction, (pop, net), myNet, (p, n), enemyNet);
                     tasks.Add(t);
                 }
             }
             return Task.WhenAll(tasks.ToArray());
         }
+        public async Task EvaluationCycle(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction, (int p, int n) i1, INeuralNetwork n1, (int p, int n) i2, INeuralNetwork n2)
+        {
+            var result = await fitnessFunction(n1, n2);
+            Populations[i1.p].Networks[i1.n].Fitness += result.Item1;
+            Populations[i2.p].Networks[i2.n].Fitness += result.Item2;
+        }
 
         private Task ResetFitness()
         {
-            return Task.Run(() =>
+            return Environment.TaskForAsync(0, Populations.Length, p =>
             {
-                Parallel.For(0, Populations.Length, (p) =>
-                {
-                    int p2 = p;
-                    Populations[p2].ResetBest();
-                    Parallel.For(0, Populations[p2].Networks.Length, n =>
-                    {
-                        Populations[p].Networks[n].Fitness = 0;
-                    });
-                });
+                Populations[p].ResetBest();
+                for(int n = 0; n < Populations[p].Networks.Length; n++)
+                    Populations[p].Networks[n].Fitness = 0;
             });
         }
 
         public Task<IGeneration> Evolve() => Evolve(TransitionRatio, RandomRatio, MutationRatio);
         public async Task<IGeneration> Evolve(double transitionRatio, double randomRatio, double mutationRatio)
         {
-            Task<IPopulation>[] tasks = new Task<IPopulation>[Size];
-
-            for(int i = 0; i < Size; i++)
-            {
-                var x = i;
-
-                var t = new Task<IPopulation>(() => Populations[x].Evolve(transitionRatio, randomRatio, mutationRatio).Result);
-                
-                tasks[i] = t;
-                Environment.WorkPool.EnqueueTask(t);
-            }
-
+            Task<IPopulation>[] tasks = Environment.WorkPool.For(0, Size, i
+                => Populations[i].Evolve(transitionRatio, randomRatio, mutationRatio).Result);
+            
             Generation newGen = new Generation(Size, PopulationSize, Ports, Length, Width, WeightRange, activationFunction);
             newGen.Populations = await Task.WhenAll(tasks);
 

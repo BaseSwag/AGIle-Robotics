@@ -13,6 +13,7 @@ namespace TestConsole
     {
         static Trainer Trainer;
         static Queue<Fight> Fights = new Queue<Fight>();
+        public static int FightsLeft = 0;
 
         public static async Task Init()
         {
