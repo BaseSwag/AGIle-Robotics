@@ -26,14 +26,29 @@ namespace AGIle_Robotics
         }
         private int size;
 
-        public double TransitionRatio { get => transitionRatio; set => transitionRatio = value; }
+        public double TransitionRatio { get => transitionRatio; set => SetRatio(ref transitionRatio, value); }
         private double transitionRatio = 0.5;
 
-        public double RandomRatio { get => randomRatio; set => randomRatio = value; }
+        public double RandomRatio { get => randomRatio; set => SetRatio(ref randomRatio, value); }
         private double randomRatio = 0.1;
 
-        public double MutationRatio { get => mutationRatio; set => mutationRatio = value; }
+        public double MutationRatio { get => mutationRatio; set => SetRatio(ref mutationRatio, value); }
         private double mutationRatio = 0.1;
+
+        public double CreationRatio { get => creationRatio; set => SetRatio(ref creationRatio, value); }
+        private double creationRatio = 0.1;
+
+        private void SetRatio(ref double ratio, double value)
+        {
+            double temp = ratio;
+            ratio = value;
+
+            if(TransitionRatio + RandomRatio + MutationRatio + CreationRatio >= 1)
+            {
+                ratio = temp;
+                throw new ArgumentException("Ratio values exceed 1.0");
+            }
+        }
 
         public INeuralNetwork Best
         {

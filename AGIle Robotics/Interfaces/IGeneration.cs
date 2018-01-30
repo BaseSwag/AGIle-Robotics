@@ -14,6 +14,7 @@ namespace AGIle_Robotics.Interfaces
         double TransitionRatio { get; set; }
         double RandomRatio { get; set; }
         double MutationRatio { get; set; }
+        double CreationRatio { get; set; }
         (int, int) PopulationSize { get; }
         (int, int) Length { get; }
         (int, int) Width { get; }

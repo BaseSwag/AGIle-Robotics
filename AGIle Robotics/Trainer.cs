@@ -44,6 +44,16 @@ namespace AGIle_Robotics
             }
         }
         private double mutationRatio;
+        public double CreationRatio
+        {
+            get => creationRatio;
+            set
+            {
+                creationRatio = value;
+                Extensions.StatusUpdater.CreationRatio = value;
+            }
+        }
+        private double creationRatio;
 
         public IGeneration CurrentGeneration { get => currentGeneration; private set => currentGeneration = value; }
         private IGeneration currentGeneration;
