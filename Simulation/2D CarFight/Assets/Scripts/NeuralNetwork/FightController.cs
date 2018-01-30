@@ -67,6 +67,17 @@ public class FightController : MonoBehaviour
         }
     }
 
+    void OnCarLost(int fitness)
+    {
+        if (!done)
+        {
+            EvolutionController.fightsDone++;
+            Debug.Log("Fight over");
+            done = true;
+            Fight.tcs.SetResult(new Tuple<double, double>(fitness, fitness));
+        }
+    }
+
     // FixedUpdate is called once per frame
     void FixedUpdate()
     {
@@ -76,7 +87,7 @@ public class FightController : MonoBehaviour
             if (tickTimeoutLeft <= 0)
             {
                 if (Fight != null)
-                    OnCarLost(Vector2.Distance(car1.transform.position, circleTransform.position) > Vector2.Distance(car2.transform.position, circleTransform.position));
+                    OnCarLost(0);
                 tickTimeoutLeft = fightTimeoutSeconds;
             }
         }

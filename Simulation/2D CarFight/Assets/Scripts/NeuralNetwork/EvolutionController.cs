@@ -74,6 +74,7 @@ public class EvolutionController : MonoBehaviour
     {
         lock(fightsQueue)
         GUI.Label(new Rect(0, 0, 500, 500), $"Generation: {trainer.Level}\nFight processed: {fightsDone}\nFight queue count: {fightsQueue.Count}");
+        timeScale = (int)GUI.HorizontalSlider(new Rect(1, 100, 500, 30), timeScale, 0, 100);
     }
 
     // Use this for initialization
