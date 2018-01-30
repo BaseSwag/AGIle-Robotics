@@ -63,13 +63,14 @@ namespace AGIle_Robotics
             });
         }
 
-        async Task<IEvolvable> IEvolvable.Evolve(double transitionRatio, double randomRatio, double mutationRatio) => await Evolve(transitionRatio, randomRatio, mutationRatio);
-        public Task<IPopulation> Evolve(double transitionRatio, double randomRatio, double mutationRatio)
+        async Task<IEvolvable> IEvolvable.Evolve(double transitionRatio, double randomRatio, double mutationRatio, double creationRatio) => await Evolve(transitionRatio, randomRatio, mutationRatio, creationRatio);
+        public Task<IPopulation> Evolve(double transitionRatio, double randomRatio, double mutationRatio, double creationRatio)
         {
             int len = Networks.Length;
             int transitionAmount = (int)(len * transitionRatio);
             int randomAmount = (int)(len * randomRatio);
             int mutationAmount = (int)(len * mutationRatio);
+            int creationAmount = (int)(len * creationRatio);
 
             List<INeuralNetwork> nextNets = new List<INeuralNetwork>();
             List<INeuralNetwork> remainingNets = Networks.OrderByDescending(n => n.Fitness).ToList();
@@ -83,11 +84,17 @@ namespace AGIle_Robotics
                 remainingNets.RemoveAt(rand);
             }
 
+            for (int i = 0; i < creationAmount; i++)
+            {
+                var newNet = new NeuralNetwork(definition, WeightRange, ActivationFunction, true);
+                nextNets.Add(newNet);
+            }
+
             CrossOver(ref nextNets, nextNets.Count, len);
 
             if(nextNets.Count != len)
             {
-                throw new Exception("Could not create enough new networks");
+                throw new Exception("Could not create enough or too many new networks");
             }
 
             Population newPopulation = new Population(size, definition, WeightRange, ActivationFunction, false);
