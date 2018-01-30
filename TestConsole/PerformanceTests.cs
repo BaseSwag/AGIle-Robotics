@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using AGIle_Robotics.Extension;
 
 namespace TestConsole
 {
@@ -13,7 +15,7 @@ namespace TestConsole
         {
             int range = 10000;
             List<int> list = new List<int>();
-            for(int i = 0; i < range * 10; i++)
+            for (int i = 0; i < range * 10; i++)
             {
                 list.Add(i * 3);
             }
@@ -21,7 +23,7 @@ namespace TestConsole
 
             Stopwatch sw = Stopwatch.StartNew();
             var result = new List<int>();
-            for(int i = 0; i < range; i++)
+            for (int i = 0; i < range; i++)
             {
                 result.Add(list[0]);
                 list.RemoveAt(0);
@@ -40,5 +42,17 @@ namespace TestConsole
             Console.ReadLine();
         }
 
+        public static void StackNew()
+        {
+            WorkPool workPool = new WorkPool(6);
+            workPool.For(0, 10, i =>
+            {
+                int i2 = i;
+                workPool.For(0, 10, j =>
+                {
+                    Console.WriteLine($"{i2} : {j}");
+                });
+            });
+        }
     }
 }

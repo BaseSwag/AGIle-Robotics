@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AGIle_Robotics
+namespace AGIle_Robotics.Extension
 {
     public class WorkPool
     {
@@ -66,6 +66,8 @@ namespace AGIle_Robotics
             TaskEnqueued?.Invoke(this, _task);
         }
 
+        public Task ForToTask(int fromInclusive, int toExclusive, Action body) => Task.WhenAll(For(fromInclusive, toExclusive, body));
+        public Task ForToTask(int fromInclusive, int toExclusive, Action<int> body) => Task.WhenAll(For(fromInclusive, toExclusive, body));
         public Task[] For(int fromInclusive, int toExclusive, Action body)
         {
             int count = toExclusive - fromInclusive;
