@@ -44,6 +44,16 @@ namespace AGIle_Robotics
             }
         }
         private double mutationRatio;
+        public double CreationRatio
+        {
+            get => creationRatio;
+            set
+            {
+                creationRatio = value;
+                Extensions.StatusUpdater.CreationRatio = value;
+            }
+        }
+        private double creationRatio;
 
         public IGeneration CurrentGeneration { get => currentGeneration; private set => currentGeneration = value; }
         private IGeneration currentGeneration;
@@ -66,11 +76,12 @@ namespace AGIle_Robotics
         public INeuralNetwork Best { get => best; private set => best = value; }
         private INeuralNetwork best;
 
-        public Trainer(double transitionRatio = 0.5, double randomRatio = 0.1, double mutationRatio = 0.1)
+        public Trainer(double transitionRatio = 0.5, double randomRatio = 0.1, double mutationRatio = 0.1, double creationRatio = 0.1)
         {
             TransitionRatio = transitionRatio;
             RandomRatio = randomRatio;
             MutationRatio = mutationRatio;
+            CreationRatio = creationRatio;
         }
 
         public async Task Initialize(int size, STuple<int, int> popSize, STuple<int, int> ports, STuple<int, int> length, STuple<int, int> width, STuple<double, double> weightRange, Func<double, double> activateWith)
@@ -78,6 +89,10 @@ namespace AGIle_Robotics
             Extensions.StatusUpdater.Activity = Updater.StatusUpdater.FrameworkActivity.Initializing;
             CurrentGeneration = await Task.Run(
                 () => (IGeneration)new Generation(size, popSize, ports, length, width, weightRange, activateWith));
+            CurrentGeneration.TransitionRatio = TransitionRatio;
+            CurrentGeneration.RandomRatio = RandomRatio;
+            CurrentGeneration.MutationRatio = MutationRatio;
+            CurrentGeneration.CreationRatio = CreationRatio;
             Extensions.StatusUpdater.Activity = Updater.StatusUpdater.FrameworkActivity.NotReady;
         }
 
@@ -108,7 +123,7 @@ namespace AGIle_Robotics
         public async Task Evolve()
         {
             Extensions.StatusUpdater.Activity = Updater.StatusUpdater.FrameworkActivity.Evolving;
-            CurrentGeneration = (IGeneration) await CurrentGeneration.Evolve(TransitionRatio, RandomRatio, MutationRatio);
+            CurrentGeneration = (IGeneration) await CurrentGeneration.Evolve(TransitionRatio, RandomRatio, MutationRatio, CreationRatio);
             Level++;
             Extensions.StatusUpdater.Activity = Updater.StatusUpdater.FrameworkActivity.Idle;
         }

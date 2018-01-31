@@ -14,12 +14,13 @@ namespace AGIle_Robotics.Interfaces
         double TransitionRatio { get; set; }
         double RandomRatio { get; set; }
         double MutationRatio { get; set; }
+        double CreationRatio { get; set; }
         (int, int) PopulationSize { get; }
         (int, int) Length { get; }
         (int, int) Width { get; }
         (int, int) Ports { get; }
         Task Create();
-        new Task<IGeneration> Evolve(double transitionRatio, double randomRatio, double mutationRatio);
+        new Task<IGeneration> Evolve(double transitionRatio, double randomRatio, double mutationRatio, double creationRatio);
         Task Evaluate(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction);
     }
 }

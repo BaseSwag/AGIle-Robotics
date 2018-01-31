@@ -63,17 +63,20 @@ namespace AGIle_Robotics
             });
         }
 
-        async Task<IEvolvable> IEvolvable.Evolve(double transitionRatio, double randomRatio, double mutationRatio) => await Evolve(transitionRatio, randomRatio, mutationRatio);
-        public Task<IPopulation> Evolve(double transitionRatio, double randomRatio, double mutationRatio)
+        async Task<IEvolvable> IEvolvable.Evolve(double transitionRatio, double randomRatio, double mutationRatio, double creationRatio) => await Evolve(transitionRatio, randomRatio, mutationRatio, creationRatio);
+        public Task<IPopulation> Evolve(double transitionRatio, double randomRatio, double mutationRatio, double creationRatio)
         {
             int len = Networks.Length;
-            int transitionAmount = (int)(len * transitionRatio);
+            int transitionAmount = (int)(len * transitionRatio) - 1;
             int randomAmount = (int)(len * randomRatio);
             int mutationAmount = (int)(len * mutationRatio);
+            int creationAmount = (int)(len * creationRatio);
 
             List<INeuralNetwork> nextNets = new List<INeuralNetwork>();
             List<INeuralNetwork> remainingNets = Networks.OrderByDescending(n => n.Fitness).ToList();
 
+            // Take fist twice to prevent mutation on best once
+            nextNets.Add(remainingNets[0]);
             nextNets.AddRange(remainingNets.Take(transitionAmount));
 
             for (int i = 0; i < randomAmount; i++)
@@ -83,11 +86,17 @@ namespace AGIle_Robotics
                 remainingNets.RemoveAt(rand);
             }
 
+            for (int i = 0; i < creationAmount; i++)
+            {
+                var newNet = new NeuralNetwork(definition, WeightRange, ActivationFunction, true);
+                nextNets.Add(newNet);
+            }
+
             CrossOver(ref nextNets, nextNets.Count, len);
 
             if(nextNets.Count != len)
             {
-                throw new Exception("Could not create enough new networks");
+                throw new Exception("Could not create enough or too many new networks");
             }
 
             Population newPopulation = new Population(size, definition, WeightRange, ActivationFunction, false);
@@ -97,7 +106,8 @@ namespace AGIle_Robotics
                 newPopulation.Networks[i] = net;
                 newPopulation.Networks[i].Fitness = 0;
 
-                newPopulation.Networks[i].Mutate(mutationRatio); // Mutate
+                if(i > 0) // Do not mutate best
+                    newPopulation.Networks[i].Mutate(mutationRatio); // Mutate
             }
 
             TaskCompletionSource<IPopulation> tcs = new TaskCompletionSource<IPopulation>();
