@@ -83,6 +83,11 @@ namespace AGIle_Robotics
             MutationRatio = mutationRatio;
             CreationRatio = creationRatio;
         }
+        public Trainer(Generation currentGeneration, NeuralNetwork best)
+        {
+            CurrentGeneration = currentGeneration;
+            Best = best;
+        }
 
         public async Task Initialize(int size, STuple<int, int> popSize, STuple<int, int> ports, STuple<int, int> length, STuple<int, int> width, STuple<double, double> weightRange, Func<double, double> activateWith)
         {

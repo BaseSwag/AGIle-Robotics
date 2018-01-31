@@ -108,6 +108,11 @@ namespace AGIle_Robotics
 
             ActivationFunction = activateWith;
         }
+        public Generation(Population[] populations, NeuralNetwork best)
+        {
+            Populations = populations;
+            Best = best;
+        }
 
         public async Task Create()
         {

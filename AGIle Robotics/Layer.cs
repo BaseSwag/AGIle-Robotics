@@ -34,6 +34,10 @@ namespace AGIle_Robotics
                 Neurons[i] = new Neuron(inputSize, weightRange, activateWith, init);
             }
         }
+        public Layer(Neuron[] neurons)
+        {
+            Neurons = neurons;
+        }
 
         public double[] Activate(double[] input)
         {

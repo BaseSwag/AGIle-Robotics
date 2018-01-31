@@ -44,6 +44,10 @@ namespace AGIle_Robotics
                 Layers[index] = layer;
             });
         }
+        public NeuralNetwork(Layer[] layers)
+        {
+            Layers = layers;
+        }
 
         public double[] Activate(double[] input)
         {
