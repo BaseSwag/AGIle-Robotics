@@ -67,7 +67,7 @@ namespace AGIle_Robotics
         public Task<IPopulation> Evolve(double transitionRatio, double randomRatio, double mutationRatio, double creationRatio)
         {
             int len = Networks.Length;
-            int transitionAmount = (int)(len * transitionRatio);
+            int transitionAmount = (int)(len * transitionRatio) - 1;
             int randomAmount = (int)(len * randomRatio);
             int mutationAmount = (int)(len * mutationRatio);
             int creationAmount = (int)(len * creationRatio);
@@ -75,6 +75,8 @@ namespace AGIle_Robotics
             List<INeuralNetwork> nextNets = new List<INeuralNetwork>();
             List<INeuralNetwork> remainingNets = Networks.OrderByDescending(n => n.Fitness).ToList();
 
+            // Take fist twice to prevent mutation on best once
+            nextNets.Add(remainingNets[0]);
             nextNets.AddRange(remainingNets.Take(transitionAmount));
 
             for (int i = 0; i < randomAmount; i++)
@@ -104,7 +106,8 @@ namespace AGIle_Robotics
                 newPopulation.Networks[i] = net;
                 newPopulation.Networks[i].Fitness = 0;
 
-                newPopulation.Networks[i].Mutate(mutationRatio); // Mutate
+                if(i > 0) // Do not mutate best
+                    newPopulation.Networks[i].Mutate(mutationRatio); // Mutate
             }
 
             TaskCompletionSource<IPopulation> tcs = new TaskCompletionSource<IPopulation>();
