@@ -9,6 +9,7 @@ using AGIle_Robotics;
 using AGIle_Robotics.Extension;
 using AGIle_Robotics.Interfaces;
 using SuperTuple;
+using Newtonsoft.Json;
 
 namespace TestConsole
 {
@@ -27,8 +28,8 @@ namespace TestConsole
 
             Task = Trainer.InitializeAndCreate(
                 size: 10,
-                popSize: (10, 15),
-                ports: (1, 1),
+                popSize: (10, 11),
+                ports: (6, 3),
                 length: (5, 15),
                 width: (2, 10),
                 weightRange: (-2.0, 2.0),
@@ -39,13 +40,17 @@ namespace TestConsole
 
             Trainer.FitnessFunction = FitnessFunction;
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 0; i++)
             {
                 Task = Trainer.EvaluateAndEvolve();
                 ReportStatus(Task).Wait();
             }
-            ReportStatus(Task, true).Wait();
 
+            string json = JsonConvert.SerializeObject(Trainer, Formatting.None);
+            System.IO.File.WriteAllText(@"C:\Users\login\Desktop\trainer.js", json);
+
+            Trainer = JsonConvert.DeserializeObject<Trainer>(json);
+            
             Console.ReadLine();
         }
 
