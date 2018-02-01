@@ -6,30 +6,49 @@ using System.Threading.Tasks;
 using AGIle_Robotics.Interfaces;
 using AGIle_Robotics.Extension;
 using SuperTuple;
+using Newtonsoft.Json;
 
 namespace AGIle_Robotics
 {
     public class NeuralNetwork : INeuralNetwork
     {
+        [JsonConverter(typeof(ArrayListJsonConverter<ILayer>))]
         public ILayer[] Layers { get => layers; private set => layers = value; }
         private ILayer[] layers;
 
+        [JsonProperty]
         public int InputSize => Layers.Length > 0 ? Layers[0].Neurons.Length : 0;
 
+        [JsonProperty]
         public int OutputSize => Layers.Length > 0 ? Layers[Layers.Length - 1].Neurons.Length : 0;
 
+        [JsonConverter(typeof(DoubleTupleJsonConverter))]
         public (double, double) WeightRange { get => weightRange; private set => weightRange = value; }
+        [JsonConverter(typeof(DoubleTupleJsonConverter))]
         private (double, double) weightRange;
 
         public double Fitness { get => fitness; set => fitness = value; }
         private double fitness;
 
+        [JsonIgnore]
         public Func<double, double> ActivationFunction { get => activationFunction; set => activationFunction = value; }
-        private Func<double, double> activationFunction;
+        [JsonIgnore]
+        private Func<double, double> activationFunction = Math.Tanh;
 
+        [JsonConverter(typeof(ArrayListJsonConverter<int>))]
         public int[] Definition { get => definition; set => definition = value; }
         private int[] definition;
 
+        [JsonConstructor]
+        public NeuralNetwork(ILayer[] layers, int[] definition, STuple<double, double> weightRange, double fitness)
+        {
+            Layers = layers;
+
+            WeightRange = weightRange;
+            Fitness = fitness;
+            Definition = definition;
+            ActivationFunction = Math.Tanh;
+        }
         public NeuralNetwork(int[] definition, STuple<double, double> weightRange, Func<double, double> activateWith, bool init = true)
         {
             WeightRange = weightRange;
@@ -43,10 +62,6 @@ namespace AGIle_Robotics
                 ILayer layer = new Layer(definition[index], inputSize, weightRange, activateWith, init);
                 Layers[index] = layer;
             });
-        }
-        public NeuralNetwork(Layer[] layers)
-        {
-            Layers = layers;
         }
 
         public double[] Activate(double[] input)

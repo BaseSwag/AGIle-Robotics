@@ -6,24 +6,42 @@ using System.Threading.Tasks;
 using AGIle_Robotics.Interfaces;
 using AGIle_Robotics.Extension;
 using SuperTuple;
+using Newtonsoft.Json;
 
 namespace AGIle_Robotics
 {
     public class Layer : ILayer
     {
+        [JsonConverter(typeof(ArrayListJsonConverter<INeuron>))]
         public INeuron[] Neurons { get => neurons; private set => neurons = value; }
         private INeuron[] neurons;
 
+        [JsonConverter(typeof(DoubleTupleJsonConverter))]
         public (double, double) WeightRange { get => weightRange; private set => weightRange = value; }
         private (double, double) weightRange;
 
+        [JsonIgnore]
         public Func<double, double> ActivationFunction { get => activationFunction; private set => activationFunction = value; }
-        private Func<double, double> activationFunction;
+        private Func<double, double> activationFunction = Math.Tanh;
 
+        public int Size { get => size; private set => size = value; }
+        private int size;
+
+        public int InputSize { get => inputSize; private set => inputSize = value; }
         private int inputSize;
 
+        [JsonConstructor]
+        public Layer(INeuron[] neurons, int size, int inputSize, STuple<double, double> weightRange)
+        {
+            Neurons = neurons;
+            Size = size;
+            WeightRange = weightRange;
+            ActivationFunction = Math.Tanh;
+            InputSize = inputSize;
+        }
         public Layer(int size, int inputSize, STuple<double, double> weightRange, Func<double, double> activateWith, bool init = true)
         {
+            Size = size;
             WeightRange = weightRange;
             ActivationFunction = activateWith;
             this.inputSize = inputSize;
@@ -33,10 +51,6 @@ namespace AGIle_Robotics
             {
                 Neurons[i] = new Neuron(inputSize, weightRange, activateWith, init);
             }
-        }
-        public Layer(Neuron[] neurons)
-        {
-            Neurons = neurons;
         }
 
         public double[] Activate(double[] input)

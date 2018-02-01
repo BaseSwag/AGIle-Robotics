@@ -7,20 +7,25 @@ using System.Text;
 using System.Threading.Tasks;
 using SuperTuple;
 using System.Diagnostics;
+using Newtonsoft.Json;
 
 namespace AGIle_Robotics
 {
     public class Population : IPopulation
     {
+        [JsonConverter(typeof(DoubleTupleJsonConverter))]
         public (double, double) WeightRange { get => weightRange; private set => weightRange = value; }
         private (double, double) weightRange;
 
+        [JsonConverter(typeof(ArrayListJsonConverter<INeuralNetwork>))]
         public INeuralNetwork[] Networks { get => networks; private set => networks = value; }
         private INeuralNetwork[] networks;
 
+        [JsonIgnore]
         public Func<double, double> ActivationFunction { get => activationFunction; private set => activationFunction = value; }
-        private Func<double, double> activationFunction;
+        private Func<double, double> activationFunction = Math.Tanh;
 
+        [JsonProperty]
         public INeuralNetwork Best
         {
             get
@@ -44,17 +49,30 @@ namespace AGIle_Robotics
         }
         public INeuralNetwork best;
 
+        public int Size { get => size; private set => size = value; }
         private int size;
+
+        public int[] Definition { get => definition; private set => definition = value; }
         private int[] definition;
 
-        public Population(int size, int[] definition, STuple<double, double> weightRange) => Init(size, definition, weightRange, Math.Tanh);
+        //public Population(int size, int[] definition, STuple<double, double> weightRange) => Init(size, definition, weightRange, Math.Tanh);
+        [JsonConstructor]
+        public Population(INeuralNetwork[] networks, int size, int[] definition, STuple<double, double> weightRange)
+        {
+            WeightRange = weightRange;
+            ActivationFunction = Math.Tanh;
+            Size = size;
+            Definition = definition;
+
+            Networks = networks;
+        }
         public Population(int size, int[] definition, STuple<double, double> weightRange, Func<double, double> activateWith, bool init = true) => Init(size, definition, weightRange, activateWith, init);
         private void Init(int size, int[] definition, STuple<double, double> weightRange, Func<double, double> activateWith, bool init = true)
         {
             WeightRange = weightRange;
             ActivationFunction = activateWith;
-            this.size = size;
-            this.definition = definition;
+            Size = size;
+            Definition = definition;
 
             Networks = new INeuralNetwork[size];
             Extensions.WorkPool.For(0, size, index =>

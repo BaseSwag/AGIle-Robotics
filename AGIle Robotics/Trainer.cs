@@ -7,11 +7,13 @@ using AGIle_Robotics.Interfaces;
 using AGIle_Robotics.Extension;
 using SuperTuple;
 using AGIle_Robotics.Updater;
+using Newtonsoft.Json;
 
 namespace AGIle_Robotics
 {
     public class Trainer : ITrainer
     {
+        [JsonIgnore]
         public StatusUpdater StatusUpdater => Extensions.StatusUpdater;
 
         public double TransitionRatio
@@ -24,6 +26,7 @@ namespace AGIle_Robotics
             }
         }
         private double transitionRatio;
+
         public double RandomRatio
         {
             get => randomRatio;
@@ -34,6 +37,7 @@ namespace AGIle_Robotics
             }
         }
         private double randomRatio;
+
         public double MutationRatio
         {
             get => mutationRatio;
@@ -44,6 +48,7 @@ namespace AGIle_Robotics
             }
         }
         private double mutationRatio;
+
         public double CreationRatio
         {
             get => creationRatio;
@@ -58,6 +63,7 @@ namespace AGIle_Robotics
         public IGeneration CurrentGeneration { get => currentGeneration; private set => currentGeneration = value; }
         private IGeneration currentGeneration;
 
+        [JsonIgnore]
         public Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> FitnessFunction
             { get => fitnessFunction; set => fitnessFunction = value; }
         private Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction;
@@ -76,17 +82,23 @@ namespace AGIle_Robotics
         public INeuralNetwork Best { get => best; private set => best = value; }
         private INeuralNetwork best;
 
+        [JsonConstructor]
+        public Trainer(double transitionRatio, double randomRatio, double mutationRatio, double creationRatio, IGeneration currentGeneration, int level, INeuralNetwork best)
+        {
+            TransitionRatio = transitionRatio;
+            RandomRatio = randomRatio;
+            MutationRatio = mutationRatio;
+            CreationRatio = creationRatio;
+            CurrentGeneration = currentGeneration;
+            Level = level;
+            Best = best;
+        }
         public Trainer(double transitionRatio = 0.5, double randomRatio = 0.1, double mutationRatio = 0.1, double creationRatio = 0.1)
         {
             TransitionRatio = transitionRatio;
             RandomRatio = randomRatio;
             MutationRatio = mutationRatio;
             CreationRatio = creationRatio;
-        }
-        public Trainer(Generation currentGeneration, NeuralNetwork best)
-        {
-            CurrentGeneration = currentGeneration;
-            Best = best;
         }
 
         public async Task Initialize(int size, STuple<int, int> popSize, STuple<int, int> ports, STuple<int, int> length, STuple<int, int> width, STuple<double, double> weightRange, Func<double, double> activateWith)

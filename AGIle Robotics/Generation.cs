@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AGIle_Robotics.Interfaces;
 using SuperTuple;
+using Newtonsoft.Json;
 using AGIle_Robotics.Extension;
 using System.Threading;
 
@@ -12,6 +13,7 @@ namespace AGIle_Robotics
 {
     public class Generation : IGeneration
     {
+        [JsonConverter(typeof(ArrayListJsonConverter<IPopulation>))]
         public IPopulation[] Populations { get => populations; set => populations = value; }
         private IPopulation[] populations;
 
@@ -50,6 +52,7 @@ namespace AGIle_Robotics
             }
         }
 
+        [JsonProperty]
         public INeuralNetwork Best
         {
             get
@@ -74,27 +77,52 @@ namespace AGIle_Robotics
             }
             private set => best = value;
         }
-        public INeuralNetwork best;
+        private INeuralNetwork best;
 
+        [JsonConverter(typeof(IntTupleJsonConverter))]
         public (int, int) Ports { get => ports; private set => ports = value; }
-        public (int, int) ports;
+        private (int, int) ports;
 
+        [JsonConverter(typeof(IntTupleJsonConverter))]
         public (int, int) PopulationSize { get => populationSize; private set => populationSize = value; }
-        public (int, int) populationSize;
+        private (int, int) populationSize;
 
+        [JsonConverter(typeof(DoubleTupleJsonConverter))]
         public (double, double) WeightRange { get => weightRange; private set => weightRange = value; }
         private (double, double) weightRange;
 
+        [JsonIgnore]
         public Func<double, double> ActivationFunction { get => activationFunction; private set => activationFunction = value; }
         private Func<double, double> activationFunction = Math.Tanh;
 
+        [JsonConverter(typeof(IntTupleJsonConverter))]
         public (int, int) Length { get => length; private set => length = value; }
-        public (int, int) length;
+        private (int, int) length;
 
+        [JsonConverter(typeof(IntTupleJsonConverter))]
         public (int, int) Width { get => width; private set => width = value; }
-        public (int, int) width;
+        private (int, int) width;
 
+        [JsonConstructor]
+        public Generation(IPopulation[] populations, int size, STuple<int, int> populationSize, STuple<int, int> ports, STuple<int, int> length, STuple<int, int> width, STuple<double, double> weightRange, double transitionRatio, double randomRatio, double mutationRatio, double creationRatio)
+        {
+            Size = size;
+            Populations = populations;
+            PopulationSize = populationSize;
+            Ports = ports;
 
+            Length = length;
+            Width = width;
+
+            WeightRange = weightRange;
+
+            ActivationFunction = Math.Tanh;
+
+            TransitionRatio = transitionRatio;
+            RandomRatio = randomRatio;
+            MutationRatio = mutationRatio;
+            CreationRatio = creationRatio;
+        }
         public Generation(int size, STuple<int, int> popSize, STuple<int, int> ports, STuple<int, int> length, STuple<int, int> width, STuple<double, double> weightRange, Func<double, double> activateWith)
         {
             Size = size;
@@ -107,11 +135,6 @@ namespace AGIle_Robotics
             WeightRange = weightRange;
 
             ActivationFunction = activateWith;
-        }
-        public Generation(Population[] populations, NeuralNetwork best)
-        {
-            Populations = populations;
-            Best = best;
         }
 
         public async Task Create()
