@@ -27,5 +27,6 @@ namespace AGIle_Robotics.Interfaces
         Task Evaluate(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction);
         Task EvaluateAndEvolve();
         Task EvaluateAndEvolve(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction);
+        string Serialize();
     }
 }

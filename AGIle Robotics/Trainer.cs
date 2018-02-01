@@ -156,5 +156,22 @@ namespace AGIle_Robotics
             await Evaluate(fitnessFunction);
             await Evolve();
         }
+
+        public string Serialize()
+        {
+            var serializationSettings = new JsonSerializerSettings();
+            serializationSettings.TypeNameHandling = TypeNameHandling.All;
+
+            string json = JsonConvert.SerializeObject(this, Formatting.None, serializationSettings);
+            return json;
+        }
+
+        public static Trainer Deserialize(string json)
+        {
+            var serializationSettings = new JsonSerializerSettings();
+            serializationSettings.TypeNameHandling = TypeNameHandling.All;
+
+            return JsonConvert.DeserializeObject<Trainer>(json, serializationSettings);
+        }
     }
 }

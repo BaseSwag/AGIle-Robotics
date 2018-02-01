@@ -107,5 +107,22 @@ namespace AGIle_Robotics
             for(int i = 0; i < Layers.Length; i++)
                 Layers[i].Mutate(ratio);
         }
+
+        public string Serialize()
+        {
+            var serializationSettings = new JsonSerializerSettings();
+            serializationSettings.TypeNameHandling = TypeNameHandling.All;
+
+            string json = JsonConvert.SerializeObject(this, Formatting.None, serializationSettings);
+            return json;
+        }
+
+        public static NeuralNetwork Deserialize(string json)
+        {
+            var serializationSettings = new JsonSerializerSettings();
+            serializationSettings.TypeNameHandling = TypeNameHandling.All;
+
+            return JsonConvert.DeserializeObject<NeuralNetwork>(json, serializationSettings);
+        }
     }
 }
