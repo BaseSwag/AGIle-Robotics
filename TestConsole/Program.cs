@@ -47,7 +47,7 @@ namespace TestConsole
             }
 
             string json = Trainer.Serialize();
-            System.IO.File.WriteAllText(@"C:\Users\login\Desktop\trainer.js", json);
+            System.IO.File.WriteAllText(@"C:\Users\login\Desktop\trainer.json", json);
 
             Trainer = Trainer.Deserialize(json);
 
