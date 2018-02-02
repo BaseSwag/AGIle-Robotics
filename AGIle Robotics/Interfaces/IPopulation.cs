@@ -11,5 +11,7 @@ namespace AGIle_Robotics.Interfaces
         INeuralNetwork[] Networks { get; }
         void ResetBest();
         new Task<IPopulation> Evolve(double transitionRatio, double randomRatio, double mutationRatio, double creationRatio);
+        int Size { get; }
+        int[] Definition { get; }
     }
 }

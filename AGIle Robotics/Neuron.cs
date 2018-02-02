@@ -6,22 +6,39 @@ using System.Threading.Tasks;
 using AGIle_Robotics.Interfaces;
 using AGIle_Robotics.Extension;
 using SuperTuple;
+using Newtonsoft.Json;
 
 namespace AGIle_Robotics
 {
     public class Neuron : INeuron
     {
+        [JsonConverter(typeof(ArrayListJsonConverter<double>))]
         public double[] InputWeights { get => inputWeights; set => inputWeights = value; }
         private double[] inputWeights;
 
-        public Func<double, double> ActivationFunction { get => activationFunction; private set => activationFunction = value; }
-        private Func<double, double> activationFunction;
+        public int InputSize { get => inputSize; set => inputSize = value; }
+        private int inputSize;
 
+        [JsonIgnore]
+        public Func<double, double> ActivationFunction { get => activationFunction; private set => activationFunction = value; }
+        private Func<double, double> activationFunction = Math.Tanh;
+
+        [JsonConverter(typeof(DoubleTupleJsonConverter))]
         public (double, double) WeightRange { get => weightRange; set => weightRange = value; }
         private (double, double) weightRange;
 
+        [JsonConstructor]
+        public Neuron(double[] inputWeights, int inputSize, STuple<double, double> weightRange)
+        {
+            InputWeights = inputWeights;
+            InputSize = inputSize;
+
+            WeightRange = weightRange;
+            ActivationFunction = Math.Tanh;
+        }
         public Neuron(int inputSize, STuple<double, double> weightRange, Func<double, double> activateWith, bool init = true)
         {
+            InputSize = inputSize;
             WeightRange = weightRange;
             ActivationFunction = activateWith;
 

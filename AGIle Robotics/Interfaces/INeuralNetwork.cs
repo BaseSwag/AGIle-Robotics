@@ -13,5 +13,6 @@ namespace AGIle_Robotics.Interfaces
         int OutputSize { get; }
         int[] Definition { get; }
         double Fitness { get; set; }
+        string Serialize();
     }
 }
