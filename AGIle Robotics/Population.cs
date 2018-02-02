@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using SuperTuple;
 using System.Diagnostics;
 using Newtonsoft.Json;
+using System.Threading;
 
 namespace AGIle_Robotics
 {
@@ -66,8 +67,7 @@ namespace AGIle_Robotics
 
             Networks = networks;
         }
-        public Population(int size, int[] definition, STuple<double, double> weightRange, Func<double, double> activateWith, bool init = true) => Init(size, definition, weightRange, activateWith, init);
-        private void Init(int size, int[] definition, STuple<double, double> weightRange, Func<double, double> activateWith, bool init = true)
+        public Population(int size, int[] definition, STuple<double, double> weightRange, Func<double, double> activateWith)
         {
             WeightRange = weightRange;
             ActivationFunction = activateWith;
@@ -75,14 +75,20 @@ namespace AGIle_Robotics
             Definition = definition;
 
             Networks = new INeuralNetwork[size];
-            Extensions.WorkPool.For(0, size, index =>
+        }
+
+        public void Create()
+        {
+            for(int i = 0; i < Size; i++)
             {
-                Networks[index] = new NeuralNetwork(definition, weightRange, activateWith, init);
-            });
+                var network = new NeuralNetwork(Definition, WeightRange, ActivationFunction);
+                Networks[i] = network;
+                Networks[i].Create();
+            }
         }
 
         async Task<IEvolvable> IEvolvable.Evolve(double transitionRatio, double randomRatio, double mutationRatio, double creationRatio) => await Evolve(transitionRatio, randomRatio, mutationRatio, creationRatio);
-        public Task<IPopulation> Evolve(double transitionRatio, double randomRatio, double mutationRatio, double creationRatio)
+        public async Task<IPopulation> Evolve(double transitionRatio, double randomRatio, double mutationRatio, double creationRatio)
         {
             int len = Networks.Length;
             int transitionAmount = (int)(len * transitionRatio) - 1;
@@ -106,7 +112,8 @@ namespace AGIle_Robotics
 
             for (int i = 0; i < creationAmount; i++)
             {
-                var newNet = new NeuralNetwork(definition, WeightRange, ActivationFunction, true);
+                var newNet = new NeuralNetwork(definition, WeightRange, ActivationFunction);
+                await Task.Run(() => newNet.Create());
                 nextNets.Add(newNet);
             }
 
@@ -117,7 +124,7 @@ namespace AGIle_Robotics
                 throw new Exception("Could not create enough or too many new networks");
             }
 
-            Population newPopulation = new Population(size, definition, WeightRange, ActivationFunction, false);
+            Population newPopulation = new Population(size, definition, WeightRange, ActivationFunction);
             for(int i = 0; i < len; i++)
             {
                 var net = nextNets[i];
@@ -126,11 +133,14 @@ namespace AGIle_Robotics
 
                 if(i > 0) // Do not mutate best
                     newPopulation.Networks[i].Mutate(mutationRatio); // Mutate
+                Interlocked.Increment(ref Extensions.StatusUpdater.networksEvolved);
             }
 
+            /*
             TaskCompletionSource<IPopulation> tcs = new TaskCompletionSource<IPopulation>();
             tcs.SetResult(newPopulation);
-            return tcs.Task;
+            */
+            return newPopulation;
         }
 
         private void CrossOver(ref List<INeuralNetwork> nextNets, int count, int total)

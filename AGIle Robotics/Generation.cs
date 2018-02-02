@@ -137,12 +137,19 @@ namespace AGIle_Robotics
             ActivationFunction = activateWith;
         }
 
-        public async Task Create()
+        public void Create() => CreateAsync().Wait();
+        public async Task CreateAsync()
         {
-            Task<IPopulation>[] tasks = Extensions.WorkPool.For(0, Size, () => CreatePopulation());
+            Task<IPopulation>[] tasks = Extensions.WorkPool.For(0, Size, () =>
+            {
+                var population = MakePopulation();
+                population.Create();
+                return population;
+            });
             Populations = await Task.WhenAll(tasks);
         }
-        private IPopulation CreatePopulation()
+
+        private IPopulation MakePopulation()
         {
             var size = Extensions.RandomInt(PopulationSize);
             var length = Extensions.RandomInt(Length);
@@ -179,7 +186,7 @@ namespace AGIle_Robotics
             var n = net;
             var t = new Task<object>(() => EvaluationCycle(fitnessFunction, p, n).Result);
             tasks.Add(t);
-            Extensions.WorkPool.EnqueueTask(t);
+            Extensions.WorkPool.Enqueue(t);
 
             int nextPop, nextNet;
 
@@ -216,7 +223,7 @@ namespace AGIle_Robotics
                             Populations[pop].Networks[net].Fitness += finished.Result.Item1;
                         lock(Populations[p2].Networks[n2])
                             Populations[p2].Networks[n2].Fitness += finished.Result.Item2;
-                        Extensions.StatusUpdater.EvaluationsRunning--;
+                        Interlocked.Decrement(ref Extensions.StatusUpdater.evaluationsRunning);
                         tcs.SetResult(null);
                     });
                     tasks.Add(tcs.Task);
@@ -226,7 +233,7 @@ namespace AGIle_Robotics
         }
         public Task<STuple<double, double>> EvaluationCycle(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction, (int p, int n) i1, INeuralNetwork n1, (int p, int n) i2, INeuralNetwork n2)
         {
-            Extensions.StatusUpdater.EvaluationsRunning++;
+            Interlocked.Increment(ref Extensions.StatusUpdater.evaluationsRunning);
             return fitnessFunction(n1, n2);
         }
 

@@ -116,7 +116,7 @@ namespace AGIle_Robotics
         public async Task Create()
         {
             Extensions.StatusUpdater.Activity = Updater.StatusUpdater.FrameworkActivity.Creating;
-            await CurrentGeneration.Create();
+            await CurrentGeneration.CreateAsync();
             Level++;
             Extensions.StatusUpdater.Activity = Updater.StatusUpdater.FrameworkActivity.Idle;
         }
@@ -140,6 +140,7 @@ namespace AGIle_Robotics
         public async Task Evolve()
         {
             Extensions.StatusUpdater.Activity = Updater.StatusUpdater.FrameworkActivity.Evolving;
+            Extensions.StatusUpdater.NetworksEvolved = 0;
             CurrentGeneration = (IGeneration) await CurrentGeneration.Evolve(TransitionRatio, RandomRatio, MutationRatio, CreationRatio);
             Level++;
             Extensions.StatusUpdater.Activity = Updater.StatusUpdater.FrameworkActivity.Idle;

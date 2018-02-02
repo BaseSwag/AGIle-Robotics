@@ -44,12 +44,17 @@ namespace AGIle_Robotics
             Size = size;
             WeightRange = weightRange;
             ActivationFunction = activateWith;
-            this.inputSize = inputSize;
-
+            InputSize = inputSize;
             Neurons = new INeuron[size];
-            for(int i = 0; i < Neurons.Length; i++)
+        }
+
+        public void Create()
+        {
+            for (int i = 0; i < Neurons.Length; i++)
             {
-                Neurons[i] = new Neuron(inputSize, weightRange, activateWith, init);
+                var neuron = new Neuron(InputSize, WeightRange, ActivationFunction);
+                neuron.Create();
+                Neurons[i] = neuron;
             }
         }
 
