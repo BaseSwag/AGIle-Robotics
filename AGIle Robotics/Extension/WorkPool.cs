@@ -56,7 +56,19 @@ namespace AGIle_Robotics.Extension
             TaskFinished += WorkPool_TaskFinished;
         }
 
-        public void EnqueueTask(Task _task)
+        public Task Enqueue(Action action)
+        {
+            var task = new Task(action);
+            Enqueue(task);
+            return task;
+        }
+        public Task<T> Enqueue<T>(Func<T> action)
+        {
+            var task = new Task<T>(() => action());
+            Enqueue(task);
+            return task;
+        }
+        public void Enqueue(Task _task)
         {
             _task.ContinueWith(t => TaskFinished?.Invoke(this, t));
             lock (taskList)
@@ -64,6 +76,19 @@ namespace AGIle_Robotics.Extension
                 taskList.Enqueue(_task);
             }
             TaskEnqueued?.Invoke(this, _task);
+        }
+        public void Enqueue(Task[] _tasks)
+        {
+            for(int i = 0; i < _tasks.Length; i++)
+            {
+                Task _task = _tasks[i];
+                _task.ContinueWith(t => TaskFinished?.Invoke(this, t));
+                lock (taskList)
+                {
+                    taskList.Enqueue(_task);
+                }
+                TaskEnqueued?.Invoke(this, _task);
+            }
         }
 
         public Task ForToTask(int fromInclusive, int toExclusive, Action body) => Task.WhenAll(For(fromInclusive, toExclusive, body));
@@ -75,9 +100,8 @@ namespace AGIle_Robotics.Extension
             int counter = 0;
             for(int i = fromInclusive; i < toExclusive; i++)
             {
-                var t = new Task(body);
+                var t = Enqueue(body);
                 tasks[counter++] = t;
-                EnqueueTask(t);
             }
             return tasks;
         }
@@ -89,9 +113,8 @@ namespace AGIle_Robotics.Extension
             for(int i = fromInclusive; i < toExclusive; i++)
             {
                 int i2 = i;
-                var t = new Task(() => body(i2));
+                var t = Enqueue(() => body(i2));
                 tasks[counter++] = t;
-                EnqueueTask(t);
             }
             return tasks;
         }
@@ -102,9 +125,8 @@ namespace AGIle_Robotics.Extension
             int counter = 0;
             for(int i = fromInclusive; i < toExclusive; i++)
             {
-                var t = new Task<T>(() => body());
+                var t = Enqueue(() => body());
                 tasks[counter++] = t;
-                EnqueueTask(t);
             }
             return tasks;
         }
@@ -116,9 +138,8 @@ namespace AGIle_Robotics.Extension
             for(int i = fromInclusive; i < toExclusive; i++)
             {
                 int i2 = i;
-                var t = new Task<T>(() => body(i2));
+                var t = Enqueue(() => body(i2));
                 tasks[counter++] = t;
-                EnqueueTask(t);
             }
             return tasks;
         }

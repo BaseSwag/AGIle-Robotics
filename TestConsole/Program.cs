@@ -40,16 +40,19 @@ namespace TestConsole
 
             Trainer.FitnessFunction = FitnessFunction;
 
-            for (int i = 0; i < 0; i++)
+            for (int i = 0; i < 3; i++)
             {
                 Task = Trainer.EvaluateAndEvolve();
                 ReportStatus(Task).Wait();
             }
 
+            ReportStatus(Task, true).Wait();
+            /*
             string json = Trainer.Serialize();
             System.IO.File.WriteAllText(@"C:\Users\login\Desktop\trainer.json", json);
 
             Trainer = Trainer.Deserialize(json);
+            */
 
             Console.ReadLine();
         }
@@ -68,6 +71,7 @@ namespace TestConsole
                 Console.WriteLine($"Activity: {Trainer.StatusUpdater.Activity}");
                 Console.WriteLine($"Best fitness: {Trainer.StatusUpdater.BestFitness}");
                 Console.WriteLine($"Evaluations running: {Trainer.StatusUpdater.EvaluationsRunning}");
+                Console.WriteLine($"Networks evolved: {Trainer.StatusUpdater.NetworksEvolved}");
                 await Task.Delay(500);
             }
         }

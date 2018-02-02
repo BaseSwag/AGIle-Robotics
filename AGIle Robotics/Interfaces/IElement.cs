@@ -11,5 +11,6 @@ namespace AGIle_Robotics.Interfaces
     {
         (double, double) WeightRange { get; }
         Func<double, double> ActivationFunction { get; }
+        void Create();
     }
 }

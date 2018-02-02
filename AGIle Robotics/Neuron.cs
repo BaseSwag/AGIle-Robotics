@@ -36,19 +36,20 @@ namespace AGIle_Robotics
             WeightRange = weightRange;
             ActivationFunction = Math.Tanh;
         }
-        public Neuron(int inputSize, STuple<double, double> weightRange, Func<double, double> activateWith, bool init = true)
+        public Neuron(int inputSize, STuple<double, double> weightRange, Func<double, double> activateWith)
         {
             InputSize = inputSize;
             WeightRange = weightRange;
             ActivationFunction = activateWith;
 
             InputWeights = new double[inputSize];
-            if (init)
+        }
+
+        public void Create()
+        {
+            for (int i = 0; i < InputWeights.Length; i++)
             {
-                for(int i = 0; i < InputWeights.Length; i++)
-                {
-                    InputWeights[i] = Extensions.RandomDouble(weightRange.Item1, weightRange.Item2);
-                }
+                InputWeights[i] = Extensions.RandomDouble(weightRange.Item1, weightRange.Item2);
             }
         }
 
@@ -77,7 +78,7 @@ namespace AGIle_Robotics
 
             if(len == neuron2?.InputWeights.Length)
             {
-                var newNeuron = new Neuron(len, WeightRange, ActivationFunction, false);
+                var newNeuron = new Neuron(len, WeightRange, ActivationFunction);
                 for(int i = 0; i < len; i++)
                 {
                     var decision = Extensions.DecideByProbability(p1, p2);
