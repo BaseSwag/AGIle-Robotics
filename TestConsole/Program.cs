@@ -46,14 +46,11 @@ namespace TestConsole
                 ReportStatus(Task).Wait();
             }
 
-            var serializationSettings = new JsonSerializerSettings();
-
-            serializationSettings.TypeNameHandling = TypeNameHandling.All;
-            string json = JsonConvert.SerializeObject(Trainer, Formatting.None, serializationSettings);
+            string json = Trainer.Serialize();
             System.IO.File.WriteAllText(@"C:\Users\login\Desktop\trainer.js", json);
 
-            Trainer = JsonConvert.DeserializeObject<Trainer>(json, serializationSettings);
-            
+            Trainer = Trainer.Deserialize(json);
+
             Console.ReadLine();
         }
 
