@@ -9,6 +9,5 @@ namespace AGIle_Robotics.Interfaces
     public interface INeuron : INeuralElement
     {
         double[] InputWeights { get; set; }
-        Func<double,double> ActivationFunction { get; }
     }
 }
