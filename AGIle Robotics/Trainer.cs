@@ -8,11 +8,18 @@ using AGIle_Robotics.Extension;
 using SuperTuple;
 using AGIle_Robotics.Updater;
 using Newtonsoft.Json;
+using System.Runtime.Remoting;
 
 namespace AGIle_Robotics
 {
     public class Trainer : ITrainer
     {
+        public enum TrainerActivationType
+        {
+            Single = 1,
+            Pair = 2,
+        }
+
         [JsonIgnore]
         public StatusUpdater StatusUpdater => Extensions.StatusUpdater;
 
@@ -64,9 +71,14 @@ namespace AGIle_Robotics
         private IGeneration currentGeneration;
 
         [JsonIgnore]
-        public Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> FitnessFunction
-            { get => fitnessFunction; set => fitnessFunction = value; }
-        private Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction;
+        public Func<INeuralNetwork, Task<double>> SingleFitnessFunction
+            { get => singleFitnessFunction; private set => singleFitnessFunction = value; }
+        private Func<INeuralNetwork, Task<double>> singleFitnessFunction;
+
+        [JsonIgnore]
+        public Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> PairFitnessFunction
+            { get => pairFitnessFunction; private set => pairFitnessFunction = value; }
+        private Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> pairFitnessFunction;
 
         public int Level
         {
@@ -82,8 +94,11 @@ namespace AGIle_Robotics
         public INeuralNetwork Best { get => best; private set => best = value; }
         private INeuralNetwork best;
 
+        public TrainerActivationType ActivationType { get => activationType; set => activationType = value; }
+        private TrainerActivationType activationType = TrainerActivationType.Single;
+
         [JsonConstructor]
-        public Trainer(double transitionRatio, double randomRatio, double mutationRatio, double creationRatio, IGeneration currentGeneration, int level, INeuralNetwork best)
+        public Trainer(double transitionRatio, double randomRatio, double mutationRatio, double creationRatio, IGeneration currentGeneration, int level, INeuralNetwork best, TrainerActivationType activationType)
         {
             TransitionRatio = transitionRatio;
             RandomRatio = randomRatio;
@@ -92,6 +107,7 @@ namespace AGIle_Robotics
             CurrentGeneration = currentGeneration;
             Level = level;
             Best = best;
+            ActivationType = activationType;
         }
         public Trainer(double transitionRatio = 0.5, double randomRatio = 0.1, double mutationRatio = 0.1, double creationRatio = 0.1)
         {
@@ -127,12 +143,20 @@ namespace AGIle_Robotics
             await Create();
         }
 
-        public Task Evaluate() => Evaluate(fitnessFunction);
-
-        public async Task Evaluate(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction)
+        public async Task Evaluate()
         {
             Extensions.StatusUpdater.Activity = Updater.StatusUpdater.FrameworkActivity.Evaluating;
-            await CurrentGeneration.Evaluate(fitnessFunction);
+
+            switch (ActivationType)
+            {
+                case TrainerActivationType.Single:
+                    await CurrentGeneration.EvaluateSingle(SingleFitnessFunction);
+                    break;
+                case TrainerActivationType.Pair:
+                    await CurrentGeneration.EvaluatePair(PairFitnessFunction);
+                    break;
+            }
+
             Best = CurrentGeneration.Best;
             Extensions.StatusUpdater.Activity = Updater.StatusUpdater.FrameworkActivity.Idle;
         }
@@ -152,10 +176,26 @@ namespace AGIle_Robotics
             await Evolve();
         }
 
-        public async Task EvaluateAndEvolve(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction)
+        public void SetFitnessFunction(Delegate function)
         {
-            await Evaluate(fitnessFunction);
-            await Evolve();
+            // Type unknown = ((ObjectHandle)function).Unwrap().GetType();
+            switch (ActivationType)
+            {
+                case TrainerActivationType.Single:
+                    /*
+                    if (unknown != typeof(Func<INeuralNetwork, Task<double>>))
+                        throw new ArgumentException("FitnessFunction does not match activation type (Single)");
+                    */
+                    SingleFitnessFunction = (Func<INeuralNetwork, Task<double>>)function;
+                    break;
+                case TrainerActivationType.Pair:
+                    /*
+                    if(unknown != typeof(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>>))
+                        throw new ArgumentException("FitnessFunction does not match activation type (Pair)");
+                    */
+                    PairFitnessFunction = (Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>>)function;
+                    break;
+            }
         }
 
         public string Serialize()

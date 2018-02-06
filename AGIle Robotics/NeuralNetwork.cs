@@ -40,7 +40,7 @@ namespace AGIle_Robotics
         private int[] definition;
 
         [JsonConstructor]
-        public NeuralNetwork(ILayer[] layers, int[] definition, STuple<double, double> weightRange, double fitness)
+        public NeuralNetwork(ILayer[] layers, int[] definition, STuple<double, double> weightRange, int inputSize, double fitness)
         {
             Layers = layers;
             InputSize = definition[0];
@@ -50,9 +50,9 @@ namespace AGIle_Robotics
             Definition = definition;
             ActivationFunction = Math.Tanh;
         }
-        public NeuralNetwork(int[] definition, STuple<double, double> weightRange, Func<double, double> activateWith)
+        public NeuralNetwork(int[] definition, STuple<double, double> weightRange, int inputSize, Func<double, double> activateWith)
         {
-            InputSize = definition[0];
+            InputSize = inputSize;
             OutputSize = definition[definition.Length - 1];
             WeightRange = weightRange;
             Definition = definition;
@@ -65,7 +65,8 @@ namespace AGIle_Robotics
         {
             for(int i = 0; i < Definition.Length; i++)
             {
-                ILayer layer = new Layer(Definition[i], InputSize, WeightRange, ActivationFunction);
+                var inputSize = i > 0 ? Definition[i - 1] : InputSize;
+                ILayer layer = new Layer(Definition[i], inputSize, WeightRange, ActivationFunction);
                 Layers[i] = layer;
                 Layers[i].Create();
             }
@@ -96,7 +97,7 @@ namespace AGIle_Robotics
 
             if(len == net2?.Layers.Length && InputSize == net2.InputSize && OutputSize == net2.OutputSize)
             {
-                var newNetwork = new NeuralNetwork(Definition, WeightRange, ActivationFunction);
+                var newNetwork = new NeuralNetwork(Definition, WeightRange, inputSize, ActivationFunction);
                 for(int i = 0; i < len; i++)
                 {
                     newNetwork.Layers[i] = (ILayer)Layers[i].CrossOver(net2.Layers[i], p1, p2);
