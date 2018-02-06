@@ -56,23 +56,28 @@ namespace AGIle_Robotics
         public int[] Definition { get => definition; private set => definition = value; }
         private int[] definition;
 
+        public int InputSize { get => inputSize; private set => inputSize = value; }
+        private int inputSize;
+
         //public Population(int size, int[] definition, STuple<double, double> weightRange) => Init(size, definition, weightRange, Math.Tanh);
         [JsonConstructor]
-        public Population(INeuralNetwork[] networks, int size, int[] definition, STuple<double, double> weightRange)
+        public Population(INeuralNetwork[] networks, int size, int[] definition, STuple<double, double> weightRange, int inputSize)
         {
             WeightRange = weightRange;
             ActivationFunction = Math.Tanh;
             Size = size;
             Definition = definition;
+            InputSize = inputSize;
 
             Networks = networks;
         }
-        public Population(int size, int[] definition, STuple<double, double> weightRange, Func<double, double> activateWith)
+        public Population(int size, int[] definition, STuple<double, double> weightRange, int inputSize, Func<double, double> activateWith)
         {
             WeightRange = weightRange;
             ActivationFunction = activateWith;
             Size = size;
             Definition = definition;
+            InputSize = inputSize;
 
             Networks = new INeuralNetwork[size];
         }
@@ -81,7 +86,7 @@ namespace AGIle_Robotics
         {
             for(int i = 0; i < Size; i++)
             {
-                var network = new NeuralNetwork(Definition, WeightRange, ActivationFunction);
+                var network = new NeuralNetwork(Definition, WeightRange, InputSize, ActivationFunction);
                 Networks[i] = network;
                 Networks[i].Create();
             }
@@ -112,7 +117,7 @@ namespace AGIle_Robotics
 
             for (int i = 0; i < creationAmount; i++)
             {
-                var newNet = new NeuralNetwork(definition, WeightRange, ActivationFunction);
+                var newNet = new NeuralNetwork(definition, WeightRange, InputSize, ActivationFunction);
                 await Task.Run(() => newNet.Create());
                 nextNets.Add(newNet);
             }
@@ -124,7 +129,7 @@ namespace AGIle_Robotics
                 throw new Exception("Could not create enough or too many new networks");
             }
 
-            Population newPopulation = new Population(size, definition, WeightRange, ActivationFunction);
+            Population newPopulation = new Population(size, definition, WeightRange, InputSize, ActivationFunction);
             for(int i = 0; i < len; i++)
             {
                 var net = nextNets[i];

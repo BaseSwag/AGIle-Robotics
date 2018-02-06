@@ -34,8 +34,6 @@ namespace TestConsole
                 );
 
             await Trainer.Create();
-
-            Trainer.FitnessFunction = FitnessFunction;
         }
 
         public static async Task EvaluateAndEvolve(int a = 1)

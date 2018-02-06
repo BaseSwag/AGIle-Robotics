@@ -21,6 +21,7 @@ namespace AGIle_Robotics.Interfaces
         (int, int) Ports { get; }
         Task CreateAsync();
         new Task<IGeneration> Evolve(double transitionRatio, double randomRatio, double mutationRatio, double creationRatio);
-        Task Evaluate(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction);
+        Task EvaluateSingle(Func<INeuralNetwork, Task<double>> fitnessFunction);
+        Task EvaluatePair(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction);
     }
 }

@@ -55,7 +55,7 @@ namespace AGIle_Robotics
 
         public double[] Activate(double[] input)
         {
-            if (input.Length != inputWeights.Length)
+            if (input.Length != InputWeights.Length)
             {
                 throw new ArgumentOutOfRangeException("input", "Amount of input values does not match length of InputWeights");
             }
