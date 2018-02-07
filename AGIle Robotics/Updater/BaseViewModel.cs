@@ -30,9 +30,12 @@ namespace AGIle_Robotics.Updater
 
         protected virtual bool SetProperty<T>(ref T target, T value, [CallerMemberName] string propertyName = null)
         {
-            if (!Locks.ContainsKey(propertyName))
+            lock (Locks)
             {
-                AddLock(propertyName);
+                if (!Locks.ContainsKey(propertyName))
+                {
+                    AddLock(propertyName);
+                }
             }
 
             lock (Locks[propertyName])

@@ -7,20 +7,26 @@ using System.Text;
 using System.Threading.Tasks;
 using SuperTuple;
 using System.Diagnostics;
+using Newtonsoft.Json;
+using System.Threading;
 
 namespace AGIle_Robotics
 {
     public class Population : IPopulation
     {
+        [JsonConverter(typeof(DoubleTupleJsonConverter))]
         public (double, double) WeightRange { get => weightRange; private set => weightRange = value; }
         private (double, double) weightRange;
 
+        [JsonConverter(typeof(ArrayListJsonConverter<INeuralNetwork>))]
         public INeuralNetwork[] Networks { get => networks; private set => networks = value; }
         private INeuralNetwork[] networks;
 
+        [JsonIgnore]
         public Func<double, double> ActivationFunction { get => activationFunction; private set => activationFunction = value; }
-        private Func<double, double> activationFunction;
+        private Func<double, double> activationFunction = Math.Tanh;
 
+        [JsonProperty]
         public INeuralNetwork Best
         {
             get
@@ -44,27 +50,50 @@ namespace AGIle_Robotics
         }
         public INeuralNetwork best;
 
+        public int Size { get => size; private set => size = value; }
         private int size;
+
+        public int[] Definition { get => definition; private set => definition = value; }
         private int[] definition;
 
-        public Population(int size, int[] definition, STuple<double, double> weightRange) => Init(size, definition, weightRange, Math.Tanh);
-        public Population(int size, int[] definition, STuple<double, double> weightRange, Func<double, double> activateWith, bool init = true) => Init(size, definition, weightRange, activateWith, init);
-        private void Init(int size, int[] definition, STuple<double, double> weightRange, Func<double, double> activateWith, bool init = true)
+        public int InputSize { get => inputSize; private set => inputSize = value; }
+        private int inputSize;
+
+        //public Population(int size, int[] definition, STuple<double, double> weightRange) => Init(size, definition, weightRange, Math.Tanh);
+        [JsonConstructor]
+        public Population(INeuralNetwork[] networks, int size, int[] definition, STuple<double, double> weightRange, int inputSize)
+        {
+            WeightRange = weightRange;
+            ActivationFunction = Math.Tanh;
+            Size = size;
+            Definition = definition;
+            InputSize = inputSize;
+
+            Networks = networks;
+        }
+        public Population(int size, int[] definition, STuple<double, double> weightRange, int inputSize, Func<double, double> activateWith)
         {
             WeightRange = weightRange;
             ActivationFunction = activateWith;
-            this.size = size;
-            this.definition = definition;
+            Size = size;
+            Definition = definition;
+            InputSize = inputSize;
 
             Networks = new INeuralNetwork[size];
-            Extensions.WorkPool.For(0, size, index =>
+        }
+
+        public void Create()
+        {
+            for(int i = 0; i < Size; i++)
             {
-                Networks[index] = new NeuralNetwork(definition, weightRange, activateWith, init);
-            });
+                var network = new NeuralNetwork(Definition, WeightRange, InputSize, ActivationFunction);
+                Networks[i] = network;
+                Networks[i].Create();
+            }
         }
 
         async Task<IEvolvable> IEvolvable.Evolve(double transitionRatio, double randomRatio, double mutationRatio, double creationRatio) => await Evolve(transitionRatio, randomRatio, mutationRatio, creationRatio);
-        public Task<IPopulation> Evolve(double transitionRatio, double randomRatio, double mutationRatio, double creationRatio)
+        public async Task<IPopulation> Evolve(double transitionRatio, double randomRatio, double mutationRatio, double creationRatio)
         {
             int len = Networks.Length;
             int transitionAmount = (int)(len * transitionRatio) - 1;
@@ -88,7 +117,8 @@ namespace AGIle_Robotics
 
             for (int i = 0; i < creationAmount; i++)
             {
-                var newNet = new NeuralNetwork(definition, WeightRange, ActivationFunction, true);
+                var newNet = new NeuralNetwork(definition, WeightRange, InputSize, ActivationFunction);
+                await Task.Run(() => newNet.Create());
                 nextNets.Add(newNet);
             }
 
@@ -99,7 +129,7 @@ namespace AGIle_Robotics
                 throw new Exception("Could not create enough or too many new networks");
             }
 
-            Population newPopulation = new Population(size, definition, WeightRange, ActivationFunction, false);
+            Population newPopulation = new Population(size, definition, WeightRange, InputSize, ActivationFunction);
             for(int i = 0; i < len; i++)
             {
                 var net = nextNets[i];
@@ -108,11 +138,14 @@ namespace AGIle_Robotics
 
                 if(i > 0) // Do not mutate best
                     newPopulation.Networks[i].Mutate(mutationRatio); // Mutate
+                Interlocked.Increment(ref Extensions.StatusUpdater.networksEvolved);
             }
 
+            /*
             TaskCompletionSource<IPopulation> tcs = new TaskCompletionSource<IPopulation>();
             tcs.SetResult(newPopulation);
-            return tcs.Task;
+            */
+            return newPopulation;
         }
 
         private void CrossOver(ref List<INeuralNetwork> nextNets, int count, int total)

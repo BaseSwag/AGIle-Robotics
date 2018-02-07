@@ -6,43 +6,70 @@ using System.Threading.Tasks;
 using AGIle_Robotics.Interfaces;
 using AGIle_Robotics.Extension;
 using SuperTuple;
+using Newtonsoft.Json;
 
 namespace AGIle_Robotics
 {
     public class NeuralNetwork : INeuralNetwork
     {
+        [JsonConverter(typeof(ArrayListJsonConverter<ILayer>))]
         public ILayer[] Layers { get => layers; private set => layers = value; }
         private ILayer[] layers;
 
-        public int InputSize => Layers.Length > 0 ? Layers[0].Neurons.Length : 0;
+        public int InputSize { get => inputSize; set => inputSize = value; }
+        private int inputSize;
 
-        public int OutputSize => Layers.Length > 0 ? Layers[Layers.Length - 1].Neurons.Length : 0;
+        public int OutputSize { get => outputSize; set => outputSize = value; }
+        private int outputSize;
 
+        [JsonConverter(typeof(DoubleTupleJsonConverter))]
         public (double, double) WeightRange { get => weightRange; private set => weightRange = value; }
+        [JsonConverter(typeof(DoubleTupleJsonConverter))]
         private (double, double) weightRange;
 
         public double Fitness { get => fitness; set => fitness = value; }
         private double fitness;
 
+        [JsonIgnore]
         public Func<double, double> ActivationFunction { get => activationFunction; set => activationFunction = value; }
-        private Func<double, double> activationFunction;
+        [JsonIgnore]
+        private Func<double, double> activationFunction = Math.Tanh;
 
+        [JsonConverter(typeof(ArrayListJsonConverter<int>))]
         public int[] Definition { get => definition; set => definition = value; }
         private int[] definition;
 
-        public NeuralNetwork(int[] definition, STuple<double, double> weightRange, Func<double, double> activateWith, bool init = true)
+        [JsonConstructor]
+        public NeuralNetwork(ILayer[] layers, int[] definition, STuple<double, double> weightRange, int inputSize, double fitness)
         {
+            Layers = layers;
+            InputSize = definition[0];
+            OutputSize = definition[definition.Length - 1];
+            WeightRange = weightRange;
+            Fitness = fitness;
+            Definition = definition;
+            ActivationFunction = Math.Tanh;
+        }
+        public NeuralNetwork(int[] definition, STuple<double, double> weightRange, int inputSize, Func<double, double> activateWith)
+        {
+            InputSize = inputSize;
+            OutputSize = definition[definition.Length - 1];
             WeightRange = weightRange;
             Definition = definition;
             ActivationFunction = activateWith;
 
             Layers = new ILayer[definition.Length];
-            Extensions.WorkPool.For(0, definition.Length, index =>
+        }
+
+        public void Create()
+        {
+            for(int i = 0; i < Definition.Length; i++)
             {
-                int inputSize = index > 0 ? definition[index - 1] : definition[index];
-                ILayer layer = new Layer(definition[index], inputSize, weightRange, activateWith, init);
-                Layers[index] = layer;
-            });
+                var inputSize = i > 0 ? Definition[i - 1] : InputSize;
+                ILayer layer = new Layer(Definition[i], inputSize, WeightRange, ActivationFunction);
+                Layers[i] = layer;
+                Layers[i].Create();
+            }
         }
 
         public double[] Activate(double[] input)
@@ -70,7 +97,7 @@ namespace AGIle_Robotics
 
             if(len == net2?.Layers.Length && InputSize == net2.InputSize && OutputSize == net2.OutputSize)
             {
-                var newNetwork = new NeuralNetwork(Definition, WeightRange, ActivationFunction, false);
+                var newNetwork = new NeuralNetwork(Definition, WeightRange, inputSize, ActivationFunction);
                 for(int i = 0; i < len; i++)
                 {
                     newNetwork.Layers[i] = (ILayer)Layers[i].CrossOver(net2.Layers[i], p1, p2);
@@ -87,6 +114,23 @@ namespace AGIle_Robotics
         {
             for(int i = 0; i < Layers.Length; i++)
                 Layers[i].Mutate(ratio);
+        }
+
+        public string Serialize()
+        {
+            var serializationSettings = new JsonSerializerSettings();
+            serializationSettings.TypeNameHandling = TypeNameHandling.All;
+
+            string json = JsonConvert.SerializeObject(this, Formatting.None, serializationSettings);
+            return json;
+        }
+
+        public static NeuralNetwork Deserialize(string json)
+        {
+            var serializationSettings = new JsonSerializerSettings();
+            serializationSettings.TypeNameHandling = TypeNameHandling.All;
+
+            return JsonConvert.DeserializeObject<NeuralNetwork>(json, serializationSettings);
         }
     }
 }

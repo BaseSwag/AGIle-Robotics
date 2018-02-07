@@ -8,6 +8,8 @@ namespace AGIle_Robotics.Interfaces
 {
     public interface ILayer : INeuralElement
     {
+        int Size { get; }
+        int InputSize { get; }
         INeuron[] Neurons { get; }
     }
 }

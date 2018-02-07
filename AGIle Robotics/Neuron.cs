@@ -6,38 +6,56 @@ using System.Threading.Tasks;
 using AGIle_Robotics.Interfaces;
 using AGIle_Robotics.Extension;
 using SuperTuple;
+using Newtonsoft.Json;
 
 namespace AGIle_Robotics
 {
     public class Neuron : INeuron
     {
+        [JsonConverter(typeof(ArrayListJsonConverter<double>))]
         public double[] InputWeights { get => inputWeights; set => inputWeights = value; }
         private double[] inputWeights;
 
-        public Func<double, double> ActivationFunction { get => activationFunction; private set => activationFunction = value; }
-        private Func<double, double> activationFunction;
+        public int InputSize { get => inputSize; set => inputSize = value; }
+        private int inputSize;
 
+        [JsonIgnore]
+        public Func<double, double> ActivationFunction { get => activationFunction; private set => activationFunction = value; }
+        private Func<double, double> activationFunction = Math.Tanh;
+
+        [JsonConverter(typeof(DoubleTupleJsonConverter))]
         public (double, double) WeightRange { get => weightRange; set => weightRange = value; }
         private (double, double) weightRange;
 
-        public Neuron(int inputSize, STuple<double, double> weightRange, Func<double, double> activateWith, bool init = true)
+        [JsonConstructor]
+        public Neuron(double[] inputWeights, int inputSize, STuple<double, double> weightRange)
         {
+            InputWeights = inputWeights;
+            InputSize = inputSize;
+
+            WeightRange = weightRange;
+            ActivationFunction = Math.Tanh;
+        }
+        public Neuron(int inputSize, STuple<double, double> weightRange, Func<double, double> activateWith)
+        {
+            InputSize = inputSize;
             WeightRange = weightRange;
             ActivationFunction = activateWith;
 
             InputWeights = new double[inputSize];
-            if (init)
+        }
+
+        public void Create()
+        {
+            for (int i = 0; i < InputWeights.Length; i++)
             {
-                for(int i = 0; i < InputWeights.Length; i++)
-                {
-                    InputWeights[i] = Extensions.RandomDouble(weightRange.Item1, weightRange.Item2);
-                }
+                InputWeights[i] = Extensions.RandomDouble(weightRange.Item1, weightRange.Item2);
             }
         }
 
         public double[] Activate(double[] input)
         {
-            if (input.Length != inputWeights.Length)
+            if (input.Length != InputWeights.Length)
             {
                 throw new ArgumentOutOfRangeException("input", "Amount of input values does not match length of InputWeights");
             }
@@ -60,7 +78,7 @@ namespace AGIle_Robotics
 
             if(len == neuron2?.InputWeights.Length)
             {
-                var newNeuron = new Neuron(len, WeightRange, ActivationFunction, false);
+                var newNeuron = new Neuron(len, WeightRange, ActivationFunction);
                 for(int i = 0; i < len; i++)
                 {
                     var decision = Extensions.DecideByProbability(p1, p2);

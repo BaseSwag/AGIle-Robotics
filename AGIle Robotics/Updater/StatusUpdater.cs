@@ -38,7 +38,10 @@ namespace AGIle_Robotics.Updater
         private int generationLevel;
 
         public int EvaluationsRunning { get => GetProperty(ref evaluationsRunning); set => SetProperty(ref evaluationsRunning, value); }
-        private int evaluationsRunning;
+        internal int evaluationsRunning;
+
+        public int NetworksEvolved { get => GetProperty(ref networksEvolved); set => SetProperty(ref networksEvolved, value); }
+        internal int networksEvolved;
 
         public int PopulationCount
         {

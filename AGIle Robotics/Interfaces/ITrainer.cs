@@ -16,16 +16,18 @@ namespace AGIle_Robotics.Interfaces
         double MutationRatio { get; set; }
         double CreationRatio { get; set; }
         int Level { get; }
+        Trainer.TrainerActivationType ActivationType { get; set; }
         INeuralNetwork Best { get; }
         IGeneration CurrentGeneration { get; }
-        Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> FitnessFunction { get; set; }
+        Func<INeuralNetwork, Task<double>> SingleFitnessFunction { get; }
+        Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> PairFitnessFunction { get; }
         Task Initialize(int size, STuple<int, int> popSize, STuple<int, int> ports, STuple<int, int> length, STuple<int, int> width, STuple<double, double> weightRange, Func<double, double> activateWith);
         Task Create();
         Task InitializeAndCreate(int size, STuple<int, int> popSize, STuple<int, int> ports, STuple<int, int> length, STuple<int, int> width, STuple<double, double> weightRange, Func<double, double> activateWith);
         Task Evolve();
         Task Evaluate();
-        Task Evaluate(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction);
         Task EvaluateAndEvolve();
-        Task EvaluateAndEvolve(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction);
+        void SetFitnessFunction(Delegate function);
+        string Serialize();
     }
 }
