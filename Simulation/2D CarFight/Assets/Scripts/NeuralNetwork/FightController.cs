@@ -67,7 +67,7 @@ public class FightController : MonoBehaviour
         }
     }
 
-    void OnCarLost(int fitness)
+    void OnCarLost(double fitness)
     {
         if (!done)
         {
@@ -87,7 +87,7 @@ public class FightController : MonoBehaviour
             if (tickTimeoutLeft <= 0)
             {
                 if (Fight != null)
-                    OnCarLost(0);
+                    OnCarLost(-0.5);
                 tickTimeoutLeft = fightTimeoutSeconds;
             }
         }

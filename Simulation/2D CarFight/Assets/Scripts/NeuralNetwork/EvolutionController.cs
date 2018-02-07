@@ -8,6 +8,8 @@ using AGIle_Robotics.Interfaces;
 using AGIle_Robotics;
 using SuperTuple;
 using System;
+using System.Timers;
+using System.IO;
 
 
 
@@ -26,6 +28,8 @@ public class EvolutionController : MonoBehaviour
     public volatile bool needsRechecking = false;
     public int timeScale = 1;
 
+    private Timer timer;
+    private DateTime start;
 
     public Trainer trainer;
 
@@ -77,9 +81,25 @@ public class EvolutionController : MonoBehaviour
         timeScale = (int)GUI.HorizontalSlider(new Rect(1, 100, 500, 30), timeScale, 0, 100);
     }
 
-    // Use this for initialization
-    void Start()
+    void ConsoleTick(object obj, ElapsedEventArgs e)
     {
+        Console.WriteLine("Fights done: " + fightsDone);
+        Console.WriteLine("Fight Queue count: " + fightsQueue.Count);
+        Console.WriteLine("Generation: " + trainer.Level);
+        Console.WriteLine("Avg. Fights/Sec: " + fightsDone / (DateTime.Now - start).TotalSeconds);
+    }
+
+    // Use this for initialization
+    void Start() 
+    {
+        start = DateTime.Now;
+        timer = new Timer();
+        timer.Elapsed += ConsoleTick;
+        timer.Interval = 1000;
+
+        timer.Start();
+
+        
         Time.timeScale = timeScale;
         fights = new FightController[fightRows * fightCountPerRow];
         for (int r = 0; r < fightRows; r++)
@@ -100,18 +120,21 @@ public class EvolutionController : MonoBehaviour
         trainer = new Trainer(
             transitionRatio: 0.5,
             randomRatio: 0.1,
-            mutationRatio: 0.1
+            mutationRatio: 0.1,
+            creationRatio: 0.1
             );
 
-        trainer.FitnessFunction = fitnessFunction;
+        trainer.ActivationType = Trainer.TrainerActivationType.Pair;
+        trainer.SetFitnessFunction(new Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>>(fitnessFunction));
 
         Debug.Log("Trainer object created");
 
         Task = Task.Run(async () =>
         {
             await trainer.Initialize(
+
             size: 10,
-            popSize: new Tuple<int, int>(10, 20),
+            popSize: new Tuple<int, int>(10, 11),
             ports: new Tuple<int, int>(6, 3),
             length: new Tuple<int, int>(5, 15),
             width: new Tuple<int, int>(2, 10),
@@ -125,16 +148,18 @@ public class EvolutionController : MonoBehaviour
         });
     }
 
+
     // FixedUpdate is called once per frame
     void FixedUpdate()
     {
         if (Time.timeScale != timeScale)
             Time.timeScale = timeScale;
 
-        if (initialized && (Task == null || Task.IsCompleted) && fightsQueue.Count == 0)
+        if (initialized && (Task == null || Task.IsCompleted))
         {
             Debug.Log("New Generation");
             Task = trainer.EvaluateAndEvolve();
+            File.WriteAllText("best.json", trainer.Best.Serialize());
         }
 
         if (needsRechecking)
