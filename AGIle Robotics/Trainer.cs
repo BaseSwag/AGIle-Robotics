@@ -9,6 +9,7 @@ using SuperTuple;
 using AGIle_Robotics.Updater;
 using Newtonsoft.Json;
 using System.Runtime.Remoting;
+using System.Threading;
 
 namespace AGIle_Robotics
 {
@@ -86,7 +87,6 @@ namespace AGIle_Robotics
             set
             {
                 level = value;
-                Extensions.StatusUpdater.GenerationLevel = value;
             }
         }
         private int level;
@@ -106,6 +106,7 @@ namespace AGIle_Robotics
             CreationRatio = creationRatio;
             CurrentGeneration = currentGeneration;
             Level = level;
+            Extensions.StatusUpdater.GenerationLevel = level;
             Best = best;
             ActivationType = activationType;
         }
@@ -146,7 +147,7 @@ namespace AGIle_Robotics
         public async Task Evaluate()
         {
             Extensions.StatusUpdater.Activity = StatusUpdater.FrameworkActivity.Evaluating;
-            Extensions.StatusUpdater.EvaluationsLeft = (int)(Math.Pow(Extensions.StatusUpdater.NetworkCount, 2) - Extensions.StatusUpdater.NetworkCount);
+            Extensions.StatusUpdater.EvaluationsLeft = Extensions.GaussSum(Extensions.StatusUpdater.NetworkCount) - Extensions.StatusUpdater.NetworkCount;
 
             switch (ActivationType)
             {
@@ -167,7 +168,8 @@ namespace AGIle_Robotics
             Extensions.StatusUpdater.Activity = Updater.StatusUpdater.FrameworkActivity.Evolving;
             Extensions.StatusUpdater.NetworksEvolved = 0;
             CurrentGeneration = (IGeneration) await CurrentGeneration.Evolve(TransitionRatio, RandomRatio, MutationRatio, CreationRatio);
-            Level++;
+            Interlocked.Increment(ref Extensions.StatusUpdater.generationLevel);
+            Interlocked.Increment(ref level);
             Extensions.StatusUpdater.Activity = Updater.StatusUpdater.FrameworkActivity.Idle;
         }
 
