@@ -81,7 +81,16 @@ public class EvolutionController : MonoBehaviour
     private void OnGUI()
     {
         lock (fightsQueue)
-            InfoText.text = $"Generation: {trainer.Level}\nFight processed: {fightsDone}\nFight queue count: {fightsQueue.Count}";
+            InfoText.text = $"Generation: {trainer.Level}\n"+"" +
+                $"Fight processed: {fightsDone}\n"+
+                $"Fight queue count: {fightsQueue.Count}\n" +
+                $"Evaluations running: {trainer.StatusUpdater.EvaluationsRunning}\n" +
+                $"Networks evolved: {trainer.StatusUpdater.NetworksEvolved}\n" +
+                $"Network count: {trainer.StatusUpdater.NetworkCount}\n" +
+                $"Population count: {trainer.StatusUpdater.PopulationCount}\n" +
+                $"Current activity: {trainer.StatusUpdater.Activity.ToString()}\n" +
+                $"Evaluations running: {trainer.StatusUpdater.EvaluationsRunning}\n" +
+                $"Best fitness: {trainer.StatusUpdater.BestFitness}\n";
     }
 
     void ConsoleTick(object obj, ElapsedEventArgs e)
@@ -98,9 +107,6 @@ public class EvolutionController : MonoBehaviour
         timer.Interval = 1000 * 60 * 5;
 
         timer.Start();
-
-
-        Time.timeScale = timeScale;
         fights = new FightController[fightRows * fightCountPerRow];
         for (int r = 0; r < fightRows; r++)
             for (int i = 0; i < fightCountPerRow; i++)
@@ -155,8 +161,6 @@ public class EvolutionController : MonoBehaviour
     // FixedUpdate is called once per frame
     void FixedUpdate()
     {
-        if (Time.timeScale != timeScale)
-            Time.timeScale = timeScale;
 
         if (initialized && (Task == null || Task.IsCompleted))
         {

@@ -109,6 +109,7 @@ e9bdabf9265d758d56f01bb188916fa8 UnityEngine.Networking.dll:UnityEngine.Networki
 73843688b51256aed059f049c540bca8 UnityEngine.Networking.dll:UnityEngine.Networking.NetworkTransformChild
 528ea1fd7c01796fc60c4e2f172ea229 UnityEngine.Networking.dll:UnityEngine.Networking.NetworkTransformVisualizer
 9de3a22eca9aefadba2d10d5987cefe3 UnityEngine.SpatialTracking.dll:UnityEngine.SpatialTracking.TrackedPoseDriver
+6abd15f184d9a05637e5b1e2c2d26144 Assembly-CSharp.dll:.SetTimeScaleScript
 322cb40e1e282f28af980cbef7922a90 UnityEngine.Analytics.dll:UnityEngine.Analytics.AnalyticsEventTracker
 dc07d7ad69b399a46e92c483bf1c04ca UnityEngine.Analytics.dll:UnityEngine.Analytics.AnalyticsTracker
 bc68edb0af574bf79f9550ead8ebae5c UnityEngine.HoloLens.dll:UnityEngine.Audio.AudioSpatializerMicrosoft
@@ -117,6 +118,7 @@ bc68edb0af574bf79f9550ead8ebae5c UnityEngine.HoloLens.dll:UnityEngine.Audio.Audi
 c2275a8bfbb9f9942cad75ecdfded41d UnityEngine.HoloLens.dll:UnityEngine.XR.WSA.SpatialMappingCollider
 45f3431f0103c41611e8d4eec3d439df UnityEngine.HoloLens.dll:UnityEngine.XR.WSA.SpatialMappingRenderer
 395a268a24ba77be48d1405804ac29a3 Assembly-CSharp.dll:.HumanInput
+05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.ExitScript
 b08f76d8fae95f84c4bcd3d88c8ff4d3 Assembly-CSharp.dll:.CarController
 684fa67f24242d049eba51385619340c Assembly-CSharp.dll:.OnExitListener
 d0081690170cd150b6990aa088cc5695 Assembly-CSharp.dll:.EvolutionController
@@ -149,8 +151,6 @@ bc68edb0af574bf79f9550ead8ebae5c UnityEngine.HoloLens.dll:UnityEngine.Audio.Audi
 c2275a8bfbb9f9942cad75ecdfded41d UnityEngine.HoloLens.dll:UnityEngine.XR.WSA.SpatialMappingCollider
 45f3431f0103c41611e8d4eec3d439df UnityEngine.HoloLens.dll:UnityEngine.XR.WSA.SpatialMappingRenderer
 9de3a22eca9aefadba2d10d5987cefe3 UnityEngine.SpatialTracking.dll:UnityEngine.SpatialTracking.TrackedPoseDriver
-194664f6e8fb5e3f91548f3b1c864f12 Assembly-CSharp.dll:.SmartCamera
-05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.ExitScript
 f6fdf9c1f0b39d2fac73638ca1e789ca Assembly-CSharp.dll:.LoadLevelScriot
+194664f6e8fb5e3f91548f3b1c864f12 Assembly-CSharp.dll:.SmartCamera
 c3e5eaee950e820a70ed00492a31c5b6 Assembly-CSharp.dll:.FightController1v1
-6abd15f184d9a05637e5b1e2c2d26144 Assembly-CSharp.dll:.SetTimeScaleScript
