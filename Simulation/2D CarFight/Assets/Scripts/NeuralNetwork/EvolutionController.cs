@@ -85,11 +85,11 @@ public class EvolutionController : MonoBehaviour
                 $"Fight processed: {fightsDone}\n"+
                 $"Fight queue count: {fightsQueue.Count}\n" +
                 $"Evaluations running: {trainer.StatusUpdater.EvaluationsRunning}\n" +
+                $"Evaluations left: {trainer.StatusUpdater.EvaluationsLeft}\n" +
                 $"Networks evolved: {trainer.StatusUpdater.NetworksEvolved}\n" +
                 $"Network count: {trainer.StatusUpdater.NetworkCount}\n" +
                 $"Population count: {trainer.StatusUpdater.PopulationCount}\n" +
                 $"Current activity: {trainer.StatusUpdater.Activity.ToString()}\n" +
-                $"Evaluations running: {trainer.StatusUpdater.EvaluationsRunning}\n" +
                 $"Best fitness: {trainer.StatusUpdater.BestFitness}\n";
     }
 
@@ -123,38 +123,48 @@ public class EvolutionController : MonoBehaviour
 
         Debug.Log("Arenas created");
 
-        trainer = new Trainer(
+
+
+        if (File.Exists("trainer.json"))
+        {
+            trainer = Trainer.Deserialize(File.ReadAllText("trainer.json"));
+            initialized = true;
+            Debug.Log("Trainer object loaded");
+        }
+        else
+        {
+            trainer = new Trainer(
             transitionRatio: 0.5,
             randomRatio: 0.1,
             mutationRatio: 0.1,
             creationRatio: 0.1
             );
 
-        if (File.Exists("trainer.json"))
-            trainer = Trainer.Deserialize(File.ReadAllText("trainer.json"));
+            Debug.Log("Trainer object created");
+
+            Task = Task.Run(async () =>
+            {
+                await trainer.Initialize(
+
+                size: 10,
+                popSize: new Tuple<int, int>(10, 11),
+                ports: new Tuple<int, int>(6, 3),
+                length: new Tuple<int, int>(5, 15),
+                width: new Tuple<int, int>(2, 10),
+                weightRange: new Tuple<double, double>(-2, 2),
+                activateWith: Math.Tanh
+                );
+                Debug.Log("Initialized");
+                await trainer.Create();
+                Debug.Log("Created");
+                initialized = true;
+            });
+        }
 
         trainer.ActivationType = Trainer.TrainerActivationType.Pair;
         trainer.SetFitnessFunction(new Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>>(fitnessFunction));
-
-        Debug.Log("Trainer object created");
-
-        Task = Task.Run(async () =>
-        {
-            await trainer.Initialize(
-
-            size: 10,
-            popSize: new Tuple<int, int>(10, 11),
-            ports: new Tuple<int, int>(6, 3),
-            length: new Tuple<int, int>(5, 15),
-            width: new Tuple<int, int>(2, 10),
-            weightRange: new Tuple<double, double>(-2, 2),
-            activateWith: Math.Tanh
-            );
-            Debug.Log("Initialized");
-            await trainer.Create();
-            Debug.Log("Created");
-            initialized = true;
-        });
+         
+        
     }
 
 
@@ -165,12 +175,12 @@ public class EvolutionController : MonoBehaviour
         if (initialized && (Task == null || Task.IsCompleted))
         {
             Debug.Log("New Generation");
-            Task = trainer.EvaluateAndEvolve();
             if (writeOut)
             {
                 writeOut = false;
                 File.WriteAllText("trainer.json", trainer.Serialize());
             }
+            Task = trainer.EvaluateAndEvolve();
         }
 
         if (needsRechecking)
