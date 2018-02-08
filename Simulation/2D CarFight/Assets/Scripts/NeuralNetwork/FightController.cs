@@ -25,6 +25,8 @@ public class FightController : MonoBehaviour
     public Vector3 StartPosCar2;
     public Vector3 StartRotationCar2;
 
+    public bool SetResult = true;
+
     public Fight Fight
     {
         get
@@ -53,16 +55,19 @@ public class FightController : MonoBehaviour
     {
         if (!done)
         {
-            EvolutionController.fightsDone++;
             Debug.Log("Fight over");
             done = true;
-            if (car1)
+            if (SetResult)
             {
-                Fight.tcs.SetResult(new Tuple<double, double>(1, -1));
-            }
-            else
-            {
-                Fight.tcs.SetResult(new Tuple<double, double>(-1, 1));
+                EvolutionController.fightsDone++;
+                if (car1)
+                {
+                    Fight.tcs?.SetResult(new Tuple<double, double>(1, -1));
+                }
+                else
+                {
+                    Fight.tcs?.SetResult(new Tuple<double, double>(-1, 1));
+                }
             }
         }
     }
@@ -71,10 +76,13 @@ public class FightController : MonoBehaviour
     {
         if (!done)
         {
-            EvolutionController.fightsDone++;
             Debug.Log("Fight over");
             done = true;
-            Fight.tcs.SetResult(new Tuple<double, double>(fitness, fitness));
+            if (SetResult)
+            {
+                EvolutionController.fightsDone++;
+                Fight.tcs?.SetResult(new Tuple<double, double>(fitness, fitness));
+            }
         }
     }
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Events;
+using UnityEngine.UI;
 using AGIle_Robotics.Interfaces;
 using AGIle_Robotics;
 using SuperTuple;
@@ -28,10 +28,14 @@ public class EvolutionController : MonoBehaviour
     public volatile bool needsRechecking = false;
     public int timeScale = 1;
 
+    public Text InfoText;
+
     private Timer timer;
     private DateTime start;
 
     public Trainer trainer;
+
+    private bool writeOut = false;
 
     public void CheckForNewFight()
     {
@@ -76,30 +80,26 @@ public class EvolutionController : MonoBehaviour
 
     private void OnGUI()
     {
-        lock(fightsQueue)
-        GUI.Label(new Rect(0, 0, 500, 500), $"Generation: {trainer.Level}\nFight processed: {fightsDone}\nFight queue count: {fightsQueue.Count}");
-        timeScale = (int)GUI.HorizontalSlider(new Rect(1, 100, 500, 30), timeScale, 0, 100);
+        lock (fightsQueue)
+            InfoText.text = $"Generation: {trainer.Level}\nFight processed: {fightsDone}\nFight queue count: {fightsQueue.Count}";
     }
 
     void ConsoleTick(object obj, ElapsedEventArgs e)
     {
-        Console.WriteLine("Fights done: " + fightsDone);
-        Console.WriteLine("Fight Queue count: " + fightsQueue.Count);
-        Console.WriteLine("Generation: " + trainer.Level);
-        Console.WriteLine("Avg. Fights/Sec: " + fightsDone / (DateTime.Now - start).TotalSeconds);
+        writeOut = true;
     }
 
     // Use this for initialization
-    void Start() 
+    void Start()
     {
         start = DateTime.Now;
         timer = new Timer();
         timer.Elapsed += ConsoleTick;
-        timer.Interval = 1000;
+        timer.Interval = 1000 * 60 * 5;
 
         timer.Start();
 
-        
+
         Time.timeScale = timeScale;
         fights = new FightController[fightRows * fightCountPerRow];
         for (int r = 0; r < fightRows; r++)
@@ -111,8 +111,8 @@ public class EvolutionController : MonoBehaviour
                 arena.name = $"Arena {r * fightCountPerRow + i}";
             }
 
-        if(Camera.main != null)
-        Camera.main.GetComponent<SmartCamera>().targets = fights.Select((x) => x.gameObject.transform).ToArray();
+        if (Camera.main != null)
+            Camera.main.GetComponent<SmartCamera>().targets = fights.Select((x) => x.gameObject.transform).ToArray();
 
 
         Debug.Log("Arenas created");
@@ -123,6 +123,9 @@ public class EvolutionController : MonoBehaviour
             mutationRatio: 0.1,
             creationRatio: 0.1
             );
+
+        if (File.Exists("trainer.json"))
+            trainer = Trainer.Deserialize(File.ReadAllText("trainer.json"));
 
         trainer.ActivationType = Trainer.TrainerActivationType.Pair;
         trainer.SetFitnessFunction(new Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>>(fitnessFunction));
@@ -159,7 +162,11 @@ public class EvolutionController : MonoBehaviour
         {
             Debug.Log("New Generation");
             Task = trainer.EvaluateAndEvolve();
-            File.WriteAllText("best.json", trainer.Best.Serialize());
+            if (writeOut)
+            {
+                writeOut = false;
+                File.WriteAllText("trainer.json", trainer.Serialize());
+            }
         }
 
         if (needsRechecking)

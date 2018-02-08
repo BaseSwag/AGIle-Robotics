@@ -931,13 +931,14 @@ MonoBehaviour:
   car1: {fileID: 114117384576434206}
   car2: {fileID: 114660816393705330}
   done: 0
-  fightTimeoutSeconds: 30
+  fightTimeoutSeconds: 300
   tickTimeoutLeft: 0
   circleTransform: {fileID: 4471772798834738}
   StartPosCar1: {x: 430, y: 0, z: -1}
   StartRotationCar1: {x: 0, y: 0, z: 180}
   StartPosCar2: {x: -430, y: 0, z: -1}
   StartRotationCar2: {x: 0, y: 0, z: 0}
+  SetResult: 1
 --- !u!114 &114586302196545698
 MonoBehaviour:
   m_ObjectHideFlags: 1
