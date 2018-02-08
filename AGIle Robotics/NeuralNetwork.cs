@@ -27,8 +27,13 @@ namespace AGIle_Robotics
         [JsonConverter(typeof(DoubleTupleJsonConverter))]
         private (double, double) weightRange;
 
-        public double Fitness { get => fitness; set => fitness = value; }
+        public double Fitness
+        {
+            get { lock (fitnessLock) return fitness; }
+            set { lock (fitnessLock) fitness = value; }
+        }
         private double fitness;
+        private object fitnessLock = new object();
 
         [JsonIgnore]
         public Func<double, double> ActivationFunction { get => activationFunction; set => activationFunction = value; }
