@@ -35,7 +35,7 @@ namespace AGIle_Robotics.Updater
         private double creationRatio;
 
         public int GenerationLevel { get => GetProperty(ref generationLevel); set => SetProperty(ref generationLevel, value); }
-        private int generationLevel;
+        internal int generationLevel;
 
         public int EvaluationsLeft { get => GetProperty(ref evaluationsLeft); set => SetProperty(ref evaluationsLeft, value); }
         internal int evaluationsLeft;

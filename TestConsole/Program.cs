@@ -48,7 +48,7 @@ namespace TestConsole
             }
 
             Console.WriteLine();
-            FitnessFunction(Trainer.Best, true);
+            FitnessFunction(Trainer.Best, true).Wait();
 
             string json = Trainer.Best.Serialize();
             System.IO.File.WriteAllText(@"C:\Users\login\Desktop\network.json", json);
@@ -74,6 +74,7 @@ namespace TestConsole
                 Console.WriteLine($"Activity: {Trainer.StatusUpdater.Activity}");
                 Console.WriteLine($"Best fitness: {Trainer.StatusUpdater.BestFitness}");
                 Console.WriteLine($"Evaluations running: {Trainer.StatusUpdater.EvaluationsRunning}");
+                Console.WriteLine($"Evaluations left: {Trainer.StatusUpdater.EvaluationsLeft}");
                 Console.WriteLine($"Networks evolved: {Trainer.StatusUpdater.NetworksEvolved}");
                 await Task.Delay(500);
             }
@@ -81,7 +82,7 @@ namespace TestConsole
 
         static Random random = new Random();
         static Task<double> FitnessFunction(INeuralNetwork network) => FitnessFunction(network, false);
-        static Task<double> FitnessFunction(INeuralNetwork network, bool debug)
+        static async Task<double> FitnessFunction(INeuralNetwork network, bool debug)
         {
             double fitness = 0;
 
@@ -172,9 +173,14 @@ namespace TestConsole
             }
             #endregion
 
+            await Task.Delay(1000);
+            /*
             var tcs = new TaskCompletionSource<double>();
             tcs.SetResult(fitness);
             return tcs.Task;
+            */
+            
+            return fitness;
         }
     }
 }

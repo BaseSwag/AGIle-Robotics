@@ -182,7 +182,7 @@ namespace AGIle_Robotics
         public async Task EvaluateSingle(Func<INeuralNetwork, Task<double>> fitnessFunction)
         {
             List<Task> tasks = new List<Task>();
-            await ResetFitness();
+            ResetFitness();
             for (int pop = 0; pop < Populations.Length; pop++)
             {
                 int pop2 = pop;
@@ -205,9 +205,9 @@ namespace AGIle_Robotics
 
         public async Task EvaluatePair(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction)
         {
-            await ResetFitness();
+            ResetFitness();
 
-            List<Task> tasks = new List<Task>();
+            List<Task<(double, double)>> tasks = new List<Task<(double, double)>>();
 
             EvaluatePair(fitnessFunction, ref tasks, 0, 0);
 
@@ -215,11 +215,11 @@ namespace AGIle_Robotics
 
             Best = null;
         }
-        private void EvaluatePair(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction, ref List<Task> tasks, int pop, int net)
+        private void EvaluatePair(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction, ref List<Task<(double, double)>> tasks, int pop, int net)
         {
             var p = pop;
             var n = net;
-            var t = new Task<object>(() => PairEvaluationCycle(fitnessFunction, p, n).Result);
+            var t = new Task<(double, double)>(() => PairEvaluationCycle(fitnessFunction, p, n).Result);
             tasks.Add(t);
             Extensions.WorkPool.Enqueue(t);
 
@@ -239,10 +239,9 @@ namespace AGIle_Robotics
 
             EvaluatePair(fitnessFunction, ref tasks, nextPop, nextNet);
         }
-        private Task<object[]> PairEvaluationCycle(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction, int pop, int net)
+        private async Task<(double, double)> PairEvaluationCycle(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction, int pop, int net)
         {
             var myNet = Populations[pop].Networks[net];
-            var tasks = new List<Task<object>>();
             for (int p = pop; p < Populations.Length; p++)
             {
                 int p2 = p;
@@ -250,22 +249,16 @@ namespace AGIle_Robotics
                 {
                     int n2 = n;
                     var enemyNet = Populations[p2].Networks[n2];
-                    var tcs = new TaskCompletionSource<object>();
-                    var t = PairEvaluationCycle(fitnessFunction, (pop, net), myNet, (p2, n2), enemyNet);
-                    t.ContinueWith(finished =>
-                    {
-                        lock(Populations[pop].Networks[net])
-                            Populations[pop].Networks[net].Fitness += finished.Result.Item1;
-                        lock(Populations[p2].Networks[n2])
-                            Populations[p2].Networks[n2].Fitness += finished.Result.Item2;
-                        Interlocked.Decrement(ref Extensions.StatusUpdater.evaluationsRunning);
-                        Interlocked.Decrement(ref Extensions.StatusUpdater.evaluationsLeft);
-                        tcs.SetResult(null);
-                    });
-                    tasks.Add(tcs.Task);
+                    var t = await PairEvaluationCycle(fitnessFunction, (pop, net), myNet, (p2, n2), enemyNet);
+                    lock (Populations[pop].Networks[net])
+                        Populations[pop].Networks[net].Fitness += t.Item1;
+                    lock (Populations[p2].Networks[n2])
+                        Populations[p2].Networks[n2].Fitness += t.Item2;
+                    Interlocked.Decrement(ref Extensions.StatusUpdater.evaluationsRunning);
+                    Interlocked.Decrement(ref Extensions.StatusUpdater.evaluationsLeft);
                 }
             }
-            return Task.WhenAll(tasks);
+            return (pop, net);
         }
         public Task<STuple<double, double>> PairEvaluationCycle(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction, (int p, int n) i1, INeuralNetwork n1, (int p, int n) i2, INeuralNetwork n2)
         {
@@ -273,14 +266,14 @@ namespace AGIle_Robotics
             return fitnessFunction(n1, n2);
         }
 
-        private async Task ResetFitness()
+        private void ResetFitness()
         {
-            await Extensions.WorkPool.ForToTask(0, Populations.Length, p =>
+            for(int p = 0; p < Populations.Length; p++)
             {
                 Populations[p].ResetBest();
                 for(int n = 0; n < Populations[p].Networks.Length; n++)
                     Populations[p].Networks[n].Fitness = 0;
-            });
+            }
         }
 
         public Task<IGeneration> Evolve() => Evolve(TransitionRatio, RandomRatio, MutationRatio, CreationRatio);

@@ -91,5 +91,10 @@ namespace AGIle_Robotics.Extension
             return Task.WhenAll(tasks);
         }
 
+        public static int GaussSum(int n)
+        {
+            return (int)(n / 2.0 * (n + 1));
+        }
+
     }
 }
