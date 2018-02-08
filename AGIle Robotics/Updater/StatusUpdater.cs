@@ -37,6 +37,9 @@ namespace AGIle_Robotics.Updater
         public int GenerationLevel { get => GetProperty(ref generationLevel); set => SetProperty(ref generationLevel, value); }
         private int generationLevel;
 
+        public int EvaluationsLeft { get => GetProperty(ref evaluationsLeft); set => SetProperty(ref evaluationsLeft, value); }
+        internal int evaluationsLeft;
+
         public int EvaluationsRunning { get => GetProperty(ref evaluationsRunning); set => SetProperty(ref evaluationsRunning, value); }
         internal int evaluationsRunning;
 
@@ -56,7 +59,7 @@ namespace AGIle_Robotics.Updater
         private int populationCount;
 
         public int NetworkCount { get => GetProperty(ref networkCount); set => SetProperty(ref networkCount, value); }
-        private int networkCount;
+        internal int networkCount;
 
         public double BestFitness
         {

@@ -145,7 +145,8 @@ namespace AGIle_Robotics
 
         public async Task Evaluate()
         {
-            Extensions.StatusUpdater.Activity = Updater.StatusUpdater.FrameworkActivity.Evaluating;
+            Extensions.StatusUpdater.Activity = StatusUpdater.FrameworkActivity.Evaluating;
+            Extensions.StatusUpdater.EvaluationsLeft = (int)(Math.Pow(Extensions.StatusUpdater.NetworkCount, 2) - Extensions.StatusUpdater.NetworkCount);
 
             switch (ActivationType)
             {
