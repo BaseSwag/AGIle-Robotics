@@ -73,6 +73,7 @@ namespace AGIle_Robotics
                 }
                 best = Populations[pop].Best;
                 Extensions.StatusUpdater.BestFitness = best.Fitness;
+                Extensions.StatusUpdater.FitnessHistory.Add(best.Fitness);
                 return best;
             }
             private set => best = value;
@@ -108,6 +109,12 @@ namespace AGIle_Robotics
         {
             Size = size;
             Populations = populations;
+            int networkCount = 0;
+            for(int i = 0; i < Populations.Length; i++)
+            {
+                networkCount += Populations[i].Size;
+            }
+            Extensions.StatusUpdater.NetworkCount = networkCount;
             PopulationSize = populationSize;
             Ports = ports;
 
@@ -147,6 +154,12 @@ namespace AGIle_Robotics
                 return population;
             });
             Populations = await Task.WhenAll(tasks);
+            int networkCount = 0;
+            for(int i = 0; i < Populations.Length; i++)
+            {
+                networkCount += Populations[i].Size;
+            }
+            Extensions.StatusUpdater.NetworkCount = networkCount;
         }
 
         private IPopulation MakePopulation()
@@ -163,7 +176,6 @@ namespace AGIle_Robotics
             definition[length - 1] = Ports.Item2;
 
             var newPop = new Population(size, definition, WeightRange, Ports.Item1, ActivationFunction);
-            Extensions.StatusUpdater.NetworkCount += size;
             return newPop;
         }
 
@@ -179,7 +191,10 @@ namespace AGIle_Robotics
                     int net2 = net;
                     var t = Extensions.WorkPool.Enqueue(async () =>
                     {
+                        Interlocked.Increment(ref Extensions.StatusUpdater.evaluationsRunning);
                         Populations[pop2].Networks[net2].Fitness = await fitnessFunction(Populations[pop2].Networks[net2]);
+                        Interlocked.Decrement(ref Extensions.StatusUpdater.evaluationsRunning);
+                        Interlocked.Decrement(ref Extensions.StatusUpdater.evaluationsLeft);
                     });
                     tasks.Add(t);
                 }
@@ -244,6 +259,7 @@ namespace AGIle_Robotics
                         lock(Populations[p2].Networks[n2])
                             Populations[p2].Networks[n2].Fitness += finished.Result.Item2;
                         Interlocked.Decrement(ref Extensions.StatusUpdater.evaluationsRunning);
+                        Interlocked.Decrement(ref Extensions.StatusUpdater.evaluationsLeft);
                         tcs.SetResult(null);
                     });
                     tasks.Add(tcs.Task);
