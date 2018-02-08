@@ -95,6 +95,5 @@ namespace AGIle_Robotics.Extension
         {
             return (int)(n / 2.0 * (n + 1));
         }
-
     }
 }

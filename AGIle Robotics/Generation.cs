@@ -225,14 +225,14 @@ namespace AGIle_Robotics
 
             int nextPop, nextNet;
 
-            if(net < Populations[pop].Networks.Length - 1)
+            if(net < Populations[p].Networks.Length - 1)
             {
-                nextPop = pop;
-                nextNet = net + 1;
+                nextPop = p;
+                nextNet = n + 1;
             }
             else
             {
-                nextPop = pop + 1;
+                nextPop = p + 1;
                 if (nextPop >= Populations.Length) return;
                 nextNet = 0;
             }
@@ -245,11 +245,11 @@ namespace AGIle_Robotics
             for (int p = pop; p < Populations.Length; p++)
             {
                 int p2 = p;
-                for (int n = net + 1; n < Populations[p2].Networks.Length; n++)
+                for (int n = (p2 == pop) ? net + 1 : 0; n < Populations[p2].Networks.Length; n++)
                 {
                     int n2 = n;
                     var enemyNet = Populations[p2].Networks[n2];
-                    var t = await PairEvaluationCycle(fitnessFunction, (pop, net), myNet, (p2, n2), enemyNet);
+                    var t = await PairEvaluationCycle(fitnessFunction, myNet, enemyNet);
                     lock (Populations[pop].Networks[net])
                         Populations[pop].Networks[net].Fitness += t.Item1;
                     lock (Populations[p2].Networks[n2])
@@ -260,7 +260,7 @@ namespace AGIle_Robotics
             }
             return (pop, net);
         }
-        public Task<STuple<double, double>> PairEvaluationCycle(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction, (int p, int n) i1, INeuralNetwork n1, (int p, int n) i2, INeuralNetwork n2)
+        public Task<STuple<double, double>> PairEvaluationCycle(Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>> fitnessFunction, INeuralNetwork n1, INeuralNetwork n2)
         {
             Interlocked.Increment(ref Extensions.StatusUpdater.evaluationsRunning);
             return fitnessFunction(n1, n2);

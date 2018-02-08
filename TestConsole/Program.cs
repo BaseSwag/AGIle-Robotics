@@ -27,8 +27,8 @@ namespace TestConsole
                 creationRatio: 0.1);
 
             Task = Trainer.InitializeAndCreate(
-                size: 10,
-                popSize: (10, 20),
+                size: 3,
+                popSize: (10, 11),
                 ports: (3, 1),
                 length: (2, 8),
                 width: (1, 5),
@@ -36,19 +36,19 @@ namespace TestConsole
                 activateWith: Math.Tanh
                 );
 
-            ReportStatus(Task).Wait();
+            Task.Wait();
 
-            Trainer.ActivationType = Trainer.TrainerActivationType.Single;
-            Trainer.SetFitnessFunction(new Func<INeuralNetwork, Task<double>>(FitnessFunction));
+            Trainer.ActivationType = Trainer.TrainerActivationType.Pair;
+            Trainer.SetFitnessFunction(new Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>>(FitnessFunction));
 
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < 1; i++)
             {
                 Task = Trainer.EvaluateAndEvolve();
-                ReportStatus(Task).Wait();
+                //ReportStatus(Task).Wait();
+                Task.Wait();
             }
 
             Console.WriteLine();
-            FitnessFunction(Trainer.Best, true).Wait();
 
             string json = Trainer.Best.Serialize();
             System.IO.File.WriteAllText(@"C:\Users\login\Desktop\network.json", json);
@@ -80,8 +80,16 @@ namespace TestConsole
             }
         }
 
-        static Random random = new Random();
-        static Task<double> FitnessFunction(INeuralNetwork network) => FitnessFunction(network, false);
+        static Task<STuple<double, double>> FitnessFunction(INeuralNetwork n1, INeuralNetwork n2)
+        {
+            Random r = new Random();
+            TaskCompletionSource<STuple<double, double>> tcs = new TaskCompletionSource<STuple<double, double>>();
+            tcs.SetResult((STuple<double, double>)(r.NextDouble(), r.NextDouble()));
+            return tcs.Task;
+        }
+
+        //static Task<double> FitnessFunction(INeuralNetwork network) => FitnessFunction(network, false);
+        /*
         static async Task<double> FitnessFunction(INeuralNetwork network, bool debug)
         {
             double fitness = 0;
@@ -114,7 +122,6 @@ namespace TestConsole
                         Console.WriteLine($"{test[i]} | {result[i]}");
                 }
             }
-            */
             #endregion
             #region XOR
             /*
@@ -149,7 +156,6 @@ namespace TestConsole
                     Console.WriteLine($"{kv.Key[0]} {kv.Key[1]} | {result[0]}");
                 }
             }
-            */
             #endregion XOR
             #region linear
             for (int i = 0; i < 10; i++)
@@ -178,9 +184,10 @@ namespace TestConsole
             var tcs = new TaskCompletionSource<double>();
             tcs.SetResult(fitness);
             return tcs.Task;
-            */
             
             return fitness;
         }
+    }
+    */
     }
 }
