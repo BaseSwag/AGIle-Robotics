@@ -10,6 +10,7 @@ using AGIle_Robotics.Extension;
 using AGIle_Robotics.Interfaces;
 using SuperTuple;
 using Newtonsoft.Json;
+using TicTacToe_Game;
 
 namespace TestConsole
 {
@@ -17,46 +18,51 @@ namespace TestConsole
     {
         static Trainer Trainer;
         static Task Task;
+        static bool load = true;
 
         static void Main(string[] args)
         {
-            Trainer = new Trainer(
-                transitionRatio: 0.5,
-                randomRatio: 0.1,
-                mutationRatio: 0.1,
-                creationRatio: 0.1);
+            if (!load)
+            {
+                Trainer = new Trainer(
+                    transitionRatio: 0.5,
+                    randomRatio: 0.1,
+                    mutationRatio: 0.1,
+                    creationRatio: 0.1);
 
-            Task = Trainer.InitializeAndCreate(
-                size: 3,
-                popSize: (10, 11),
-                ports: (3, 1),
-                length: (2, 8),
-                width: (1, 5),
-                weightRange: (-2.0, 2.0),
-                activateWith: Math.Tanh
-                );
+                Task = Trainer.InitializeAndCreate(
+                    size: 10,
+                    popSize: (10, 20),
+                    ports: (10, 9),
+                    length: (2, 15),
+                    width: (2, 10),
+                    weightRange: (-2.0, 2.0),
+                    activateWith: Math.Tanh
+                    );
 
-            Task.Wait();
+                ReportStatus(Task).Wait();
+            }
+            else
+            {
+                Trainer = Trainer.Deserialize(System.IO.File.ReadAllText(@"C:\Users\login\Desktop\trainer.json"));
+            }
 
             Trainer.ActivationType = Trainer.TrainerActivationType.Pair;
             Trainer.SetFitnessFunction(new Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>>(FitnessFunction));
 
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 Task = Trainer.EvaluateAndEvolve();
-                //ReportStatus(Task).Wait();
-                Task.Wait();
+                ReportStatus(Task).Wait();
+
+                string json = Trainer.Serialize();
+                System.IO.File.WriteAllText(@"C:\Users\login\Desktop\trainer.json", json);
             }
 
-            Console.WriteLine();
-
-            string json = Trainer.Best.Serialize();
-            System.IO.File.WriteAllText(@"C:\Users\login\Desktop\network.json", json);
-
-            Console.ReadLine();
-            Console.WriteLine();
-
-
+            while (true)
+            {
+                HumanTest(Trainer.Best);
+            }
         }
 
         static async Task ReportStatus(Task task, bool anyway = false)
@@ -80,20 +86,10 @@ namespace TestConsole
             }
         }
 
+
+        static Random random = new Random();
         static Task<STuple<double, double>> FitnessFunction(INeuralNetwork n1, INeuralNetwork n2)
         {
-            Random r = new Random();
-            TaskCompletionSource<STuple<double, double>> tcs = new TaskCompletionSource<STuple<double, double>>();
-            tcs.SetResult((STuple<double, double>)(r.NextDouble(), r.NextDouble()));
-            return tcs.Task;
-        }
-
-        //static Task<double> FitnessFunction(INeuralNetwork network) => FitnessFunction(network, false);
-        /*
-        static async Task<double> FitnessFunction(INeuralNetwork network, bool debug)
-        {
-            double fitness = 0;
-
             #region sequence
             /*
             for (int n = 0; n < 10; n++)
@@ -122,6 +118,7 @@ namespace TestConsole
                         Console.WriteLine($"{test[i]} | {result[i]}");
                 }
             }
+            */
             #endregion
             #region XOR
             /*
@@ -156,8 +153,10 @@ namespace TestConsole
                     Console.WriteLine($"{kv.Key[0]} {kv.Key[1]} | {result[0]}");
                 }
             }
+            */
             #endregion XOR
             #region linear
+            /*
             for (int i = 0; i < 10; i++)
             {
                 double a, b, x;
@@ -177,17 +176,180 @@ namespace TestConsole
                     Console.WriteLine($"{a} * {x} + {b} = {correct} | {res[0]}");
                 }
             }
+            */
+            #endregion
+            #region TicTacToe
+            Game game = new Game();
+            Game.GameState gameState = Game.GameState.Undetermined;
+
+            bool n1turn = true;
+
+            while (gameState == Game.GameState.Undetermined)
+            {
+                var board = BoardToArray(game.GetBoard());
+                var input = new double[10];
+                input[0] = n1turn ? 1 : -1;
+                for (int i = 0; i < board.Length; i++)
+                    input[i + 1] = board[i];
+                INeuralNetwork network = n1turn ? n1 : n2;
+                var output = network.Activate(input);
+
+                var newGameState = Game.GameState.Error;
+                List<int> chosenTiles = new List<int>();
+                while (newGameState == Game.GameState.Error)
+                {
+                    int tile = -1;
+                    double highest = double.MinValue;
+                    for (int i = 0; i < output.Length; i++)
+                    {
+                        if (output[i] > highest && !chosenTiles.Contains(i))
+                        {
+                            highest = output[i];
+                            tile = i;
+                        }
+                    }
+                    chosenTiles.Add(tile);
+                    tile++;
+
+                    newGameState = game.NewMove((Game.TileNumber)tile);
+                }
+
+                n1turn = !n1turn;
+                gameState = newGameState;
+            }
+
+            (double, double) fitness = (0, 0);
+            if (gameState == Game.GameState.Win)
+            {
+                if (n1turn)
+                {
+                    fitness = (-1, 1);
+                }
+                else
+                {
+                    fitness = (1, -1);
+                }
+            }
+
             #endregion
 
-            await Task.Delay(1000);
-            /*
-            var tcs = new TaskCompletionSource<double>();
+            var tcs = new TaskCompletionSource<STuple<double,double>>();
             tcs.SetResult(fitness);
             return tcs.Task;
-            
-            return fitness;
         }
-    }
-    */
+
+        private static double[] BoardToArray(Game.BoardStates[,] boardStates)
+        {
+            double[] result = new double[9];
+            int counter = 0;
+            foreach(var field in boardStates)
+            {
+                double f = 0;
+                switch (field)
+                {
+                    case Game.BoardStates.O:
+                        f = 1;
+                        break;
+                    case Game.BoardStates.X:
+                        f = -1;
+                        break;
+                }
+                result[counter++] = f;
+            }
+            return result;
+        }
+
+        static void HumanTest(INeuralNetwork enemy)
+        {
+            Console.Clear();
+            Game game = new Game();
+            Game.GameState gameState = Game.GameState.Undetermined;
+
+            bool playerturn = true;
+
+            while (gameState == Game.GameState.Undetermined)
+            {
+                if (!playerturn)
+                {
+                    var board = BoardToArray(game.GetBoard());
+                    var input = new double[10];
+                    input[0] = -1;
+                    for (int i = 0; i < board.Length; i++)
+                        input[i + 1] = board[i];
+                    var output = enemy.Activate(input);
+
+                    var newGameState = Game.GameState.Error;
+                    List<int> chosenTiles = new List<int>();
+                    while (newGameState == Game.GameState.Error)
+                    {
+                        int tile = -1;
+                        double highest = double.MinValue;
+                        for (int i = 0; i < output.Length; i++)
+                        {
+                            if (output[i] > highest && !chosenTiles.Contains(i))
+                            {
+                                highest = output[i];
+                                tile = i;
+                            }
+                        }
+                        chosenTiles.Add(tile);
+                        tile++;
+
+                        newGameState = game.NewMove((Game.TileNumber)tile);
+                    }
+                    gameState = newGameState;
+                }
+                else
+                {
+                    var newGameState = Game.GameState.Error;
+                    while (newGameState == Game.GameState.Error)
+                    {
+                        int tile = -1;
+                        int.TryParse(Console.ReadLine(), out tile);
+                        newGameState = game.NewMove((Game.TileNumber)tile);
+                    }
+                    gameState = newGameState;
+                }
+                playerturn = !playerturn;
+                Console.WriteLine();
+                VisualizeBoard(game.GetBoard());
+                Console.WriteLine();
+            }
+
+            if(gameState == Game.GameState.Win)
+            {
+                string winner = playerturn ? "Bot" : "Player";
+                Console.WriteLine();
+                Console.WriteLine(winner + " wins!");
+            }
+            else if(gameState == Game.GameState.Tie)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Tie!");
+            }
+            Console.ReadLine();
+        }
+
+        static void VisualizeBoard(Game.BoardStates[,] boardStates)
+        {
+            for (int x = 0; x < boardStates.GetLength(0); x++)
+            {
+                for (int y = 0; y < boardStates.GetLength(1); y++)
+                {
+                    string field = "-";
+                    switch(boardStates[x, y])
+                    {
+                        case Game.BoardStates.O:
+                            field = "O";
+                            break;
+                        case Game.BoardStates.X:
+                            field = "X";
+                            break;
+                    }
+                    Console.Write(" " + field);
+                }
+                Console.WriteLine();
+            }
+        }
     }
 }

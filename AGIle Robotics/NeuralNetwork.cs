@@ -48,7 +48,7 @@ namespace AGIle_Robotics
         public NeuralNetwork(ILayer[] layers, int[] definition, STuple<double, double> weightRange, int inputSize, double fitness)
         {
             Layers = layers;
-            InputSize = definition[0];
+            InputSize = inputSize;
             OutputSize = definition[definition.Length - 1];
             WeightRange = weightRange;
             Fitness = fitness;
