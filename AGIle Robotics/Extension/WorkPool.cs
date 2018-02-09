@@ -49,7 +49,7 @@ namespace AGIle_Robotics.Extension
 
         public WorkPool(int _maxThreads)
         {
-            workers = new Task[maxThreads];
+            workers = new Task[_maxThreads];
             MaxThreads = _maxThreads;
 
             TaskEnqueued += WorkPool_TaskEnqueued;
