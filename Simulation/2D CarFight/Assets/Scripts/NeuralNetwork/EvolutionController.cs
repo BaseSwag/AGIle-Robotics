@@ -10,6 +10,7 @@ using SuperTuple;
 using System;
 using System.Timers;
 using System.IO;
+using AGIle_Robotics.Extension;
 
 
 
@@ -81,8 +82,8 @@ public class EvolutionController : MonoBehaviour
     private void OnGUI()
     {
         lock (fightsQueue)
-            InfoText.text = $"Generation: {trainer.Level}\n"+"" +
-                $"Fight processed: {fightsDone}\n"+
+            InfoText.text = $"Generation: {trainer.Level}\n" + "" +
+                $"Fight processed: {fightsDone}\n" +
                 $"Fight queue count: {fightsQueue.Count}\n" +
                 $"Evaluations running: {trainer.StatusUpdater.EvaluationsRunning}\n" +
                 $"Evaluations left: {trainer.StatusUpdater.EvaluationsLeft}\n" +
@@ -124,6 +125,7 @@ public class EvolutionController : MonoBehaviour
         Debug.Log("Arenas created");
 
 
+        Extensions.WorkPool.MaxThreads = fights.Length + 10;
 
         if (File.Exists("trainer.json"))
         {
@@ -163,8 +165,9 @@ public class EvolutionController : MonoBehaviour
 
         trainer.ActivationType = Trainer.TrainerActivationType.Pair;
         trainer.SetFitnessFunction(new Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>>(fitnessFunction));
-         
-        
+
+
+
     }
 
 

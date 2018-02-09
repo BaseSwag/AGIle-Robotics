@@ -62,11 +62,11 @@ public class FightController : MonoBehaviour
                 EvolutionController.fightsDone++;
                 if (car1)
                 {
-                    Fight.tcs?.SetResult(new Tuple<double, double>(1, -1));
+                    Fight.tcs?.SetResult(new Tuple<double, double>(-1, 1));
                 }
                 else
                 {
-                    Fight.tcs?.SetResult(new Tuple<double, double>(-1, 1));
+                    Fight.tcs?.SetResult(new Tuple<double, double>(1, -1));
                 }
             }
         }
