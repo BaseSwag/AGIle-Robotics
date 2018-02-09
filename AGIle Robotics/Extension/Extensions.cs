@@ -10,7 +10,7 @@ namespace AGIle_Robotics.Extension
 {
     public static class Extensions
     {
-        internal static readonly WorkPool WorkPool = new WorkPool(6);
+        internal static readonly WorkPool WorkPool = new WorkPool(24);
 
         internal static StatusUpdater StatusUpdater = new StatusUpdater();
 

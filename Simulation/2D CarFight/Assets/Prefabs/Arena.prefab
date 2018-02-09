@@ -931,7 +931,7 @@ MonoBehaviour:
   car1: {fileID: 114117384576434206}
   car2: {fileID: 114660816393705330}
   done: 0
-  fightTimeoutSeconds: 300
+  fightTimeoutSeconds: 120
   tickTimeoutLeft: 0
   circleTransform: {fileID: 4471772798834738}
   StartPosCar1: {x: 430, y: 0, z: -1}

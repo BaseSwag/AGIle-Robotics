@@ -104,7 +104,7 @@ public class EvolutionController : MonoBehaviour
         start = DateTime.Now;
         timer = new Timer();
         timer.Elapsed += ConsoleTick;
-        timer.Interval = 1000 * 60 * 5;
+        timer.Interval = 1000 * 60 * 2;
 
         timer.Start();
         fights = new FightController[fightRows * fightCountPerRow];
@@ -172,7 +172,7 @@ public class EvolutionController : MonoBehaviour
     void FixedUpdate()
     {
 
-        if (initialized && (Task == null || Task.IsCompleted))
+        if (initialized && (Task == null || Task.IsCompleted) && trainer.StatusUpdater.EvaluationsLeft == 0)
         {
             Debug.Log("New Generation");
             if (writeOut)
