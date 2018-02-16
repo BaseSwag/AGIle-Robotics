@@ -26,6 +26,7 @@ public class FightController : MonoBehaviour
     public Vector3 StartRotationCar2;
 
     public bool SetResult = true;
+    public bool RealSumo = false;
 
     public Fight Fight
     {
@@ -95,7 +96,15 @@ public class FightController : MonoBehaviour
             if (tickTimeoutLeft <= 0)
             {
                 if (Fight != null)
-                    OnCarLost(-0.5);
+                    if (RealSumo)
+                    {
+                        OnCarLost(Vector3.Distance(car1.transform.position, this.transform.position) > Vector3.Distance(car2.transform.position, this.transform.position));
+                    }
+                    else
+                    {
+                        OnCarLost(-0.5);
+                    }
+
                 tickTimeoutLeft = fightTimeoutSeconds;
             }
         }
