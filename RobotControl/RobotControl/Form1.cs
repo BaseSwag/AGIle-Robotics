@@ -18,8 +18,10 @@ namespace RobotControl
         Timer timer = new Timer();
         Stream s;
         TcpClient tcpClient;
-        public Form1()
+        string[] args;
+        public Form1(string[] args)
         {
+            this.args = args;
             InitializeComponent();
             timer.Interval = 100;
             timer.Tick += Timer_Tick;
@@ -37,9 +39,9 @@ namespace RobotControl
 
         private void Form1_Load(object sender, EventArgs e)
         {
-             tcpClient = new TcpClient();
-             tcpClient.Connect("10.0.0.1", 8006);
-             s = tcpClient.GetStream();
+            tcpClient = new TcpClient();
+            tcpClient.Connect("10.0.0.1", int.Parse(args[0]));
+            s = tcpClient.GetStream();
 
             timer.Start();
 
