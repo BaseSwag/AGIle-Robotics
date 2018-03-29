@@ -33,7 +33,7 @@ namespace TestConsole
                 Task = Trainer.InitializeAndCreate(
                     size: 10,
                     popSize: (10, 20),
-                    ports: (10, 9),
+                    ports: (9, 9),
                     length: (2, 15),
                     width: (2, 10),
                     weightRange: (-2.0, 2.0),
@@ -50,7 +50,7 @@ namespace TestConsole
             Trainer.ActivationType = Trainer.TrainerActivationType.Pair;
             Trainer.SetFitnessFunction(new Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>>(FitnessFunction));
 
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < 10000; i++)
             {
                 Task = Trainer.EvaluateAndEvolve();
                 ReportStatus(Task).Wait();
@@ -59,9 +59,21 @@ namespace TestConsole
                 System.IO.File.WriteAllText(@"C:\Users\login\Desktop\trainer.json", json);
             }
 
+            Random random = new Random();
             while (true)
             {
-                HumanTest(Trainer.Best);
+                if (false)
+                {
+                    INeuralNetwork network;
+                    int pop = random.Next(Trainer.CurrentGeneration.Populations.Length);
+                    int net = random.Next(Trainer.CurrentGeneration.Populations[pop].Size);
+                    network = Trainer.CurrentGeneration.Populations[pop].Networks[net];
+                    AITest(Trainer.Best, network);
+                }
+                else
+                {
+                    HumanTest(Trainer.Best);
+                }
             }
         }
 
@@ -186,36 +198,11 @@ namespace TestConsole
 
             while (gameState == Game.GameState.Undetermined)
             {
-                var board = BoardToArray(game.GetBoard());
-                var input = new double[10];
-                input[0] = n1turn ? 1 : -1;
-                for (int i = 0; i < board.Length; i++)
-                    input[i + 1] = board[i];
                 INeuralNetwork network = n1turn ? n1 : n2;
-                var output = network.Activate(input);
-
-                var newGameState = Game.GameState.Error;
-                List<int> chosenTiles = new List<int>();
-                while (newGameState == Game.GameState.Error)
-                {
-                    int tile = -1;
-                    double highest = double.MinValue;
-                    for (int i = 0; i < output.Length; i++)
-                    {
-                        if (output[i] > highest && !chosenTiles.Contains(i))
-                        {
-                            highest = output[i];
-                            tile = i;
-                        }
-                    }
-                    chosenTiles.Add(tile);
-                    tile++;
-
-                    newGameState = game.NewMove((Game.TileNumber)tile);
-                }
+                Game.BoardStates side = n1turn ? Game.BoardStates.O : Game.BoardStates.X;
+                gameState = DoAITurn(ref game, network, side);
 
                 n1turn = !n1turn;
-                gameState = newGameState;
             }
 
             (double, double) fitness = (0, 0);
@@ -238,22 +225,19 @@ namespace TestConsole
             return tcs.Task;
         }
 
-        private static double[] BoardToArray(Game.BoardStates[,] boardStates)
+        private static double[] BoardToArray(Game.BoardStates[,] boardStates, Game.BoardStates side)
         {
             double[] result = new double[9];
             int counter = 0;
             foreach(var field in boardStates)
             {
                 double f = 0;
-                switch (field)
-                {
-                    case Game.BoardStates.O:
-                        f = 1;
-                        break;
-                    case Game.BoardStates.X:
-                        f = -1;
-                        break;
-                }
+                if (field == side)
+                    f = 1;
+                if (field == Game.BoardStates.Unassigned)
+                    f = 0;
+                else
+                    f = -1;
                 result[counter++] = f;
             }
             return result;
@@ -271,33 +255,7 @@ namespace TestConsole
             {
                 if (!playerturn)
                 {
-                    var board = BoardToArray(game.GetBoard());
-                    var input = new double[10];
-                    input[0] = -1;
-                    for (int i = 0; i < board.Length; i++)
-                        input[i + 1] = board[i];
-                    var output = enemy.Activate(input);
-
-                    var newGameState = Game.GameState.Error;
-                    List<int> chosenTiles = new List<int>();
-                    while (newGameState == Game.GameState.Error)
-                    {
-                        int tile = -1;
-                        double highest = double.MinValue;
-                        for (int i = 0; i < output.Length; i++)
-                        {
-                            if (output[i] > highest && !chosenTiles.Contains(i))
-                            {
-                                highest = output[i];
-                                tile = i;
-                            }
-                        }
-                        chosenTiles.Add(tile);
-                        tile++;
-
-                        newGameState = game.NewMove((Game.TileNumber)tile);
-                    }
-                    gameState = newGameState;
+                    gameState = DoAITurn(ref game, enemy, Game.BoardStates.X);
                 }
                 else
                 {
@@ -328,6 +286,72 @@ namespace TestConsole
                 Console.WriteLine("Tie!");
             }
             Console.ReadLine();
+        }
+
+        static void AITest(INeuralNetwork n1, INeuralNetwork n2)
+        {
+            Console.Clear();
+            Game game = new Game();
+            Game.GameState gameState = Game.GameState.Undetermined;
+
+            bool turn = true;
+
+            while (gameState == Game.GameState.Undetermined)
+            {
+                Thread.Sleep(250);
+                if (turn)
+                {
+                    gameState = DoAITurn(ref game, n1, Game.BoardStates.O);
+                }
+                else
+                {
+                    gameState = DoAITurn(ref game, n2, Game.BoardStates.X);
+                }
+                turn = !turn;
+                Console.WriteLine();
+                VisualizeBoard(game.GetBoard());
+                Console.WriteLine();
+            }
+
+            if(gameState == Game.GameState.Win)
+            {
+                string winner = turn ? "n2" : "n1";
+                Console.WriteLine();
+                Console.WriteLine(winner + " wins!");
+            }
+            else if(gameState == Game.GameState.Tie)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Tie!");
+            }
+            Console.ReadLine();
+        }
+
+        static Game.GameState DoAITurn(ref Game game, INeuralNetwork network, Game.BoardStates side)
+        {
+            var input = BoardToArray(game.GetBoard(), side);
+            var output = network.Activate(input);
+
+            var newGameState = Game.GameState.Error;
+            List<int> chosenTiles = new List<int>();
+            while (newGameState == Game.GameState.Error)
+            {
+                int tile = -1;
+                double highest = double.MinValue;
+                for (int i = 0; i < output.Length; i++)
+                {
+                    if (output[i] > highest && !chosenTiles.Contains(i))
+                    {
+                        highest = output[i];
+                        tile = i;
+                    }
+                }
+                chosenTiles.Add(tile);
+                tile++;
+
+                newGameState = game.NewMove((Game.TileNumber)tile);
+            }
+            return newGameState;
         }
 
         static void VisualizeBoard(Game.BoardStates[,] boardStates)

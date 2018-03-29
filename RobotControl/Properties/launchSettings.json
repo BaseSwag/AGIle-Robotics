@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "RobotControl": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Users\\login\\Desktop\\network.json\" 5000"
+    }
+  }
+}
