@@ -105,7 +105,7 @@ public class EvolutionController : MonoBehaviour
         start = DateTime.Now;
         timer = new Timer();
         timer.Elapsed += ConsoleTick;
-        timer.Interval = 1000 * 60 * 2;
+        timer.Interval = 1000 * 30;
 
         timer.Start();
         fights = new FightController[fightRows * fightCountPerRow];
@@ -178,11 +178,7 @@ public class EvolutionController : MonoBehaviour
         if (initialized && (Task == null || Task.IsCompleted) && trainer.StatusUpdater.EvaluationsLeft == 0)
         {
             Debug.Log("New Generation");
-            if (writeOut)
-            {
-                writeOut = false;
-                File.WriteAllText("trainer.json", trainer.Serialize());
-            }
+            File.WriteAllText("trainer.json", trainer.Serialize());
             Task = trainer.EvaluateAndEvolve();
         }
 

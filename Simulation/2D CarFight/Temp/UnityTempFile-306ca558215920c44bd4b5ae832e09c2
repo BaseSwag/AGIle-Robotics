@@ -72,6 +72,7 @@
 -r:"C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnitySpatialTracking/RuntimeEditor/UnityEngine.SpatialTracking.dll"
 -r:"C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityVR/Editor/UnityEditor.VR.dll"
 -r:"C:/Program Files/Unity/Editor/Data/Managed/UnityEditor.Graphs.dll"
+-r:"C:/Program Files/Unity/Editor/Data/PlaybackEngines/AndroidPlayer/UnityEditor.Android.Extensions.dll"
 -r:"C:/Program Files/Unity/Editor/Data/PlaybackEngines/windowsstandalonesupport/UnityEditor.WindowsStandalone.Extensions.dll"
 -r:"C:/Program Files (x86)/Microsoft Visual Studio Tools for Unity/15.0/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll"
 -r:"Assets/Plugins/AGIle Robotics.dll"
@@ -92,7 +93,7 @@
 -define:UNITY_2017_1_OR_NEWER
 -define:UNITY_2017_2_OR_NEWER
 -define:UNITY_2017_3_OR_NEWER
--define:UNITY_2017_3_0
+-define:UNITY_2017_3_1
 -define:UNITY_2017_3
 -define:UNITY_2017
 -define:PLATFORM_ARCH_64

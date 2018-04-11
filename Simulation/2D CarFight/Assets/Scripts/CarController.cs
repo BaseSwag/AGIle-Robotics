@@ -20,9 +20,7 @@ public class CarController : MonoBehaviour
 
     public float lookRotationRelative = 0;
     public bool inTriggerForward = true;
-    public float sensorForward = 0;
     public bool inTriggerBackward = true;
-    public float sensorBackward = 0;
 
     public float speedMultiplier = 0;
 
@@ -55,7 +53,7 @@ public class CarController : MonoBehaviour
         {
             //rigidbody2D.velocity = rigidbody2D.velocity * 0.5f;
 
-            if (vertical > 0.1 || vertical < -0.1)
+            if (vertical > 0.4 || vertical < -0.4)
             {
                 rigidbody2D.drag = 2;
                 rigidbody2D.AddForce(transform.right * vertical * Time.fixedDeltaTime * speedMultiplier, ForceMode2D.Force);
@@ -66,7 +64,7 @@ public class CarController : MonoBehaviour
             }
 
 
-            if (hortizontal > 0.1 || hortizontal < -0.1)
+            if (hortizontal > 0.5 || hortizontal < -0.5)
                 rigidbody2D.angularVelocity = -hortizontal * 360 / 1.2f;
             //transform.rotation *= Quaternion.Euler(new Vector3(0, 0, -hortizontal * Time.fixedDeltaTime * 360 / 1.2f));
 
@@ -81,18 +79,7 @@ public class CarController : MonoBehaviour
             while (lookRotationRelative < -180)
                 lookRotationRelative += 360;
 
-            if (inTriggerBackward)
-                if (sensorBackward > 0)
-                    sensorBackward -= Time.fixedDeltaTime;
-                else
-                    sensorBackward = 0;
-
-            if (inTriggerForward)
-                if (sensorForward > 0)
-                    sensorForward -= Time.fixedDeltaTime;
-                else
-                    sensorForward = 0;
-
+            
             float newLookRotation;
             if(lookRotationRelative <= -45 / 2 || lookRotationRelative >= 45 / 2)
             {
@@ -102,9 +89,10 @@ public class CarController : MonoBehaviour
             {
                 newLookRotation = lookRotationRelative / 45 + 0.5f;
             }
-            
 
-            OnSetAIInputs.Invoke(new float[] { newLookRotation, 0, hortizontal, vertical, sensorForward, sensorBackward });
+
+            //OnSetAIInputs.Invoke(new float[] { newLookRotation, 0, hortizontal, vertical, sensorForward, sensorBackward });
+            OnSetAIInputs.Invoke(new float[] { newLookRotation, 0, 0, 0, inTriggerForward ? 1 : 0, inTriggerBackward ? 1 : 0});
 
             count += Time.fixedDeltaTime;
 
@@ -123,13 +111,11 @@ public class CarController : MonoBehaviour
     {
         if (collider.gameObject.transform == this.LightSensorForward)
         {
-            sensorForward = 1;
             inTriggerForward = false;
         }
 
         if (collider.gameObject.transform == this.LightSensorBackward)
         {
-            sensorBackward = 1;
             inTriggerBackward = false;
         }
     }
@@ -138,13 +124,11 @@ public class CarController : MonoBehaviour
     {
         if (collider.gameObject.transform == this.LightSensorForward)
         {
-            sensorForward = 1;
             inTriggerForward = true;
         }
 
         if (collider.gameObject.transform == this.LightSensorBackward)
         {
-            sensorBackward = 1;
             inTriggerForward = true;
         }
     }
