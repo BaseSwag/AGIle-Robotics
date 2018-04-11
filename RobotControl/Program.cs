@@ -140,7 +140,6 @@ namespace RobotControl
                 network = null;
                 return false;
             }
-
         }
 
         private static void ServerLoop(int port)
