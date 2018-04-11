@@ -40,6 +40,8 @@ public class FightController : MonoBehaviour
             //Debug.Log($"Fight assigned to {gameObject.name}");
             this.Reset();
             fight = value;
+            car1.transform.Rotate(new Vector3(0, 0, 1), UnityEngine.Random.Range(0, 360f));
+            car2.transform.Rotate(new Vector3(0, 0, 1), UnityEngine.Random.Range(0, 360f));
             car1.neuralNetwork = fight.n1;
             car2.neuralNetwork = fight.n2;
         }

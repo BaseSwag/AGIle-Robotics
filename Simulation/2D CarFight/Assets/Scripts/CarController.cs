@@ -53,7 +53,7 @@ public class CarController : MonoBehaviour
         {
             //rigidbody2D.velocity = rigidbody2D.velocity * 0.5f;
 
-            if (vertical > 0.4 || vertical < -0.4)
+            if (vertical > 0.7 || vertical < -0.7)
             {
                 rigidbody2D.drag = 2;
                 rigidbody2D.AddForce(transform.right * vertical * Time.fixedDeltaTime * speedMultiplier, ForceMode2D.Force);
