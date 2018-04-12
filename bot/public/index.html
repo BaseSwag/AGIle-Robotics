@@ -10,10 +10,22 @@
 <body>
     <div class="container">
         <div class="column">
-            <div class="item" style="background: green">
-                <h1>Sumobot</h1>
+            <div id="nipple-zone" class="item">
+                <h1 id="skynet">Sumobot</h1>
             </div>
-            <div class="item" style="background: yellow">
+            <div id="controls" class="item">
+                <button class="btn">Manuelle Steuerung</button>
+                <button class="btn">Künstliche Intelligenz</button>
+                <button class="btn" disabled>...</button>
+                <button class="btn danger">!Aus</button>
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="item">
+                <img id="display" src="https://cdn-4.motorsport.com/static/img/amp/600000/600000/606000/606100/606144/s6_308414/endurance-24-hours-of-the-nurburgring-2015-28-audi-sport-team-wrt-audi-r8-lms-christopher.jpg">
+            </div>
+            <div class="item">
                 <div id="info" class="container">
                     <div id="robotContainer" class="column"></div>
                     <div id="charts" class="column">
@@ -28,18 +40,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <div class="column">
-            <div class="item" style="background: blue">
-                <img id="display" src="https://cdn-4.motorsport.com/static/img/amp/600000/600000/606000/606100/606144/s6_308414/endurance-24-hours-of-the-nurburgring-2015-28-audi-sport-team-wrt-audi-r8-lms-christopher.jpg">
-            </div>
-            <div id="controls" class="item" style="background: pink">
-                <button class="btn">Manuelle Steuerung</button>
-                <button class="btn">Künstliche Intelligenz</button>
-                <button class="btn">...</button>
-                <button class="btn danger">!Aus</button>
             </div>
         </div>
     </div>
