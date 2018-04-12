@@ -1,7 +1,13 @@
 
 function createChart(context, data) {
-    const options = {};
-
+    const options = {
+        scales:
+            {
+                xAxes: [{
+                    display: false
+                }]
+            }
+    };
     return new Chart(context, {
         type: 'line',
         options,
