@@ -51,3 +51,16 @@ body, html {
 #info {
 
 }
+
+#robotContainer {
+    height: 100%;
+    width: 35%;
+    background-color: transparent;
+}
+
+#defaultCanvas0 {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: transparent;
+}

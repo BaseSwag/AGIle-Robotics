@@ -69,3 +69,7 @@ joystick.on('move', (evt, data) => {
     steer(x, y);
 });
 joystick.on('end', () => steer(0, 0));
+
+Number.prototype.map = function (in_min, in_max, out_min, out_max) {
+  return (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
