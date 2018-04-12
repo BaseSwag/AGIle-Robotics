@@ -22,14 +22,17 @@ function createLabels(count) {
     return labels;
 }
 
-function createDataSet(label, count) {
+function createDataSet(label, color, count) {
     const data = new Array(count);
     for (let i = 0; i < count; i++) {
-        data[i] = Math.random() * 10;
+        data[i] = Math.random() * 1;
     }
     return {
         label,
-        data
+        data,
+        backgroundColor: color,
+        borderColor: color,
+        fill: false,
     }
 }
 
@@ -37,28 +40,30 @@ const labels = createLabels(30);
 const config = {
     labels,
     datasets: [
-        createDataSet('X', 30),
-        createDataSet('Y', 30),
+        createDataSet('X', 'rgb(255, 99, 132)', 30),
+        createDataSet('Y', 'rgb(54, 162, 235)', 30),
     ]
 }
 const sensorConfig = {
     labels,
     datasets: [
-        createDataSet('Front', 30),
-        createDataSet('Back', 30),
+        {
+            steppedLine: true,
+            ...createDataSet('Front', 'rgb(75, 192, 192)', 30),
+        },
+        {
+            steppedLine: 'before',
+            ...createDataSet('Back', 'rgb(255, 159, 64)', 30),
+        }
     ]
 }
 const timeConfig = {
     labels,
     datasets: [
-        createDataSet('frameTime', 30),
-        createDataSet('loopTime', 30),
+        createDataSet('frameTime', 'rgb(255, 205, 86)', 30),
+        createDataSet('loopTime', 'rgb(153, 102, 255)', 30),
     ]
 }
-
-Chart.defaults.global.legend.position = 'right';
-Chart.defaults.global.legend.display = false;
-Chart.defaults.global.responsive = false;
 
 const elSteering = document.getElementById('chart-steering');
 const elSensors = document.getElementById('chart-sensors');
