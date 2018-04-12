@@ -1,15 +1,34 @@
 body, html {
     height: 100%;
+    background: #00e676;
 }
 
 * {
     box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+@font-face {
+    font-family: 'Skynet';
+    src: url('terminator.ttf');
+}
+
+#skynet {
+    font-family: 'Skynet';
+    text-align: center;
+    top: 50%;
+    margin: 0;
+    font-size: 4rem;
+    position: relative;
+    transform: translateY(-50%);
 }
 
 .container {
     min-height: 100%;
+    max-height: 100%;
     display: flex;
     flex-direction: row;
+    padding: 10px 20px;
 }
 
 .column {
@@ -25,29 +44,71 @@ body, html {
     max-height: 50%;
     min-height: 50%;
     max-width: 100%;
-    background: blue;
     overflow: hidden;
-    padding: 10px;
+    padding: 10px 0;
+    justify-content: space-around;
 }
 
 #display {
-    background: gray;
     height: 100%;
     width: 100%;
+    box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
 }
 
 #controls {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
 }
 
 .btn {
-    flex: 1;
-    background: green;
+    flex: 0 0 20%;
+    color: black;
+    background: white;
+    margin: 0 16px;
+    box-sizing: border-box;
+    transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+    padding-left: 16px;
+    padding-right: 16px;
+    font-size: 1.275rem;
+    line-height: 2.25rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    will-change: transform, opacity;
+    align-items: center;
+    min-width: 250px;
+    border: none;
+    outline: none;
+    user-select: none;
+    vertical-align: middle;
+    border-radius: 2px;
+    text-align: center;
+    box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+}
+
+.btn:hover {
+    cursor: pointer;
+    opacity: 0.92;
+    box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+}
+
+.btn:active {
+    transition-duration: 75ms;
+    opacity: 0.80;
+    box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.btn:disabled {
+    box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 0px 0px rgba(0, 0, 0, 0.12);
+    color: rgba(0, 0, 0, 0.38);
+    background: rgba(0, 0, 0, 0.12);
+    cursor: not-allowed;
 }
 
 .btn.danger {
-    background: red;
+    background: #ff1744;
 }
 
 #info {
@@ -59,6 +120,8 @@ body, html {
 
 #robotContainer {
     background-color: transparent;
+    flex: 0 1 30%;
+    max-width: 30%;
 }
 
 #defaultCanvas0 {
@@ -71,7 +134,8 @@ body, html {
 #charts {
     display: flex;
     flex-direction: column;
-    
+    flex: 0 2 70%;
+    max-width: 70%;
 }
 
 .chart {

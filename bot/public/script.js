@@ -62,6 +62,7 @@ function log(m) {
 const joystick = nipplejs.create({
     color: 'blue',
     mode: 'semi',
+    zone: document.getElementById('nipple-zone'),
 });
 joystick.on('move', (evt, data) => {
     const x = Math.cos(data.angle.radian) * data.distance / 50;
