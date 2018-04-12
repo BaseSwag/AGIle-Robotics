@@ -36,9 +36,31 @@ const config = {
         createDataSet('Y', 15),
     ]
 }
+const sensorConfig = {
+    labels,
+    datasets: [
+        createDataSet('Front', 15),
+        createDataSet('Back', 15),
+    ]
+}
+const timeConfig = {
+    labels,
+    datasets: [
+        createDataSet('frameTime', 15),
+        createDataSet('loopTime', 15),
+    ]
+}
+
+Chart.defaults.global.legend.position = 'right';
+Chart.defaults.global.legend.display = false;
+Chart.defaults.global.responsive = false;
 
 const elSteering = document.getElementById('chart-steering');
+const elSensors = document.getElementById('chart-sensors');
+const elTime = document.getElementById('chart-time');
 const chart = createChart(elSteering, config);
+const sensorChart = createChart(elSensors, config);
+const timeChart = createChart(elTime, config);
 
 function pushValues(chart, values) {
     for (let i=0; i < values.length; i++) {
