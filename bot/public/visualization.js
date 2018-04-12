@@ -15,27 +15,34 @@ let vRobotData = {
 }
 
 function windowResized() {
-    let  robotContainer = document.querySelector('#robotContainer');
+    let robotContainer = document.querySelector('#robotContainer');
     vWidth = robotContainer.offsetWidth;
     vHeight = robotContainer.offsetHeight;
+    let vCanvas = createCanvas(vWidth, vHeight);
+    vCanvas.parent('robotContainer');
     vCenterX = vWidth / 2;
     vCenterY = vHeight / 2;
-    vRobotHeight = vHeight * (3 / 4);
-    vRobotWidth = vRobotHeight * (3 / 4);
+
+
+    vRobotHeight = vHeight * (4 / 5);
+    if(vWidth < vRobotHeight * (3 / 4)) {
+        vRobotWidth = vWidth * (4 / 5);
+        vRobotHeight = vRobotWidth * (4 / 3);
+    } else {
+        vRobotWidth = vRobotHeight * (3 / 4);
+    }
 }
 
 function setup() {
     windowResized();
-    noLoop();
+    //noLoop();
     ellipseMode(CENTER);
     rectMode(CENTER);
     colorMode(RGB);
-    let vCanvas = createCanvas(vWidth, vHeight);
-    vCanvas.parent('robotContainer');
 }
 
 function draw() {
-    /*
+    //*
     frameRate(1);
     vRobotData = {
         joyX: random(-1, 1),
@@ -43,7 +50,7 @@ function draw() {
         sensorF: Math.round(random(0, 1)),
         sensorB: Math.round(random(0, 1)),
     }
-    */
+    //*/
     clear();
     background('rgba(0,0,0,0)');
     drawCar();
@@ -102,7 +109,7 @@ function joyToDif(x, y)
 function drawTyre(x, y, width, height, speed) {
     let color = speed.map(-1, 1, 0, 100);
     push();
-    strokeWeight(4);
+    //strokeWeight(4);
     colorMode(HSL);
     fill(color, 100, 50);
     rect(x, y, width, height, 20);
