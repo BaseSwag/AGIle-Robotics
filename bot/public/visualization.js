@@ -35,14 +35,14 @@ function windowResized() {
 
 function setup() {
     windowResized();
-    //noLoop();
+    noLoop();
     ellipseMode(CENTER);
     rectMode(CENTER);
     colorMode(RGB);
 }
 
 function draw() {
-    //*
+    /*
     frameRate(1);
     vRobotData = {
         joyX: random(-1, 1),
@@ -60,7 +60,10 @@ function draw() {
 }
 
 function drawRobot(data) {
-    vRobotData = data;
+    vRobotData.joyX = data.lastX;
+    vRobotData.joyY = data.lastY;
+    vRobotData.sensorB = data.back;
+    vRobotData.sensorF = data.front;
     draw();
 }
 

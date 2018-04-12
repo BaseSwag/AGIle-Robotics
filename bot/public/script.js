@@ -2,19 +2,20 @@ var sock = null;
 var ellog = null;
 
 function onMessage({ data }) {
-    data = JSON.parse(data);
-    switch (data.type) {
-        case "image":
-            display.src = `data:image/jpg;base64,${data.data}`
-            break;
+    if (data instanceof Blob) {
+        const url = window.URL.createObjectURL(data);
+        display.src = url;
+        return;
     }
+    const status = JSON.parse(data);
+    updateChartData(status);
+    drawRobot(status);
 }
 function send(type, data) {
     if (sock)
         sock.send(JSON.stringify({ type, data }));
 }
 function steer(x, y) {
-    console.log('steering', x, y);
     send('steer', { x, y });
 }
 
@@ -22,7 +23,7 @@ window.onload = function () {
     var wsuri;
     ellog = document.getElementById('log');
     if (window.location.protocol === "file:") {
-        wsuri = "ws://localhost:9000";
+        wsuri = "ws://10.0.0.1:9000";
     } else {
         wsuri = "ws://" + window.location.hostname + ":9000";
     }

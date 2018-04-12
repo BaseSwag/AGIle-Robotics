@@ -18,7 +18,12 @@ class DashboardServerFactory(WebSocketServerFactory):
             print("unregistered client {}".format(client.peer))
             self.clients.remove(client)
 
-    def broadcast(self, type, data):
-        msg = json.dumps({'type': type, 'data': data})
+    def broadcastImage(self, image):
+        for c in self.clients:
+            c.sendMessage(image, isBinary=True)
+
+
+    def broadcastStatus(self, data):
+        msg = json.dumps(data)
         for c in self.clients:
             c.sendMessage(msg.encode('utf8'))
