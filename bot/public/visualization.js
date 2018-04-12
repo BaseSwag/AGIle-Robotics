@@ -84,15 +84,37 @@ function drawVector() {
 function drawTyres() {
     let tyreHeight = vRobotHeight / 4;
     let tyreWidth = vRobotWidth / 10;
-    let middleSpacer = tyreHeight * (3/4);
+    let middleSpacer = tyreHeight * (3 / 4);
     let sideSpacer = vRobotWidth / 20;
     
     let dif = joyToDif(vRobotData.joyX, vRobotData.joyY);
 
+    for (let x = -1; x <= 1; x += 2) {
+        for (let y = -1; y <= 1; y += 2) {
+            let xCoord = vCenterX + (vRobotWidth / 2 * x);
+            xCoord += tyreWidth / 2 * (-x);
+            xCoord += sideSpacer * (-x);
+
+            let yCoord = vCenterY + (middleSpacer / 2 * y);
+            yCoord += tyreHeight / 2 * y;
+
+            let d;
+            if(x == -1) {
+                d = dif.l;
+            } else {
+                d = dif.r;
+            }
+
+            drawTyre(xCoord, yCoord, tyreWidth, tyreHeight, d);
+        }
+    }
+
+    /*
     drawTyre(vCenterX + vRobotWidth / 2 - tyreWidth / 2 - sideSpacer, vCenterY + middleSpacer / 2 + tyreHeight / 2, tyreWidth, tyreHeight, dif.r);
     drawTyre(vCenterX + vRobotWidth / 2 - tyreWidth / 2 - sideSpacer, vCenterY - middleSpacer / 2 - tyreHeight / 2, tyreWidth, tyreHeight, dif.r);
     drawTyre(vCenterX - vRobotWidth / 2 + tyreWidth / 2 + sideSpacer, vCenterY + middleSpacer / 2 + tyreHeight / 2, tyreWidth, tyreHeight, dif.l);
     drawTyre(vCenterX - vRobotWidth / 2 + tyreWidth / 2 + sideSpacer, vCenterY - middleSpacer / 2 - tyreHeight / 2, tyreWidth, tyreHeight, dif.l);
+    */
 }
 
 function joyToDif(x, y)
