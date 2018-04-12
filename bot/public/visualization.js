@@ -46,13 +46,18 @@ function draw() {
     */
     clear();
     background('rgba(0,0,0,0)');
-    drawRobot();
+    drawCar();
     drawTyres();
     drawSensors();
     drawVector();
 }
 
-function drawRobot() {
+function drawRobot(data) {
+    vRobotData = data;
+    draw();
+}
+
+function drawCar() {
     push();
     fill(128);
     rect(vCenterX, vCenterY, vRobotWidth, vRobotHeight, 20);
