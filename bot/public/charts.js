@@ -11,9 +11,14 @@ function createChart(context, data) {
 
 function createLabels(count) {
     const labels = [];
-    for (let i = 0; i < count; i++) {
-        labels.push(`t-${i}`)
+    for (let i = count -1; i > 0; i--) {
+        if ((count - 1 - i) % 5 == 0) {
+            labels.push(`-${i}s`);
+        } else {
+            labels.push('');
+        }
     }
+    labels.push('now')
     return labels;
 }
 
@@ -28,26 +33,26 @@ function createDataSet(label, count) {
     }
 }
 
-const labels = createLabels(15);
+const labels = createLabels(30);
 const config = {
     labels,
     datasets: [
-        createDataSet('X', 15),
-        createDataSet('Y', 15),
+        createDataSet('X', 30),
+        createDataSet('Y', 30),
     ]
 }
 const sensorConfig = {
     labels,
     datasets: [
-        createDataSet('Front', 15),
-        createDataSet('Back', 15),
+        createDataSet('Front', 30),
+        createDataSet('Back', 30),
     ]
 }
 const timeConfig = {
     labels,
     datasets: [
-        createDataSet('frameTime', 15),
-        createDataSet('loopTime', 15),
+        createDataSet('frameTime', 30),
+        createDataSet('loopTime', 30),
     ]
 }
 
@@ -59,8 +64,8 @@ const elSteering = document.getElementById('chart-steering');
 const elSensors = document.getElementById('chart-sensors');
 const elTime = document.getElementById('chart-time');
 const chart = createChart(elSteering, config);
-const sensorChart = createChart(elSensors, config);
-const timeChart = createChart(elTime, config);
+const sensorChart = createChart(elSensors, sensorConfig);
+const timeChart = createChart(elTime, timeConfig);
 
 function pushValues(chart, values) {
     for (let i=0; i < values.length; i++) {
