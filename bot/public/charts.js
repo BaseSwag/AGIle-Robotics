@@ -25,7 +25,7 @@ function createLabels(count) {
 function createDataSet(label, color, count) {
     const data = new Array(count);
     for (let i = 0; i < count; i++) {
-        data[i] = Math.random() * 1;
+        data[i] = 0;
     }
     return {
         label,
@@ -85,4 +85,10 @@ function pushValues(chart, values) {
 function pushValue(data, value) {
     data.shift();
     data.push(value)
+}
+
+function updateChartData(status) {
+    pushValues(chart, [status.lastX, status.lastY]);
+    pushValues(sensorChart, [status.front, status.back]);
+    pushValues(timeChart, [status.frameTime, status.loopTime]);
 }
