@@ -41,7 +41,7 @@ window.onload = function () {
     }
     if (sock) {
         sock.onopen = function () {
-            log("Connected to " + wsuri);
+            console.log("Connected to " + wsuri);
         }
         sock.onclose = function (e) {
             log("Connection closed (wasClean = " + e.wasClean + ", code = " + e.code + ", reason = '" + e.reason + "')");

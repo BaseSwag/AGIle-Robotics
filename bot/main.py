@@ -1,14 +1,16 @@
 import time
+from camera import getNextFrame
+from cv2 import imencode
+from init import factory
 
 def sendImage(image):
-    success, buffer = imencode('.jpg', frame)
+    success, buffer = imencode('.jpg', image)
     if success:
-        msg = b64encode(buffer)
-        factory.broadcast('image', msg)
+        factory.broadCastImage(buffer)
 
 def activateStrategy(status):
     info = [
-        str(status['target'])
+        str(status['target']),
         '0', '0', '0',
         str(status['front']),
         str(status['back'])

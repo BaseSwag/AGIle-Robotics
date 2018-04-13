@@ -1,10 +1,14 @@
 import cv2
-import atexit
-
-cascadePath = 'cascade.xml'
+import socket
 
 capture = cv2.VideoCapture(0)
-cascade = cv2.CascadeClassifier(cascadePath)
+
+soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+soc.bind(('0.0.0.0', 6331))
+soc.listen(1)
+
+client, addr = soc.accept()
+print('Connected from ', addr)
 
 def getNextFrame():
     frame = readFrame()
@@ -20,20 +24,17 @@ def readFrame():
 
 
 def findTarget(frame):
-    raw = cascade.detectMultiScale(
-        frame,
-        scaleFactor=1.1,
-        minNeighbors=5,
-        minSize=(30, 30),
-    )
-
-    if(len(raw) == 0):
+    try:
+        success, buff = cv2.imencode('.jpg', frame)
+        client.send(buff.tobytes())
+        data = client.recv(200)
+        target = data.split(' ')
+        if len(target) == 4:
+            return (int(target[0]), int(target[1]), int(target[2]), int(target[3]))
+        else:
+            return False
+    except:
         return False
-
-    x1, y1 = (min(row[column] for row in raw) for column in range(2))
-    x2, y2 = (max(row[column] + row[column + 2] for row in raw) for column in range(2))
-    return (x1, y1, x2, y2)
-
 
 def visualizeTarget(frame, target):
     if target != False:

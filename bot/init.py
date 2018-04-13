@@ -1,7 +1,9 @@
 import sys, time, json, traceback
 from base64 import b64encode
 from cv2 import imencode
-
+import atexit
+from subprocess import Popen
+from threading import Timer
 
 from enemy import enemy
 from dashboard.factory import DashboardServerFactory
@@ -23,7 +25,6 @@ from twisted.internet import reactor, task
 from twisted.python import log
 
 from autobahn.twisted.websocket import listenWS
-#import main
 
 log.startLogging(sys.stdout)
 
@@ -32,8 +33,8 @@ def changeMode(m):
     global mode
 
     print('changing mode to ', m)
+    control(mode, 0, 0)
     if m == 'stop':
-        control(mode, 0, 0)
         mode = False
     else:
         mode = m
@@ -58,15 +59,22 @@ aiFactory.control = control
 reactor.listenTCP(1337, aiFactory)
 reactor.listenTCP(8000, site)
 
-#def loop():
-    #try:
-        #frame, target = getNextFrame()
-        #success, buffer = imencode('.jpg', frame)
-        #msg = b64encode(buffer)
-        #factory.broadcast('image', msg)
-    #except:
-        #print(traceback.format_exc())
-        #pass
+aiProcess = Popen('/usr/local/bin/dotnet "/home/pi/neural/RobotControl.dll" "/home/pi/network2.json"', shell=True)
+
+def cleanup():
+    aiFactory.broadcast('exit')
+    timer = Timer(5, lambda: aiProcess.kill())
+
+    try:
+        timer.start()
+        out = aiProcess.communicate()
+    finally:
+        timer.cancel()
+
+    print('bye bye')
+
+
+atexit.register(cleanup)
 
 def sendImage(image):
     success, buffer = imencode('.jpg', image)

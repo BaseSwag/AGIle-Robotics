@@ -15,5 +15,5 @@ class AIServerProtocol(Protocol):
 
     def dataReceived(self, message):
         x, y = message.split(' ')[0:2]
-        self.factory.control(float(x), float(y))
+        self.factory.control('ai', float(x), float(y))
         

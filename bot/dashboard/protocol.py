@@ -13,10 +13,13 @@ class DashboardServerProtocol(WebSocketServerProtocol):
             return
 
         message = json.loads(payload.decode('utf8'))
-        type, data = message['type'], message['data']
-        if type == 'steer':
-            x, y = data['x'], data['y']
-            print(x, y)
+        action, param = message['action'], message['param']
+        if action == 'steer':
+            x, y = param['x'], param['y']
+            self.factory.control('manual', x, y)
+        elif action == 'change-mode':
+            self.factory.changeMode(param)
+
 
 
     def connectionLost(self, reason):
