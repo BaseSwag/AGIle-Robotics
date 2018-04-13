@@ -22,7 +22,7 @@ def findTarget(frame):
     return (str(x1), str(y1), str(x2), str(y2))
 
 soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-soc.connect(('10.0.0.1', 6331))
+soc.connect(('10.0.0.1', 7331))
 
 while True:
     raw = np.frombuffer(soc.recv(50000), np.uint8)

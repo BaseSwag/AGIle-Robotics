@@ -4,7 +4,7 @@ import socket
 capture = cv2.VideoCapture(0)
 
 soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-soc.bind(('0.0.0.0', 6331))
+soc.bind(('0.0.0.0', 7331))
 soc.listen(1)
 
 client, addr = soc.accept()
