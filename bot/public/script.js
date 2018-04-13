@@ -11,12 +11,17 @@ function onMessage({ data }) {
     updateChartData(status);
     drawRobot(status);
 }
-function send(type, data) {
+function send(action, param) {
     if (sock)
-        sock.send(JSON.stringify({ type, data }));
+        sock.send(JSON.stringify({ action, param }));
 }
+
 function steer(x, y) {
     send('steer', { x, y });
+}
+
+function changeMode(mode) {
+    send('change-mode', mode)
 }
 
 window.onload = function () {

@@ -14,10 +14,10 @@
                 <h1 id="skynet">Sumobot</h1>
             </div>
             <div id="controls" class="item">
-                <button class="btn">Manuelle Steuerung</button>
-                <button class="btn">Künstliche Intelligenz</button>
-                <button class="btn" disabled>Strategie</button>
-                <button class="btn danger">!Aus</button>
+                <button class="btn" onclick="changeMode('manual')">Manuelle Steuerung</button>
+                <button class="btn" onclick="changeMode('ai')">Künstliche Intelligenz</button>
+                <button class="btn" onclick="changeMode('enemy')">Strategie</button>
+                <button class="btn danger" onclick="changeMode('stop')">!Aus</button>
             </div>
         </div>
 

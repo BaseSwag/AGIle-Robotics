@@ -85,7 +85,7 @@ function pushValues(chart, values) {
             pushValue(dataset.data, values[i])
         }
     }
-    chart.update();
+    chart.update(0);
 }
 
 function pushValue(data, value) {
