@@ -22,59 +22,9 @@ namespace TestConsole
 
         static void Main(string[] args)
         {
-            if (!load)
-            {
-                Trainer = new Trainer(
-                    transitionRatio: 0.5,
-                    randomRatio: 0.1,
-                    mutationRatio: 0.1,
-                    creationRatio: 0.1);
-
-                Task = Trainer.InitializeAndCreate(
-                    size: 10,
-                    popSize: (10, 20),
-                    ports: (9, 9),
-                    length: (2, 15),
-                    width: (2, 10),
-                    weightRange: (-2.0, 2.0),
-                    activateWith: Math.Tanh
-                    );
-
-                ReportStatus(Task).Wait();
-            }
-            else
-            {
-                Trainer = Trainer.Deserialize(System.IO.File.ReadAllText(@"C:\Users\login\Desktop\trainer.json"));
-            }
-
-            Trainer.ActivationType = Trainer.TrainerActivationType.Pair;
-            Trainer.SetFitnessFunction(new Func<INeuralNetwork, INeuralNetwork, Task<STuple<double, double>>>(FitnessFunction));
-
-            for (int i = 0; i < 10000; i++)
-            {
-                Task = Trainer.EvaluateAndEvolve();
-                ReportStatus(Task).Wait();
-
-                string json = Trainer.Serialize();
-                System.IO.File.WriteAllText(@"C:\Users\login\Desktop\trainer.json", json);
-            }
-
-            Random random = new Random();
-            while (true)
-            {
-                if (false)
-                {
-                    INeuralNetwork network;
-                    int pop = random.Next(Trainer.CurrentGeneration.Populations.Length);
-                    int net = random.Next(Trainer.CurrentGeneration.Populations[pop].Size);
-                    network = Trainer.CurrentGeneration.Populations[pop].Networks[net];
-                    AITest(Trainer.Best, network);
-                }
-                else
-                {
-                    HumanTest(Trainer.Best);
-                }
-            }
+            var trainer = Trainer.Deserialize(System.IO.File.ReadAllText(@"D:\trainer.json"));
+            var json = trainer.Best.Serialize();
+            System.IO.File.WriteAllText(@"D:\network.json", json);
         }
 
         static async Task ReportStatus(Task task, bool anyway = false)
